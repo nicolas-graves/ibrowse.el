@@ -40,11 +40,7 @@
 (defun chromium-tabs--parse-tabs ()
   "Extract tabs results from browser response."
   (wrapi-decode-url-buffer 'utf-8)
-  ;; (let-alist (json-read)
-    ;; (seq-map #'chromium-tabs--extract-interesting-fields .articles)
-  ;; )
-  (json-read)
-)
+  (seq-map #'chromium-tabs--extract-interesting-fields (json-read)))
 
 (defun chromium-tabs--url (query)
   "Returns the url of the chromium json list of tabs."
