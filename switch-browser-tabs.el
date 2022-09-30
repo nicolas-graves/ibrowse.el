@@ -68,7 +68,7 @@ function obeying the interface described in the docstring of
 `biblio-backends'.  Returns the buffer in which results will be
 inserted."
   (interactive)
-  (unless backend (setq backend #'chromium-tabs-backend))
+  (unless backend (setq backend #'cdp-tabs-backend))
   (unless query (setq query "list"))
   (switch-browser-tabs--1 backend query))
 

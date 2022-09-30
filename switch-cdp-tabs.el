@@ -23,39 +23,42 @@
 
 ;;; Commentary:
 ;; Switch between tabs from Emacs
+;; This backend works with all browsers implementing the Chrome
+;; Debugging Protocol (abbreviated CDP). It does not work yet for
+;; Firefox-based browsers (as of v105.0).
 
 ;;; Code:
 
 (require 'switch-browser-tabs)
 
-(defconst chromium-tabs--remote-debugging-port
+(defconst cdp-tabs--remote-debugging-port
   "9222")
 
-(defun chromium-tabs--extract-interesting-fields (item)
+(defun cdp-tabs--extract-interesting-fields (item)
   "Prepare a tabs search result ITEM for display."
   (let-alist item
     (if (string= .type "page")
         (cons .title .id))))
 
-(defun chromium-tabs--parse-tabs ()
+(defun cdp-tabs--parse-tabs ()
   "Extract tabs results from browser response."
   (wrapi-decode-url-buffer 'utf-8)
-  (seq-map #'chromium-tabs--extract-interesting-fields (json-read)))
+  (seq-map #'cdp-tabs--extract-interesting-fields (json-read)))
 
-(defun chromium-tabs--url (query)
+(defun cdp-tabs--url (query)
   "Returns the url of the chromium json list of tabs."
   (format "http://localhost:%s/json/%s"
-          chromium-tabs--remote-debugging-port
+          cdp-tabs--remote-debugging-port
           query))
 
 ;;;###autoload
-(defun chromium-tabs-backend (command &optional arg)
+(defun cdp-tabs-backend (command &optional arg)
   "A tabs backend for wrapi.el.
 COMMAND, ARG, MORE: See `biblio-backends'."
   (pcase command
     (`name "chromium")
-    (`url (chromium-tabs--url arg))
-    (`parse-buffer (chromium-tabs--parse-tabs))))
+    (`url (cdp-tabs--url arg))
+    (`parse-buffer (cdp-tabs--parse-tabs))))
 
-(provide 'switch-chromium-tabs)
-;;; switch-chromium-tabs.el ends here
+(provide 'switch-cdp-tabs)
+;;; switch-cdp-tabs.el ends here
