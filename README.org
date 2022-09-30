@@ -1,0 +1,17 @@
+
+* Switch browser tabs
+
+This package is a tiny re-adaptation of the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts for Emacs. Compared to it, it removes the need for external dependencies, and uses instead emacs built-in functionality. For now, it only implements the Chromium script, as the script for Firefox seems quite outdated. PR welcomed for other browsers!
+
+This package relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=, but also works without.
+
+** Chromium-based browsers
+
+*** Installation
+1. Install the package using your favorite package manager.
+2. Run your browser with the option =--remote-debugging-port=9222=.
+3. In Emacs, =M-x switch-browser-tabs=.
+
+**** Packaging status
+***** TODO Guix
+***** TODO MELPA
