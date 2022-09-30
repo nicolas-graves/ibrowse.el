@@ -31,41 +31,6 @@
 
 ;;; Interaction
 
-;; (defun browser-tabs-get-id (metadata)
-;;   "Compute a url from METADATA.
-;; Uses .url, and .doi as a fallback."
-;;   (let-alist metadata
-;;     (if .url .url
-;;       (when .doi
-;;         (concat "https://doi.org/" (url-encode-url .doi))))))
-
-;; (defun browser-tabs--selection-activate ()
-;;   "Open the web page of the current entry in a web browser."
-;;   (interactive)
-;;   (-if-let* ((url (biblio-get-url (biblio--selection-metadata-at-point))))
-;;       (browse-url url)
-;;     (user-error "This record does not contain a URL")))
-
-;; TODO convert things from biblio-selection to embark
-
-;; (defun biblio--selection-copy-callback (bibtex entry)
-;;   "Add BIBTEX (from ENTRY) to kill ring."
-;;   (kill-new bibtex)
-;;   (message "Killed bibtex entry for %S."
-;;            (biblio--prepare-title (biblio-alist-get 'title entry))))
-
-;; (defun biblio--selection-copy ()
-;;   "Copy BibTeX of current entry at point."
-;;   (interactive)
-;;   (biblio--selection-forward-bibtex #'biblio--selection-copy-callback))
-
-;; (defun biblio--selection-copy-quit ()
-;;   "Copy BibTeX of current entry at point and close results."
-;;   (interactive)
-;;   (biblio--selection-forward-bibtex #'biblio--selection-copy-callback t))
-
-;;; Printing search results
-
 (defun browser-tabs--tag-backend (backend items)
   "Add (backend . BACKEND) to each alist in ITEMS."
   (seq-map (lambda (i) (cons `(backend . ,backend) i)) items))
