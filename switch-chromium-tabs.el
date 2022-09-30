@@ -44,7 +44,7 @@
 
 (defun chromium-tabs--url (query)
   "Returns the url of the chromium json list of tabs."
-  (format "https://localhost:%s/json/%s"
+  (format "http://localhost:%s/json/%s"
           chromium-tabs--remote-debugging-port
           query))
 
