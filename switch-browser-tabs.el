@@ -38,20 +38,23 @@
 (defun tabs-lookup--title->id (selected candidates &rest _)
   (cdr (assoc selected candidates)))
 
-(defun browser-tabs--callback (backend)
+(defun browser-tabs-activate (id)
+  (wrapi-url-retrieve
+   (funcall backend 'url (concat "activate/" id))
+   (wrapi-generic-url-callback
+    (lambda () t))))
+
+(defun switch-browser-tabs--callback (backend)
   "Generate a search results callback for RESULTS-BUFFER.
 Results are parsed with (BACKEND 'parse-buffer)."
   (wrapi-generic-url-callback
    (lambda () ;; no allowed errors, so no arguments
      "Parse results of bibliographic search."
-     (let* ((candidates (browser-tabs--tag-backend
-                         backend (funcall backend 'parse-buffer)))
-            (id (consult--read candidates
-                               :lookup #'tabs-lookup--title->id)))
-       (wrapi-url-retrieve
-        (funcall backend 'url (concat "activate/" id))
-        (wrapi-generic-url-callback
-         (lambda () t)))))))
+     (let ((candidates (browser-tabs--tag-backend
+                        backend (funcall backend 'parse-buffer))))
+       (browser-tabs-activate
+        (consult--read candidates
+                       :lookup #'tabs-lookup--title->id))))))
 
 ;;; Listing tabs
 
@@ -59,7 +62,7 @@ Results are parsed with (BACKEND 'parse-buffer)."
   "Just like `browser-tabs-lookup' on BACKEND and QUERY, but never prompt."
   (wrapi-url-retrieve
    (funcall backend 'url query)
-   (browser-tabs--callback backend)))
+   (switch-browser-tabs--callback backend)))
 
 ;;;###autoload
 (defun switch-browser-tabs (&optional backend query)
