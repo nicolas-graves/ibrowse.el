@@ -31,10 +31,6 @@
 
 ;;; Interaction
 
-(defun browser-tabs--tag-backend (backend items)
-  "Add (backend . BACKEND) to each alist in ITEMS."
-  (seq-map (lambda (i) (cons `(backend . ,backend) i)) items))
-
 (defun tabs-lookup--title->id (selected candidates &rest _)
   (cdr (assoc selected candidates)))
 
@@ -50,11 +46,11 @@ Results are parsed with (BACKEND 'parse-buffer)."
   (wrapi-generic-url-callback
    (lambda () ;; no allowed errors, so no arguments
      "Parse results of bibliographic search."
-     (let ((candidates (browser-tabs--tag-backend
-                        backend (funcall backend 'parse-buffer))))
-       (browser-tabs-activate
-        (consult--read candidates
-                       :lookup #'tabs-lookup--title->id))))))
+     (browser-tabs-activate
+      backend
+      (consult--read
+       (funcall backend 'parse-buffer)
+       :lookup #'tabs-lookup--title->id))))))
 
 ;;; Listing tabs
 
