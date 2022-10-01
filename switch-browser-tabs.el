@@ -50,7 +50,8 @@ Results are parsed with (BACKEND 'parse-buffer)."
                                :lookup #'tabs-lookup--title->id)))
        (wrapi-url-retrieve
         (funcall backend 'url (concat "activate/" id))
-        (lambda _ nil))))))
+        (wrapi-generic-url-callback
+         (lambda () t)))))))
 
 ;;; Listing tabs
 
