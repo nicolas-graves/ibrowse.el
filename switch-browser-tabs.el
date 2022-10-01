@@ -34,7 +34,7 @@
 (defun tabs-lookup--title->id (selected candidates &rest _)
   (cdr (assoc selected candidates)))
 
-(defun browser-tabs-activate (id)
+(defun browser-tabs-activate (backend id)
   (wrapi-url-retrieve
    (funcall backend 'url (concat "activate/" id))
    (wrapi-generic-url-callback
@@ -50,7 +50,7 @@ Results are parsed with (BACKEND 'parse-buffer)."
       backend
       (consult--read
        (funcall backend 'parse-buffer)
-       :lookup #'tabs-lookup--title->id))))))
+       :lookup #'tabs-lookup--title->id)))))
 
 ;;; Listing tabs
 
