@@ -1,9 +1,9 @@
 
 * Switch browser tabs
 
-This package is a tiny re-adaptation of the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts for Emacs. Compared to it, it removes the need for external dependencies, and uses instead emacs built-in functionality. For now, it only implements the Chromium script, as the script for Firefox seems quite outdated. PR welcomed for other browsers!
+This package is a tiny rewrite of the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts for Emacs. It removes the need for external dependencies except the small generic wrapi package, and focuses on emacs built-in functionality. For now, it only implements the Chromium Developer Protocol script, which should soon be implemented by firefox-based browsers. PR welcomed for other protocols!
 
-This package relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=, but also works without.
+This package relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=.
 
 ** Chromium-based browsers
 
