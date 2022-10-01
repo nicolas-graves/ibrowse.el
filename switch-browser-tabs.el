@@ -27,7 +27,6 @@
 ;;; Code:
 
 (require 'wrapi)
-(require 'consult)
 
 ;;; Interaction
 
@@ -46,11 +45,11 @@ Results are parsed with (BACKEND 'parse-buffer)."
   (wrapi-generic-url-callback
    (lambda () ;; no allowed errors, so no arguments
      "Parse results of bibliographic search."
-     (browser-tabs-activate
-      backend
-      (consult--read
-       (funcall backend 'parse-buffer)
-       :lookup #'tabs-lookup--title->id)))))
+     (let* ((candidates (funcall backend 'parse-buffer))
+            (selected (completing-read "Select:" candidates))
+            (id (tabs-lookup--title->id
+                 selected candidates)))
+       (browser-tabs-activate backend id)))))
 
 ;;; Listing tabs
 
