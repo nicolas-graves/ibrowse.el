@@ -34,10 +34,8 @@
   (cdr (assoc selected candidates)))
 
 (defun browser-tabs-activate (backend id)
-  (wrapi-url-retrieve
-   (funcall backend 'url (concat "activate/" id))
-   (wrapi-generic-url-callback
-    (lambda () t))))
+  (with-temp-buffer
+    (funcall backend 'url (concat "activate/" id))))
 
 (defun switch-browser-tabs--callback (backend)
   "Generate a search results callback for RESULTS-BUFFER.
@@ -55,9 +53,9 @@ Results are parsed with (BACKEND 'parse-buffer)."
 
 (defun switch-browser-tabs--1 (backend query)
   "Just like `browser-tabs-lookup' on BACKEND and QUERY, but never prompt."
-  (wrapi-url-retrieve
-   (funcall backend 'url query)
-   (switch-browser-tabs--callback backend)))
+  (with-current-buffer
+      (url-retrieve-synchronously (funcall backend 'url query))
+    (switch-browser-tabs--callback backend)))
 
 ;;;###autoload
 (defun switch-browser-tabs (&optional backend query)
