@@ -26,48 +26,50 @@
 
 ;;; Code:
 
-(require 'wrapi)
+(require 'json)
+(require 'dash)
+(require 'seq)
+
+;;; Backend
+
+(defconst cdp-tabs--remote-debugging-port
+  "9222")
+
+(defun cdp-tabs--url (query)
+  "Returns the url of the chromium json list of tabs."
+  (format "http://localhost:%s/json/%s"
+          cdp-tabs--remote-debugging-port
+          query))
+
+(defun cdp-tabs--extract-interesting-fields (item)
+  "Prepare a tabs search result ITEM for display."
+  (let-alist item
+    (if (string= .type "page")
+        (cons .title .id))))
+
+(defun cdp-tabs--parse-tabs ()
+  "Extract tabs results from browser response."
+  (seq-map #'cdp-tabs--extract-interesting-fields
+           (json-parse-buffer :object-type 'alist)))
 
 ;;; Interaction
 
-(defun tabs-lookup--title->id (selected candidates &rest _)
+(defun tabs--title->id (selected candidates &rest _)
   (cdr (assoc selected candidates)))
 
-(defun browser-tabs-activate (backend id)
-  (with-temp-buffer
-    (funcall backend 'url (concat "activate/" id))))
-
-(defun switch-browser-tabs--callback (backend)
-  "Generate a search results callback for RESULTS-BUFFER.
-Results are parsed with (BACKEND 'parse-buffer)."
-  (wrapi-generic-url-callback
-   (lambda () ;; no allowed errors, so no arguments
-     "Parse results of bibliographic search."
-     (let* ((candidates (funcall backend 'parse-buffer))
-            (selected (completing-read "Select:" candidates))
-            (id (tabs-lookup--title->id
-                 selected candidates)))
-       (browser-tabs-activate backend id)))))
-
-;;; Listing tabs
-
-(defun switch-browser-tabs--1 (backend query)
-  "Just like `browser-tabs-lookup' on BACKEND and QUERY, but never prompt."
-  (with-current-buffer
-      (url-retrieve-synchronously (funcall backend 'url query))
-    (switch-browser-tabs--callback backend)))
+(defun browser-tabs-activate (id)
+  (url-retrieve-synchronously (cdp-tabs--url (concat "activate/" id))))
 
 ;;;###autoload
-(defun switch-browser-tabs (&optional backend query)
-  "Perform a search using BACKEND, and QUERY.
-Prompt for any missing or nil arguments.  BACKEND should be a
-function obeying the interface described in the docstring of
-`biblio-backends'.  Returns the buffer in which results will be
-inserted."
+(defun switch-browser-tabs
+  "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
   (interactive)
-  (unless backend (setq backend #'cdp-tabs-backend))
-  (unless query (setq query "list"))
-  (switch-browser-tabs--1 backend query))
+  (with-temp-buffer
+    (url-insert-file-contents (cdp-tabs--url "list"))
+    (let* ((candidates (cdp-tabs--parse-tabs))
+           (selected (completing-read "Select:" candidates))
+           (id (tabs--title->id selected candidates)))
+      (browser-tabs-activate id))))
 
 (provide 'switch-browser-tabs)
 ;;; switch-browser-tabs.el ends here
