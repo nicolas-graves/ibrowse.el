@@ -47,10 +47,12 @@
     (if (string= .type "page")
         (cons .title .id))))
 
-(defun cdp-tabs--parse-tabs ()
-  "Extract tabs results from browser response."
-  (seq-map #'cdp-tabs--extract-interesting-fields
-           (json-parse-buffer :object-type 'alist)))
+(defun cdp-tabs--get-candidates ()
+  "Get an alist with candidates."
+  (with-temp-buffer
+    (url-insert-file-contents (cdp-tabs--url "list"))
+    (seq-map #'cdp-tabs--extract-interesting-fields
+             (json-parse-buffer :object-type 'alist))))
 
 ;;; Interaction
 
@@ -62,14 +64,12 @@
 
 ;;;###autoload
 (defun switch-browser-tabs
-  "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
+    "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
   (interactive)
-  (with-temp-buffer
-    (url-insert-file-contents (cdp-tabs--url "list"))
-    (let* ((candidates (cdp-tabs--parse-tabs))
-           (selected (completing-read "Select:" candidates))
-           (id (tabs--title->id selected candidates)))
-      (browser-tabs-activate id))))
+  (let* ((candidates (cdp-tabs--get-candidates))
+         (selected (completing-read "Select:" candidates))
+         (id (tabs--title->id selected candidates)))
+    (browser-tabs-activate id)))
 
 (provide 'switch-browser-tabs)
 ;;; switch-browser-tabs.el ends here
