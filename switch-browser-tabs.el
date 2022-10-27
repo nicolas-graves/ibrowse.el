@@ -66,7 +66,7 @@
   (url-retrieve-synchronously (cdp-tabs--url (concat "close/" id))))
 
 ;;;###autoload
-(defun switch-browser-tabs
+(defun switch-browser-tabs ()
     "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
   (interactive)
   (let* ((candidates (cdp-tabs--get-candidates))
