@@ -54,13 +54,16 @@
     (seq-map #'cdp-tabs--extract-interesting-fields
              (json-parse-buffer :object-type 'alist))))
 
-;;; Interaction
-
-(defun tabs--title->id (selected candidates &rest _)
+(defun cdp-tabs--title->id (selected candidates &rest _)
   (cdr (assoc selected candidates)))
 
-(defun browser-tabs-activate (id)
+;;; Interaction
+
+(defun cdp-tabs-activate (id)
   (url-retrieve-synchronously (cdp-tabs--url (concat "activate/" id))))
+
+(defun cdp-tabs-close (id)
+  (url-retrieve-synchronously (cdp-tabs--url (concat "close/" id))))
 
 ;;;###autoload
 (defun switch-browser-tabs
@@ -68,8 +71,8 @@
   (interactive)
   (let* ((candidates (cdp-tabs--get-candidates))
          (selected (completing-read "Select:" candidates))
-         (id (tabs--title->id selected candidates)))
-    (browser-tabs-activate id)))
+         (id (cdp-tabs--title->id selected candidates)))
+    (cdp-tabs-activate id)))
 
 (provide 'switch-browser-tabs)
 ;;; switch-browser-tabs.el ends here
