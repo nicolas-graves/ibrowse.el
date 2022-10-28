@@ -66,14 +66,18 @@
 (defun cdp-tabs-close (id)
   (url-retrieve-synchronously (cdp-tabs--url (concat "close/" id))))
 
-;;;###autoload
-(defun switch-browser-tab ()
+(defun browser-tab-action-tab-by-name (action)
     "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
-  (interactive)
   (let* ((candidates (cdp-tabs--get-candidates))
          (selected (completing-read "Select:" candidates))
          (id (cdp-tabs--title->id selected candidates)))
-    (cdp-tabs-activate id)))
+    (funcall action id)))
+
+;;;###autoload
+(defun browser-tab-select-tab-by-name ()
+  (interactive)
+  "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
+  (browser-tab-action-tab-by-name 'cdp-tabs-activate))
 
 (provide 'switch-browser-tabs)
 ;;; switch-browser-tabs.el ends here
