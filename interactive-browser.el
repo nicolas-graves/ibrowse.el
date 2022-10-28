@@ -6,7 +6,7 @@
 ;; Version: 0.0.0
 ;; Package-Requires: ((emacs "24.3") (let-alist "1.0.4") (seq "1.11") (dash "2.12.1"))
 ;; Keywords: browser, tabs, switch
-;; URL: https://git.sr.ht/~ngraves/switch-browser-tabs.el
+;; URL: https://git.sr.ht/~ngraves/interactive-browser.el
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -79,5 +79,5 @@
   "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
   (browser-tab-action-tab-by-name 'cdp-tabs-activate))
 
-(provide 'switch-browser-tabs)
-;;; switch-browser-tabs.el ends here
+(provide 'interactive-browser)
+;;; interactive-browser.el ends here
