@@ -1,4 +1,4 @@
-;; switch-browser-tabs.el --- Switch between tabs from Emacs -*- lexical-binding: t -*-
+;; interactive-browser.el --- Interact with your browser from Emacs -*- lexical-binding: t -*-
 
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 
@@ -22,7 +22,7 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; Switch between tabs from Emacs
+;; Interact with your browser from Emacs
 
 ;;; Code:
 
@@ -32,16 +32,16 @@
 
 ;;; Backend
 
-(defconst cdp-tabs--remote-debugging-port
+(defconst cdp--remote-debugging-port
   "9222")
 
 (defun cdp-tabs--url (query)
   "Returns the url of the chromium json list of tabs."
   (format "http://localhost:%s/json/%s"
-          cdp-tabs--remote-debugging-port
+          cdp--remote-debugging-port
           query))
 
-(defun cdp-tabs--extract-interesting-fields (item)
+(defun cdp-tabs--extract-fields (item)
   "Prepare a tabs search result ITEM for display."
   (let-alist item
     (if (string= .type "page")
@@ -51,8 +51,9 @@
   "Get an alist with candidates."
   (with-temp-buffer
     (url-insert-file-contents (cdp-tabs--url "list"))
-    (seq-map #'cdp-tabs--extract-interesting-fields
-             (json-parse-buffer :object-type 'alist))))
+    (map-filter '(lambda (x y) (if x (cons x y)))
+                (seq-map #'cdp-tabs--extract-fields
+                         (json-parse-buffer :object-type 'alist)))))
 
 (defun cdp-tabs--title->id (selected candidates &rest _)
   (cdr (assoc selected candidates)))
@@ -66,7 +67,7 @@
   (url-retrieve-synchronously (cdp-tabs--url (concat "close/" id))))
 
 ;;;###autoload
-(defun switch-browser-tabs ()
+(defun switch-browser-tab ()
     "Just like `browser-tabs-lookup' on BACKEND, but never prompt."
   (interactive)
   (let* ((candidates (cdp-tabs--get-candidates))
