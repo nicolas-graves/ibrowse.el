@@ -55,6 +55,19 @@
                 (seq-map #'cdp-tabs--extract-fields
                          (json-parse-buffer :object-type 'alist)))))
 
+(defun browser-bookmarks--extract-fields (item)
+  "Prepare a  search result ITEM for display."
+  (let-alist item
+    (if (string= .type "url")
+        (cons .name .url))))
+
+(defun browser-bookmarks--get-candidates ()
+  "Get an alist with candidates."
+  (with-temp-buffer
+    (insert-file-contents "~/.config/chromium/Default/Bookmarks")
+    (seq-map #'browser-bookmarks--extract-fields
+    (let-alist (json-parse-buffer :object-type 'alist) .roots.bookmark_bar.children))))
+
 (defun cdp-tabs--title->id (selected candidates &rest _)
   (cdr (assoc selected candidates)))
 
