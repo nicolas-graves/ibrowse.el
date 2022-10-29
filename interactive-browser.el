@@ -79,5 +79,11 @@
   (interactive)
   (cdp-action-tab-by-name 'cdp-tabs-activate))
 
+;;;###autoload
+(defun browser-tab-close-tab-by-name ()
+  "Close browser tab by name."
+  (interactive)
+  (cdp-action-tab-by-name 'cdp-tabs-close))
+
 (provide 'interactive-browser)
 ;;; interactive-browser.el ends here
