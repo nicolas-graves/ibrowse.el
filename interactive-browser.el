@@ -66,10 +66,10 @@
 (defun cdp-tabs-close (id)
   (url-retrieve-synchronously (cdp-tabs--url (concat "close/" id))))
 
-(defun cdp-action-tab-by-name (action)
+(defun cdp-action-tab-by-name (action prompt)
     "Call the function action on the id selected from cdp-tabs--get-candidates."
   (let* ((candidates (cdp-tabs--get-candidates))
-         (selected (completing-read "Select:" candidates))
+         (selected (completing-read prompt candidates))
          (id (cdp-tabs--title->id selected candidates)))
     (funcall action id)))
 
@@ -77,13 +77,13 @@
 (defun browser-tab-select-tab-by-name ()
   "Activate browser tab by name."
   (interactive)
-  (cdp-action-tab-by-name 'cdp-tabs-activate))
+  (cdp-action-tab-by-name 'cdp-tabs-activate "Select browser tab by name:"))
 
 ;;;###autoload
 (defun browser-tab-close-tab-by-name ()
   "Close browser tab by name."
   (interactive)
-  (cdp-action-tab-by-name 'cdp-tabs-close))
+  (cdp-action-tab-by-name 'cdp-tabs-close "Close browser tab by name:"))
 
 (provide 'interactive-browser)
 ;;; interactive-browser.el ends here
