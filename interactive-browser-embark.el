@@ -1,4 +1,4 @@
-;; switch-browser-tabs.el --- Switch between tabs from Emacs -*- lexical-binding: t -*-
+;; interactive-browser-embark.el --- Interact with your browser from Emacs -*- lexical-binding: t -*-
 
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 
@@ -6,7 +6,7 @@
 ;; Version: 0.0.0
 ;; Package-Requires: ((emacs "24.3") (let-alist "1.0.4") (seq "1.11") (dash "2.12.1"))
 ;; Keywords: browser, tabs, switch
-;; URL: https://git.sr.ht/~ngraves/switch-browser-tabs.el
+;; URL: https://git.sr.ht/~ngraves/interactive-browser.el
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; Switch between tabs from Emacs
+;; Interact with your browser from Emacs
 
 ;;; Code:
 
@@ -31,6 +31,17 @@
 ;; Ideas for some embark-actions
 ;; - send the url to embark-become or embark-act as a URL
 ;; - copy the url
-;; - kill the tab
-;; - activate the tab
-;; - maybe do something with the tab title, like copy an org-link target ?
+;; DONE kill the tab
+;; DONE activate the tab
+;; - maybe do something with the tab name, like copy an org-link target ?
+
+(require 'embark)
+
+(add-to-list 'marginalia-prompt-categories '("\\<browser tab by name\\>" . browser-tab))
+
+(embark-define-keymap embark-browser-tab-actions
+  "Keymap for actions for browser tabs (when mentioned by name)."
+  ("s" browser-tab-select-tab-by-name)
+  ("k" browser-tab-close-tab-by-name))
+
+(add-to-list 'embark-keymap-alist '(browser-tab . embark-browser-tab-actions))
