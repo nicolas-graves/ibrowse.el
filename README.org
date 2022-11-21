@@ -1,17 +1,25 @@
 
-* Switch browser tabs
+* Interactive browser
 
-This package is a tiny rewrite of the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts for Emacs. It removes the need for external dependencies except the small generic wrapi package, and focuses on emacs built-in functionality. For now, it only implements the Chromium Developer Protocol script, which should soon be implemented by firefox-based browsers. PR welcomed for other protocols!
+The goal of this package is to be able to control your browser through common actions (switch tabs, close tabs, open tabs from history link, copy a url, send the url to embark-become...) using emacs built-in functionnalities.
 
-This package relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=.
+This package currently introduces the following commands :
+- =browser-tab-select-tab-by-name=
+- =browser-tab-close-tab-by-name=
 
-** Chromium-based browsers
+This package is inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts, but aspires to have broader functionalities, more integrated with Emacs. It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. For now, it only implements the Chromium Developer Protocol script, which should soon be implemented by firefox-based browsers. PR are welcome for other protocols!
 
-*** Installation
+** Chromium Developer Protocol
+
+*** Usage
 1. Install the package using your favorite package manager.
 2. Run your browser with the option =--remote-debugging-port=9222=.
-3. In Emacs, =M-x switch-browser-tabs=.
+3. Use the commands mentionned above in Emacs.
 
 **** Packaging status
 ***** TODO Guix
 ***** TODO MELPA
+
+** Embark functionalities
+
+After loading the file =interactive-browser-embark.el=, you can also select commands once a tab is selected, in case you change your mind.
