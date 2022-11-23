@@ -90,6 +90,22 @@
   "Action to browse URL."
   (browse-url url))
 
+(defun ibrowse-core--insert-url (_title url _id)
+  "Insert URL in the current buffer."
+  (with-current-buffer (insert url)))
+
+(defun ibrowse-core--insert-org-link (title url _id)
+  "Insert TITLE and URL as Org link if `org-insert-link' is available.
+Does nothing if `org-insert-link' is unavailable."
+  (if (fboundp 'org-insert-link)
+      (with-current-buffer (org-insert-link '() url title))))
+
+(defun ibrowse-core--insert-markdown-link (title url)
+  "Insert TITLE and URL as markdown link.
+Does nothing if `markdown-insert-inline-link' is unavailable."
+  (if (fboundp 'markdown-insert-inline-link)
+      (with-current-buffer (markdown-insert-inline-link title url))))
+
 (defun ibrowse-core-act-by-name (prompt get-candidates action)
   "GET-CANDIDATES using PROMPT and call the function ACTION on the \
 selected item."
