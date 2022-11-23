@@ -113,6 +113,7 @@ call the function CALLBACK afterwards."
             #'ibrowse-history--sql-command-read-callback))))
   ibrowse-history-candidates)
 
+;;; Interaction
 
 (defun ibrowse-history-delete-item (_title _url id)
   "Delete browser ID item using sqlite."
@@ -124,8 +125,6 @@ call the function CALLBACK afterwards."
      (ibrowse-history-delete-sql id)))
   ;; Delete cache.
   (setq ibrowse-history-candidates nil))
-
-;;; Interaction
 
 ;;;###autoload
 (defun ibrowse-history-browse-url-by-name ()

@@ -1,6 +1,9 @@
 ;; ibrowse-core.el --- Interact with your browser from Emacs -*- lexical-binding: t -*-
 
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
+;; Some snippets have been written by
+;; Copyright © 2021 BlueBoxWare
+;; Copyright © 2016 Taichi Kawabata <kawabata.taichi@gmail.com>
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
