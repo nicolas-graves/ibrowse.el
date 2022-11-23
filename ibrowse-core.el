@@ -91,9 +91,11 @@
 (defun ibrowse-core-act-by-name (prompt get-candidates action)
   "GET-CANDIDATES using PROMPT and call the function ACTION on the \
 selected item."
-  (let* ((candidates    (funcall get-candidates))
-         (selected (completing-read prompt candidates)))
-    (funcall action (assoc selected candidates))))
+  (let* ((candidates (funcall get-candidates))
+         (selected   (completing-read prompt candidates)))
+    (pcase (assoc selected candidates)
+      (`(,title ,url ,id)
+       (funcall action title url id)))))
 
 (provide 'ibrowse-core)
 ;;; ibrowse-core.el ends here
