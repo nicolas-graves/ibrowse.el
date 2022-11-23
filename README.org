@@ -1,25 +1,56 @@
 
-* Interactive browser
+* ibrowse
 
-The goal of this package is to be able to control your browser through common actions (switch tabs, close tabs, open tabs from history link, copy a url, send the url to embark-become...) using emacs built-in functionnalities.
+Ibrowse stands for interactive browse, its goal is to be able to control your browser through common actions on browser tabs, history or bookmarks using emacs built-in functionnalities.
 
-This package currently introduces the following commands :
-- =browser-tab-select-tab-by-name=
-- =browser-tab-close-tab-by-name=
+ It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. For now, it is only implemented for the Chromium Developer Protocol (and thus chromium-based browsers), which should soon be implemented by firefox-based browsers. PR are welcome for other protocols!
 
-This package is inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts, but aspires to have broader functionalities, more integrated with Emacs. It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. For now, it only implements the Chromium Developer Protocol script, which should soon be implemented by firefox-based browsers. PR are welcome for other protocols!
+ This package is originally inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts and the [[https://github.com/cpitclaudel/biblio.el][biblio.el]] package, but aspires to have broader functionalities, more integrated with Emacs. While writing the package, I also stumbled upon (and occasionally copied parts of):
 
-** Chromium Developer Protocol
+ - [[https://github.com/kawabata/helm-chrome][helm-chrome]]
+ - [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]]
+ - [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]]
+ - [[https://github.com/anticomputer/chrome.el][chrome.el]]
+ - [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]
 
-*** Usage
-1. Install the package using your favorite package manager.
-2. Run your browser with the option =--remote-debugging-port=9222=.
-3. Use the commands mentionned above in Emacs.
+All implement very close features to ibrowse, but are either more developped (=chrome.el= has a major mode frontend, which I considered unnecessary for a daily use with embark and the minibuffer), rely on =helm= or javascript code, or have more limited functionality. All (except [[https://github.com/anticomputer/chrome.el][chrome.el]], which I didn't copied code from) are licensed under GPLv3+, making this package an "aggregate" also under GPLv3+.
 
-**** Packaging status
-***** TODO Guix
-***** TODO MELPA
+It is composed of three control functionalities for your browser :
+
+** ibrowse-tab.el
+
+To use the functions in =ibrowse-tab.el=, you need to use the Chromium Developer Protocol. Simply run your browser with the option =--remote-debugging-port=9222=.
+
+This file currently introduces the following commands :
+- =ibrowse-tab-select-by-name=
+- =ibrowse-tab-close-by-name=
+- =ibrowse-tab-copy-url-by-name=
+
+Copying url title is a native embark option.
+
+** ibrowse-bookmark.el
+
+Unfinished for now.
+
+This file will introduce the following commands :
+- =ibrowse-bookmark-browse-url-by-name=
+- =ibrowse-bookmark-delete-by-name=
+- =ibrowse-bookmark-copy-url-by-name=
+- =ibrowse-bookmark-add=
+
+** ibrowse-history.el
+
+Unfinished for now. Should we use a cache ? I'm not sure xuchunyang has done the right thing here.
+
+This file will introduce the following commands :
+- =ibrowse-history-browse-url-by-name=
+- =ibrowse-history-delete-by-name=
+- =ibrowse-history-copy-url-by-name=
 
 ** Embark functionalities
 
-After loading the file =interactive-browser-embark.el=, you can also select commands once a tab is selected, in case you change your mind.
+After loading the file =ibrowse-embark.el=, you can also select commands once a tab is selected, in case you change your mind.
+
+** Roadmap / Changelog
+
+Also, how do you do to
