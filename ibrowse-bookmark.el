@@ -42,11 +42,11 @@
 ;;; Backend
 
 (defvar ibrowse-bookmark-file
-  (concat ibrowse-chromium-default-folder "Bookmarks")
+  (concat ibrowse-core-default-folder "Bookmarks")
   "Chromium-based browsers Bookmarks file.")
 
 (defun ibrowse-bookmarks--extract-fields (item)
-  "Prepare a  search result ITEM for display."
+  "Prepare a search result ITEM for display."
   (let-alist item
     (if (string= .type "url")
         (cons .name .url))))

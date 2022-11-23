@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "24.3") (let-alist "1.0.4") (seq "1.11") (dash "2.12.1"))
+;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: browser, tabs, switch
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -42,7 +42,7 @@
 (defun ibrowse-tab--get-candidates ()
   "Get an alist with candidates."
   (with-temp-buffer
-    (url-insert-file-contents (ibrowse--cdp-url "list"))
+    (url-insert-file-contents (ibrowse-core--cdp-url "list"))
     (delq nil
           (seq-map #'ibrowse-tab--extract-fields
                    (json-parse-buffer :object-type 'alist)))))
@@ -52,41 +52,38 @@
 
 ;;; Interaction
 
-(defun ibrowse-tab-activate (id)
-  (url-retrieve-synchronously (ibrowse--cdp-url (concat "activate/" id))))
+(defun ibrowse-tab-activate (_title _url id)
+  (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "activate/" id))))
 
-(defun ibrowse-tab-close (id)
-  (url-retrieve-synchronously (ibrowse--cdp-url (concat "close/" id))))
+(defun ibrowse-tab-close (_title _url id)
+  (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
 
 ;;;###autoload
 (defun ibrowse-tab-select-by-name ()
   "Activate browser tab by name."
   (interactive)
-  (ibrowse-action-item-by-name
+  (ibrowse-core-act-by-name
    "Select browser tab by name:"
-   'ibrowse-tab--get-candidates
-   'ibrowse-action--first->third
-   'ibrowse-tab-activate))
+   #'ibrowse-tab--get-candidates
+   #'ibrowse-tab-activate))
 
 ;;;###autoload
 (defun ibrowse-tab-close-by-name ()
   "Close browser tab by name."
   (interactive)
-  (ibrowse-action-item-by-name
+  (ibrowse-core-act-by-name
    "Close browser tab by name:"
-   'ibrowse-tab--get-candidates
-   'ibrowse-action--first->third
-   'ibrowse-tab-close))
+   #'ibrowse-tab--get-candidates
+   #'ibrowse-tab-close))
 
 ;;;###autoload
 (defun ibrowse-tab-copy-url-by-name ()
   "Copy url of the browser tab by name."
   (interactive)
-  (ibrowse-action-item-by-name
+  (ibrowse-core-act-by-name
    "Copy url of browser tab by name:"
-   'ibrowse-tab--get-candidates
-   'ibrowse-action--first->second
-   'kill-new))
+   #'ibrowse-tab--get-candidates
+   #'ibrowse-core-copy-url))
 
 (provide 'ibrowse-tab)
 ;;; ibrowse-tab.el ends here

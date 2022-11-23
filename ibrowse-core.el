@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "24.3") (let-alist "1.0.4") (seq "1.11") (dash "2.12.1"))
+;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: browser, tabs, switch
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -28,19 +28,19 @@
 
 ;;; Variables
 
-(defconst ibrowse--cdp-remote-debugging-port
+(defconst ibrowse-core--cdp-debugging-port
   "9222")
 
-(defun ibrowse--cdp-url (query)
-  "Returns the url of the chromium json list of tabs."
+(defun ibrowse-core--cdp-url (query)
+  "Return the url of the chromium developer protocol QUERY."
   (format "http://localhost:%s/json/%s"
-          ibrowse--cdp-remote-debugging-port
+          ibrowse-core--cdp-debugging-port
           query))
 
 ;; Change this variable to use another profile.
-(defvar ibrowse-default-folder-name "Default")
+(defvar ibrowse-core-default-folder-name "Default")
 
-(defvar ibrowse-chromium-base-folder-list
+(defvar ibrowse-core-base-folder-list
   '("~/.config/google-chrome"
     "~/.config/chromium"
     "$LOCALAPPDATA/Google/Chrome/User Data"
@@ -57,44 +57,43 @@
     "~/Library/Application Support/Vivaldi"
     "~/AppData/Local/Google/Chrome/User Data/Default/"))
 
-(defun ibrowse-guess-default-folder ()
+(defun ibrowse-core-guess-default-folder ()
+  "Guess the folder containing the History and Bookmarks files."
   (car
    (seq-sort
     #'file-newer-than-file-p
     (seq-filter
      (lambda (p)
        (substitute-in-file-name
-        (concat p "/" ibrowse-default-folder-name "/History")))
-     ibrowse-chromium-default-folder-list))))
+        (concat p "/" ibrowse-core-default-folder-name "/History")))
+     ibrowse-core-base-folder-list))))
 
-(defvar ibrowse-chromium-default-folder (ibrowse-guess-default-folder)
+(defvar ibrowse-core-default-folder (ibrowse-core-guess-default-folder)
   "Chromium-based browsers profile folder.")
 
 ;;; Functions
 
-(defun ibrowse--file-check (filename)
-  "Check if the ibrowse-history-file exists."
-  (pcase (concat ibrowse-chromium-default-folder filename)
+(defun ibrowse-core--file-check (file)
+  "Check if FILE exists."
+  (pcase (concat ibrowse-core-default-folder file)
     ('nil (user-error "`ibrowse-history-file' is not set"))
     ((pred file-exists-p) nil)
     (f (user-error "'%s' doesn't exist, please reset `ibrowse-history-file'" f))))
 
-(defun ibrowse-action--first->third (selected candidates &rest _)
-  (caddr (assoc selected candidates)))
+(defun ibrowse-core-copy-url (_title url _id)
+  "Action to copy URL."
+  (kill-new url))
 
-(defun ibrowse-action--first->second (selected candidates &rest _)
-  (cadr (assoc selected candidates)))
+(defun ibrowse-core-browse-url (_title url _id)
+  "Action to browse URL."
+  (browse-url url))
 
-(defun ibrowse-action-open-url (url)
-  (url-retrieve-synchronously (ibrowse--cdp-url (concat "new?" url))))
-
-(defun ibrowse-action-item-by-name (prompt get-candidates convert action)
-  "Call the function ACTION on the id selected from the function
-GET-CANDIDATES."
+(defun ibrowse-core-act-by-name (prompt get-candidates action)
+  "GET-CANDIDATES using PROMPT and call the function ACTION on the \
+selected item."
   (let* ((candidates    (funcall get-candidates))
-         (selected-name (completing-read prompt candidates))
-         (selected-id   (funcall convert selected-name candidates)))
-    (funcall action selected-id)))
+         (selected (completing-read prompt candidates)))
+    (funcall action (assoc selected candidates))))
 
 (provide 'ibrowse-core)
 ;;; ibrowse-core.el ends here

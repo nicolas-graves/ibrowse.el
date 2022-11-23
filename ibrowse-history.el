@@ -5,7 +5,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "24.3") (let-alist "1.0.4") (seq "1.11") (dash "2.12.1"))
+;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: browser, tabs, switch
 ;; URL: https://git.sr.ht/~ngraves/ibrowse-history.el
 
@@ -24,6 +24,7 @@
 
 ;;; Commentary:
 ;; Interact with your browser from Emacs
+;; Dependency: sqlite
 
 ;;; Code:
 
@@ -38,20 +39,26 @@
 
 ;;; Backend
 
-(defvar ibrowse-history-file (concat ibrowse-chromium-default-folder "History")
+(defvar ibrowse-history-file (concat ibrowse-core-default-folder "History")
   "Chrome history SQLite database file.")
 
 (defvar ibrowse-history-sql
   "SELECT title, url, id, last_visit_time FROM urls ORDER BY id DESC LIMIT 100000"
-  "The SQL used to extract history.
+  "The SQL command used to extract history.
 
 If you have too many history and worry about the memory use,
-consider adjusting the SQL.  For your reference, I have 41525
-history items and it takes about 7.4M memory in Emacs.
+consider adjusting the SQL.
 
-Don't change \"select url, title, last_visit_time\" part.")
+Don't change \"select title, url, id, last_visit_time\" part.")
+
+(defun ibrowse-history-delete-sql (id)
+  "The SQL command used to delete the item ID from history."
+  (concat "DELETE FROM urls WHERE id=" id ";"
+          "DELETE FROM visits WHERE url=" id ";"))
 
 (defun ibrowse-history--apply-sql-command (callback file sql-function)
+  "Function to apply the SQL-FUNCTION command using the SQL FILE and \
+call the function CALLBACK afterwards."
   (if (zerop
        (call-process "sqlite3" nil t nil
                      "-ascii"
@@ -60,16 +67,18 @@ Don't change \"select url, title, last_visit_time\" part.")
       (funcall callback file)
     (error "Command sqlite3 failed: %s" (buffer-string))))
 
-(defun ibrowse-history--sql-command-read-callback (tmp)
+(defun ibrowse-history--sql-command-read-callback (file)
+  "Function applied to the result of the SQL query, using the file FILE."
   (let (result)
     (goto-char (point-min))
     ;; -ascii delimited by 0x1F and 0x1E
     (while (re-search-forward (rx (group (+? anything)) "\x1e") nil t)
       (push (split-string (match-string 1) "\x1f") result))
-    (delete-file tmp)
+    (delete-file file)
     (nreverse result)))
 
 (defun ibrowse-history--extract-fields (callback)
+  ""
   "Read `ibrowse-history-file'."
   (ibrowse-history-file-check)
   (with-temp-buffer
@@ -79,6 +88,16 @@ Don't change \"select url, title, last_visit_time\" part.")
        callback
        tmp
        ibrowse-history-sql))))
+
+(defun ibrowse-history-format-title (title last-visit-time)
+  ""
+  (format "%s | %s"
+          (format-time-string
+           "%Y-%m-%d"
+           (- (/ (string-to-number last-visit-time) 1000000)
+              ;; https://stackoverflow.com/a/26233663/2999892
+              11644473600))
+          title))
 
 (defvar ibrowse-history-candidates nil
   "The `ibrowse-history' cache.")
@@ -90,25 +109,14 @@ Don't change \"select url, title, last_visit_time\" part.")
     (setq ibrowse-history-candidates
           (mapcar
            (pcase-lambda (`(,title ,url ,id ,last-visit-time))
-             (let ((display
-                    (format "%s | %s"
-                            (format-time-string
-                             "%Y-%m-%d"
-                             (- (/ (string-to-number last-visit-time) 1000000)
-                                ;; https://stackoverflow.com/a/26233663/2999892
-                                11644473600))
-                            title)))
-               (list display url id)))
+             (list (ibrowse-history-format-title title last-visit-time) url id))
            (ibrowse-history--extract-fields
             #'ibrowse-history--sql-command-read-callback))))
   ibrowse-history-candidates)
 
-(defun ibrowse-history-delete-sql (id)
-  (concat "DELETE FROM urls WHERE id=" id ";"
-          "DELETE FROM visits WHERE url=" id ";"))
 
-(defun ibrowse-history-delete-item (id)
-  "Read `ibrowse-history-file'."
+(defun ibrowse-history-delete-item (_title _url id)
+  "Delete browser ID item using sqlite."
   (ibrowse-history-file-check)
   (with-temp-buffer
     (ibrowse-history--apply-sql-command
@@ -122,36 +130,33 @@ Don't change \"select url, title, last_visit_time\" part.")
 
 ;;;###autoload
 (defun ibrowse-history-browse-url-by-name ()
-  "Browse item from history by name."
+  "Select and browse item from history by name."
   (interactive)
-  (ibrowse-action-item-by-name
+  (ibrowse-core-act-by-name
    "Browse item from history by name:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-action--first->second
-   #'ibrowse-action-open-url))
+   #'ibrowse-core-browse-url))
 
 ;;;###autoload
 (defun ibrowse-history-copy-url-by-name ()
-  "Copy item from history by name."
+  "Select and copy url from history by name."
   (interactive)
-  (ibrowse-action-item-by-name
+  (ibrowse-core-act-by-name
    "Browse item from history by name:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-action--first->second
-   #'kill-new))
+   #'ibrowse-core-copy-url))
 
 ;;;###autoload
 (defun ibrowse-history-delete-by-name ()
-  "Delete browser item from history by name.
+  "Select and delete browser item from history by name.
 
 It is currently not possible to delete history items while browsing,
 because chromium-based browsers have an EXCLUSIVE lock on the relying
 SQlite database."
   (interactive)
-  (ibrowse-action-item-by-name
+  (ibrowse-core-act-by-name
    "Delete browser item from history by name:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-action--first->third
    #'ibrowse-history-delete-item))
 
 (provide 'ibrowse-history)

@@ -40,8 +40,8 @@
 
 (embark-define-keymap embark-browser-tab-actions
   "Keymap for actions for browser tabs (when mentioned by name)."
-  ("s" ibrowse-tab-select-tab-by-name)
-  ("k" ibrowse-tab-close-tab-by-name)
-  ("u" ibrowse-tab-copy-url-tab-by-name))
+  ("s" ibrowse-tab-select-by-name)
+  ("k" ibrowse-tab-close-by-name)
+  ("u" ibrowse-tab-copy-url-by-name))
 
 (add-to-list 'embark-keymap-alist '(browser-tab . embark-browser-tab-actions))
