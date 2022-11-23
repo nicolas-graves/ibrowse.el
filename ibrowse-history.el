@@ -78,8 +78,7 @@ call the function CALLBACK afterwards."
     (nreverse result)))
 
 (defun ibrowse-history--extract-fields (callback)
-  ""
-  "Read `ibrowse-history-file'."
+  "Read `ibrowse-history-file' and call the CALLBACK function."
   (ibrowse-history-file-check)
   (with-temp-buffer
     (let ((tmp (make-temp-name "ibrowse-history")))
@@ -90,7 +89,7 @@ call the function CALLBACK afterwards."
        ibrowse-history-sql))))
 
 (defun ibrowse-history-format-title (title last-visit-time)
-  ""
+  "Format TITLE and LAST-VISIT-TIME for `completing-read'."
   (format "%s | %s"
           (format-time-string
            "%Y-%m-%d"
