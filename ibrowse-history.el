@@ -79,7 +79,7 @@ call the function CALLBACK afterwards."
 
 (defun ibrowse-history--extract-fields (callback)
   "Read `ibrowse-history-file' and call the CALLBACK function."
-  (ibrowse-history-file-check)
+  (ibrowse-core--file-check "History")
   (with-temp-buffer
     (let ((tmp (make-temp-name "ibrowse-history")))
       (copy-file ibrowse-history-file tmp)
@@ -116,7 +116,7 @@ call the function CALLBACK afterwards."
 
 (defun ibrowse-history-delete-item (_title _url id)
   "Delete browser ID item using sqlite."
-  (ibrowse-history-file-check)
+  (ibrowse-core--file-check "History")
   (with-temp-buffer
     (ibrowse-history--apply-sql-command
      (lambda (file) nil)
@@ -134,7 +134,7 @@ call the function CALLBACK afterwards."
   (ibrowse-core-act-by-name
    "Browse item from history by name:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-core-browse-url))
+   #'ibrowse-core--browse-url))
 
 ;;;###autoload
 (defun ibrowse-history-copy-url-by-name ()
@@ -143,7 +143,7 @@ call the function CALLBACK afterwards."
   (ibrowse-core-act-by-name
    "Browse item from history by name:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-core-copy-url))
+   #'ibrowse-core--copy-url))
 
 ;;;###autoload
 (defun ibrowse-history-delete-by-name ()

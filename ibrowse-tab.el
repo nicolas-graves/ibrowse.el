@@ -83,7 +83,7 @@
   (ibrowse-core-act-by-name
    "Copy url of browser tab by name:"
    #'ibrowse-tab--get-candidates
-   #'ibrowse-core-copy-url))
+   #'ibrowse-core--copy-url))
 
 (provide 'ibrowse-tab)
 ;;; ibrowse-tab.el ends here

@@ -80,11 +80,11 @@
     ((pred file-exists-p) nil)
     (f (user-error "'%s' doesn't exist, please reset `ibrowse-history-file'" f))))
 
-(defun ibrowse-core-copy-url (_title url _id)
+(defun ibrowse-core--copy-url (_title url _id)
   "Action to copy URL."
   (kill-new url))
 
-(defun ibrowse-core-browse-url (_title url _id)
+(defun ibrowse-core--browse-url (_title url _id)
   "Action to browse URL."
   (browse-url url))
 
