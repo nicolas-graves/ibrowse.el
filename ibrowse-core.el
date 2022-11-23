@@ -59,14 +59,16 @@
 
 (defun ibrowse-core-guess-default-folder ()
   "Guess the folder containing the History and Bookmarks files."
-  (car
-   (seq-sort
-    #'file-newer-than-file-p
-    (seq-filter
-     (lambda (p)
-       (substitute-in-file-name
-        (concat p "/" ibrowse-core-default-folder-name "/History")))
-     ibrowse-core-base-folder-list))))
+  (concat
+   (car
+    (seq-sort
+     #'file-newer-than-file-p
+     (seq-filter
+      (lambda (p)
+        (substitute-in-file-name
+         (concat p "/" ibrowse-core-default-folder-name "/History")))
+      ibrowse-core-base-folder-list)))
+   "/" ibrowse-core-default-folder-name "/"))
 
 (defvar ibrowse-core-default-folder (ibrowse-core-guess-default-folder)
   "Chromium-based browsers profile folder.")
