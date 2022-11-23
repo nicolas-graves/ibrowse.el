@@ -248,11 +248,139 @@ Search for STR, ignore ignore-lists."
              (let-alist (json-parse-buffer :object-type 'alist)
                .roots.bookmark_bar.children))))
 
-;;; Interaction
+;;; Actions / Interaction
 ;; ibrowse-bookmark-browse-url-by-name
 ;; ibrowse-bookmark-delete-by-name
 ;; ibrowse-bookmark-copy-url-by-name
 ;; ibrowse-bookmark-add
+
+(defvar counsel-chrome-bm--initialized nil)
+
+(defvar counsel-chrome-bm--no-jq-message-shown nil)
+
+(defun counsel-chrome-bm--dispatch (bookmark)
+  "Pass BOOKMARK to the correct action based on settings."
+  (let* ((split (split-string bookmark (string ibrowse-bookmark--separator)))
+         (title (car split))
+         (url (cadr split)))
+    (if (and counsel-chrome-bm-default-action (not current-prefix-arg))
+        (funcall counsel-chrome-bm-default-action title url)
+      (ivy-read "Action: " counsel-chrome-bm-actions-alist
+                :require-match t
+                :history 'counsel-chrome-bm--action-history
+                :caller 'counsel-chrome-bm--dispatch
+                :re-builder #'ivy--regex-plus
+                :action (lambda (action)
+                          (funcall (cdr action) title url))))))
+
+(defun counsel-chrome-bm--read (all caller)
+  "Setup and run `ivy-read' on behalf of CALLER.
+Ignore ignore-lists if ALL is non-nil."
+  (unless counsel-chrome-bm--initialized (counsel-chrome-bm-initialize))
+  (counsel-chrome-bm--check-for-problems)
+  (let* ((jq (counsel-chrome-bm--jq))
+         (use-jq (and jq (not ibrowse-bookmark-no-jq) (file-executable-p jq)))
+         (provider (cond ((and use-jq all (not ibrowse-bookmark-no-jq))
+                          #'counsel-chrome-bm--read-all-jq)
+                         ((and use-jq (not ibrowse-bookmark-no-jq))
+                          #'counsel-chrome-bm--read-filtered-jq)
+                         (all
+                          (counsel-chrome-bm--read-native t))
+                         (t
+                          (counsel-chrome-bm--read-native nil)))))
+    (when (and
+           (not use-jq)
+           (not counsel-chrome-bm--no-jq-message-shown)
+           (not ibrowse-bookmark-no-jq))
+      (setq counsel-chrome-bm--no-jq-message-shown t)
+      (message
+       "counsel-chrome-bm: Could not find jq. Falling back to native JSON parsing."))
+    (when use-jq
+      (counsel-set-async-exit-code caller
+                                   4
+                                   (counsel-chrome-bm--parse-error-msg))
+      (counsel-set-async-exit-code caller
+                                   5
+                                   (counsel-chrome-bm--parse-error-msg)))
+    (ivy-read
+     "Bookmark: "
+     provider
+     :require-match t
+     :history 'counsel-chrome-bm--history
+     :preselect (ivy-thing-at-point)
+     :caller caller
+     :action #'counsel-chrome-bm--dispatch
+     :dynamic-collection use-jq)))
+
+;;;
+;;; Commands
+;;;
+
+;;;###autoload
+(defun counsel-chrome-bm ()
+  "Browse Chrome bookmarks with `ivy'.
+Respects `ibrowse-bookmark-ignore-folder' and `ibrowse-bookmark-ignore-key'.
+
+Executes `counsel-chrome-bm-default-action' on the selected bookmark.  If
+`counsel-chrome-bm-default-action' is nil, it will present a list of actions
+to choose from.
+
+When called with a prefix argument it will ignore
+`counsel-chrome-bm-default-action' and always ask which action to perform."
+  (interactive)
+  (counsel-chrome-bm--read nil 'counsel-chrome-bm))
+
+;;;###autoload
+(defun counsel-chrome-bm-all ()
+  "Browse all Chrome bookmarks.
+Ignores `ibrowse-bookmark-ignore-folder' and `ibrowse-bookmark-ignore-key'.
+
+Executes `counsel-chrome-bm-default-action' on the selected bookmark.  If
+`counsel-chrome-bm-default-action' is nil, it will present a list of actions
+to choose from.
+
+When called with a prefix argument it will ignore
+`counsel-chrome-bm-default-action' and always ask which action to perform."
+  (interactive)
+  (counsel-chrome-bm--read t 'counsel-chrome-bm-all))
+
+;;;###autoload
+(defun counsel-chrome-bm-initialize ()
+  "Initialize `counsel-chrome-bm'.
+Normally this command is automatically called when necessary. But if you want
+to configure your own extra actions for `counsel-chrome-bm' with
+`ivy-set-actions' or `ivy-add-actions', you'll have to make sure to call this
+command first, e.g.:
+
+\(use-package counsel-chrome-bm
+  :config
+  (counsel-chrome-bm-initialize)
+  (ivy-set-actions 'counsel-chrome-bm '( <etc> ))
+
+The same goes for changing `ivy-more-chars-alist'."
+  (interactive)
+  (dolist (cmd '(counsel-chrome-bm counsel-chrome-bm-all))
+    (add-to-list 'ivy-more-chars-alist (cons cmd 0))
+    (ivy-set-actions cmd `(("i"
+                            ,(lambda (x)
+                               (counsel-chrome-bm--split-and-call
+                                #'ibrowse-core--insert-url x))
+                            "insert url")
+                           ("O"
+                            ,(lambda (x)
+                               (counsel-chrome-bm--split-and-call
+                                #'ibrowse-core--browse-url x))
+                            "open")
+                           ("w"
+                            ,(lambda (x)
+                               (counsel-chrome-bm--split-and-call
+                                #'ibrowse-core--copy-url x))
+                            "copy url")))
+    (when (and (fboundp 'ivy-rich-set-columns) (fboundp 'ivy-rich-mode))
+        (dolist (cmd '(counsel-chrome-bm counsel-chrome-bm-all)))
+        (ivy-rich-mode)
+        (ivy-rich-mode)))
+  (setq counsel-chrome-bm--initialized t))
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here
