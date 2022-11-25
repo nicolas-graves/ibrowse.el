@@ -24,14 +24,10 @@
 ;;; Commentary:
 ;; Interact with your browser from Emacs
 
+;; TODO send the url to embark-become or embark-act as a URL
+
 ;;; Code:
 
-;; Ideas for some embark-actions for tabs
-;; - send the url to embark-become or embark-act as a URL
-;; DONE copy the url
-;; DONE kill the tab
-;; DONE activate the tab
-;; NATIVE copy the tab title
 
 (require 'embark)
 (require 'ibrowse-tab)
