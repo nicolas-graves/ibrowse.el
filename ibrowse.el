@@ -28,7 +28,7 @@
 
 (require 'ibrowse-tab)
 (require 'ibrowse-bookmark)
-(require 'ibrowse-history)
+;; (require 'ibrowse-history) not included for now, too alpha
 
 (provide 'ibrowse)
 ;;; ibrowse.el ends here

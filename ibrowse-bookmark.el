@@ -1,7 +1,7 @@
 ;; ibrowser-bookmark.el --- Interact with your browser from Emacs -*- lexical-binding: t -*-
 
-;; Copyright © 2021 BlueBoxWare (original author)
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
+;; Copyright © 2021 BlueBoxWare
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
@@ -31,8 +31,6 @@
 ;;; Code:
 
 (require 'json)
-(require 'dash)
-(require 'seq)
 (require 'radix-tree)
 (require 'ibrowse-core)
 

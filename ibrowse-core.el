@@ -29,6 +29,8 @@
 
 ;;; Code:
 
+(require 'seq)
+
 ;;; Variables
 
 (defconst ibrowse-core--cdp-debugging-port

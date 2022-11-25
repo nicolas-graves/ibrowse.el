@@ -28,9 +28,6 @@
 
 ;;; Code:
 
-(require 'json)
-(require 'dash)
-(require 'seq)
 (require 'ibrowse-core)
 
 (eval-when-compile
