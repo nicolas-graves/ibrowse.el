@@ -36,6 +36,8 @@
 (require 'embark)
 (require 'ibrowse-tab)
 
+;;; ibrowse-tab
+
 (add-to-list 'marginalia-prompt-categories '("\\<browser tab by title\\>" . browser-tab))
 
 (embark-define-keymap embark-browser-tab-actions
@@ -47,6 +49,34 @@
   ("m" ibrowse-tab-insert-markdown-link))
 
 (add-to-list 'embark-keymap-alist '(browser-tab . embark-browser-tab-actions))
+
+;;; ibrowse-history
+
+(add-to-list 'marginalia-prompt-categories '("\\<from browser history\\>" . browser-history))
+
+(embark-define-keymap embark-browser-history-actions
+  "Keymap for actions for browser history items (when mentioned by name)."
+  ("b" ibrowse-history-browse-url)
+  ("d" ibrowse-history-delete)
+  ("u" ibrowse-history-copy-url)
+  ("o" ibrowse-history-insert-org-link)
+  ("m" ibrowse-history-insert-markdown-link))
+
+(add-to-list 'embark-keymap-alist '(browser-history . embark-browser-history-actions))
+
+;;; ibrowse-bookmark
+
+(add-to-list 'marginalia-prompt-categories '("\\<from browser bookmarks\\>" . browser-bookmark))
+
+(embark-define-keymap embark-browser-bookmark-actions
+  "Keymap for actions for browser bookmark items (when mentioned by name)."
+  ("b" ibrowse-bookmark-browse-url)
+  ("d" ibrowse-bookmark-delete)
+  ("u" ibrowse-bookmark-copy-url)
+  ("o" ibrowse-bookmark-insert-org-link)
+  ("m" ibrowse-bookmark-insert-markdown-link))
+
+(add-to-list 'embark-keymap-alist '(browser-bookmark . embark-browser-bookmark-actions))
 
 (provide 'ibrowse-embark)
 
