@@ -28,51 +28,62 @@
 
 ;;; Code:
 
-
 (require 'embark)
-(require 'ibrowse-tab)
+(require 'marginalia)
 
 ;;; ibrowse-tab
+(when (fboundp #'ibrowse-tab--get-candidates)
+  (add-to-list
+   'marginalia-prompt-categories
+   '("\\<browser tab by title\\>" . browser-tab))
 
-(add-to-list 'marginalia-prompt-categories '("\\<browser tab by title\\>" . browser-tab))
+  (embark-define-keymap embark-browser-tab-actions
+    "Keymap for actions for browser tabs (when mentioned by title)."
+    ("s" ibrowse-tab-select)
+    ("k" ibrowse-tab-close)
+    ("u" ibrowse-tab-copy-url)
+    ("o" ibrowse-tab-insert-org-link)
+    ("m" ibrowse-tab-insert-markdown-link))
 
-(embark-define-keymap embark-browser-tab-actions
-  "Keymap for actions for browser tabs (when mentioned by title)."
-  ("s" ibrowse-tab-select)
-  ("k" ibrowse-tab-close)
-  ("u" ibrowse-tab-copy-url)
-  ("o" ibrowse-tab-insert-org-link)
-  ("m" ibrowse-tab-insert-markdown-link))
-
-(add-to-list 'embark-keymap-alist '(browser-tab . embark-browser-tab-actions))
+  (add-to-list
+   'embark-keymap-alist
+   '(browser-tab . embark-browser-tab-actions)))
 
 ;;; ibrowse-history
+(when (fboundp #'ibrowse-history--get-candidates)
+  (add-to-list
+   'marginalia-prompt-categories
+   '("\\<from browser history\\>" . browser-history))
 
-(add-to-list 'marginalia-prompt-categories '("\\<from browser history\\>" . browser-history))
+  (embark-define-keymap embark-browser-history-actions
+    "Keymap for actions for browser history items (when mentioned by name)."
+    ("b" ibrowse-history-browse-url)
+    ("d" ibrowse-history-delete)
+    ("u" ibrowse-history-copy-url)
+    ("o" ibrowse-history-insert-org-link)
+    ("m" ibrowse-history-insert-markdown-link))
 
-(embark-define-keymap embark-browser-history-actions
-  "Keymap for actions for browser history items (when mentioned by name)."
-  ("b" ibrowse-history-browse-url)
-  ("d" ibrowse-history-delete)
-  ("u" ibrowse-history-copy-url)
-  ("o" ibrowse-history-insert-org-link)
-  ("m" ibrowse-history-insert-markdown-link))
-
-(add-to-list 'embark-keymap-alist '(browser-history . embark-browser-history-actions))
+  (add-to-list
+   'embark-keymap-alist
+   '(browser-history . embark-browser-history-actions)))
 
 ;;; ibrowse-bookmark
+(when (fboundp #'ibrowse-bookmark--get-candidates)
+  (add-to-list
+   'marginalia-prompt-categories
+   '("\\<from browser bookmarks\\>" . browser-bookmark))
 
-(add-to-list 'marginalia-prompt-categories '("\\<from browser bookmarks\\>" . browser-bookmark))
+  (embark-define-keymap embark-browser-bookmark-actions
+    "Keymap for actions for browser bookmark items (when mentioned by name)."
+    ("b" ibrowse-bookmark-browse-url)
+    ("d" ibrowse-bookmark-delete)
+    ("u" ibrowse-bookmark-copy-url)
+    ("o" ibrowse-bookmark-insert-org-link)
+    ("m" ibrowse-bookmark-insert-markdown-link))
 
-(embark-define-keymap embark-browser-bookmark-actions
-  "Keymap for actions for browser bookmark items (when mentioned by name)."
-  ("b" ibrowse-bookmark-browse-url)
-  ("d" ibrowse-bookmark-delete)
-  ("u" ibrowse-bookmark-copy-url)
-  ("o" ibrowse-bookmark-insert-org-link)
-  ("m" ibrowse-bookmark-insert-markdown-link))
-
-(add-to-list 'embark-keymap-alist '(browser-bookmark . embark-browser-bookmark-actions))
+  (add-to-list
+   'embark-keymap-alist
+   '(browser-bookmark . embark-browser-bookmark-actions)))
 
 (provide 'ibrowse-embark)
 
