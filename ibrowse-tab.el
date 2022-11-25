@@ -47,10 +47,7 @@
           (seq-map #'ibrowse-tab--extract-fields
                    (json-parse-buffer :object-type 'alist)))))
 
-(defun ibrowse-tab--title->url (selected candidates &rest _)
-  (cadr (assoc selected candidates)))
-
-;;; Interaction
+;;; Actions
 
 (defun ibrowse-tab-activate (_title _url id)
   (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "activate/" id))))
@@ -59,47 +56,47 @@
   (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
 
 ;;;###autoload
-(defun ibrowse-tab-select-by-name ()
-  "Activate browser tab by name."
+(defun ibrowse-tab-select ()
+  "Activate browser tab by title."
   (interactive)
   (ibrowse-core-act-by-name
-   "Select browser tab by name:"
+   "Select browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-tab-activate))
 
 ;;;###autoload
-(defun ibrowse-tab-close-by-name ()
-  "Close browser tab by name."
+(defun ibrowse-tab-close ()
+  "Close browser tab by title."
   (interactive)
   (ibrowse-core-act-by-name
-   "Close browser tab by name:"
+   "Close browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-tab-close))
 
 ;;;###autoload
-(defun ibrowse-tab-copy-url-by-name ()
-  "Copy url of the browser tab by name."
+(defun ibrowse-tab-copy-url ()
+  "Copy url of the browser tab by title."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser tab by name:"
+   "Copy url of browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--copy-url))
 
 ;;;###autoload
-(defun ibrowse-tab-insert-org-link-by-name ()
-  "Insert org-link of the browser tab by name."
+(defun ibrowse-tab-insert-org-link ()
+  "Insert org-link of the browser tab by title."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser tab by name:"
+  "Insert org-link of browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--insert-org-link))
 
 ;;;###autoload
-(defun ibrowse-tab-insert-markdown-link-by-name ()
-  "Insert markdown-link of the browser tab by name."
+(defun ibrowse-tab-insert-markdown-link ()
+  "Insert markdown-link of the browser tab by title."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser tab by name:"
+   "Insert markdown-link of browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--insert-markdown-link))
 
