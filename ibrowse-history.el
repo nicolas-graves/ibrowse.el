@@ -57,8 +57,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
           "DELETE FROM visits WHERE url=" id ";"))
 
 (defun ibrowse-history--apply-sql-command (callback file sql-function)
-  "Function to apply the SQL-FUNCTION command using the SQL FILE and \
-call the function CALLBACK afterwards."
+  "Apply the SQL-FUNCTION command using the SQL FILE, then call CALLBACK."
   (if (zerop
        (call-process "sqlite3" nil t nil
                      "-ascii"
@@ -120,7 +119,7 @@ call the function CALLBACK afterwards."
   (ibrowse-core--file-check "History")
   (with-temp-buffer
     (ibrowse-history--apply-sql-command
-     (lambda (file) nil)
+     (lambda (_) nil)
      ibrowse-history-file
      (ibrowse-history-delete-sql id)))
   ;; Delete cache.
