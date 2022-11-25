@@ -97,7 +97,7 @@
 
 (defun ibrowse-bookmark--generate-file (bookmark-list)
   "Generate the content of a bookmark file from BOOKMARK-LIST."
-  (let* ((radix        (ibrowse-bookmark--radix-tree bookmark-list))
+  (let* ((radix        (ibrowse-bookmark--radix-tree (list bookmark-list)))
          (bookmark-bar (radix-tree-subtree (car radix) ".Bookmarks bar."))
          (other        (radix-tree-subtree (cadr radix) ".Other bookmarks."))
          (synced       (radix-tree-subtree (caddr radix) ".Mobile bookmarks.")))
@@ -113,7 +113,6 @@
 BOOKMARK-LIST to FILENAME."
   (with-temp-file filename
     (insert (json-encode bookmark-list))))
-;; (json-read-file ibrowse-bookmark-file)
 
 (defun ibrowse-bookmark--check-for-problems ()
   "Check for issues and throws an error if any issue is found."
@@ -141,10 +140,12 @@ RECURSION-ID."
 
 (defun ibrowse-bookmark--get-candidates ()
   "Get an alist with candidates."
-  (delq nil
-        (mapcar (lambda (x)
-                  (ibrowse-bookmark--extract-fields (cdr x) ""))
-                (alist-get 'roots (json-read-file ibrowse-bookmark-file)))))
+  (seq-mapcat
+   #'identity
+   (delq nil
+         (mapcar (lambda (x)
+                   (ibrowse-bookmark--extract-fields (cdr x) ""))
+                 (alist-get 'roots (json-read-file ibrowse-bookmark-file))))))
 
 (defun ibrowse-bookmark--radix-tree (bookmark-list)
   "Generate a radix-tree from BOOKMARK-LIST."
@@ -156,10 +157,19 @@ RECURSION-ID."
    bookmark-list))
 
 ;;; Actions / Interaction
-;; ibrowse-bookmark-browse-url-by-name
 ;; ibrowse-bookmark-delete-by-name
 ;; ibrowse-bookmark-copy-url-by-name
 ;; ibrowse-bookmark-add
+
+;;;###autoload
+
+(defun ibrowse-bookmark-browse-url-by-name ()
+  "Select and browse item from bookmark by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Browse item from history by name:"
+   #'ibrowse-bookmark--get-candidates
+   #'ibrowse-core--browse-url))
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here
