@@ -85,5 +85,23 @@
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--copy-url))
 
+;;;###autoload
+(defun ibrowse-tab-insert-org-link-by-name ()
+  "Insert org-link of the browser tab by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Copy url of browser tab by name:"
+   #'ibrowse-tab--get-candidates
+   #'ibrowse-core--insert-org-link))
+
+;;;###autoload
+(defun ibrowse-tab-insert-markdown-link-by-name ()
+  "Insert markdown-link of the browser tab by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Copy url of browser tab by name:"
+   #'ibrowse-tab--get-candidates
+   #'ibrowse-core--insert-markdown-link))
+
 (provide 'ibrowse-tab)
 ;;; ibrowse-tab.el ends here
