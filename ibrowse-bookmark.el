@@ -112,7 +112,7 @@
   "Write the file generated from `ibrowse-bookmark--generate-file' and \
 BOOKMARK-LIST to FILENAME."
   (with-temp-file filename
-    (insert (json-encode bookmark-list))))
+    (insert (json-encode (ibrowse-bookmark--generate-file bookmark-list)))))
 
 (defun ibrowse-bookmark--check-for-problems ()
   "Check for issues and throws an error if any issue is found."
