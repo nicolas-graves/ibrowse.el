@@ -158,7 +158,6 @@ RECURSION-ID."
 
 ;;; Actions / Interaction
 ;; ibrowse-bookmark-delete-by-name
-;; ibrowse-bookmark-copy-url-by-name
 ;; ibrowse-bookmark-add
 
 ;;;###autoload
@@ -170,6 +169,15 @@ RECURSION-ID."
    "Browse item from history by name:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--browse-url))
+
+;;;###autoload
+(defun ibrowse-bookmark-copy-url-by-name ()
+  "Select and copy item from bookmarks by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Browse item from history by name:"
+   #'ibrowse-bookmark--get-candidates
+   #'ibrowse-core--copy-url))
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here
