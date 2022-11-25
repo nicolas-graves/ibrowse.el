@@ -145,6 +145,24 @@ call the function CALLBACK afterwards."
    #'ibrowse-core--copy-url))
 
 ;;;###autoload
+(defun ibrowse-history-insert-org-link-by-name ()
+  "Insert org-link from history by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Copy url of browser history by name:"
+   #'ibrowse-history--get-candidates
+   #'ibrowse-core--insert-org-link))
+
+;;;###autoload
+(defun ibrowse-history-insert-markdown-link-by-name ()
+  "Insert markdown-link from history by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Copy url of browser history by name:"
+   #'ibrowse-history--get-candidates
+   #'ibrowse-core--insert-markdown-link))
+
+;;;###autoload
 (defun ibrowse-history-delete-by-name ()
   "Select and delete browser item from history by name.
 
