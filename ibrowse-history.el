@@ -127,43 +127,43 @@ call the function CALLBACK afterwards."
   (setq ibrowse-history-candidates nil))
 
 ;;;###autoload
-(defun ibrowse-history-browse-url-by-name ()
+(defun ibrowse-history-browse-url ()
   "Select and browse item from history by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Browse item from history by name:"
+   "Browse from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--browse-url))
 
 ;;;###autoload
-(defun ibrowse-history-copy-url-by-name ()
+(defun ibrowse-history-copy-url ()
   "Select and copy url from history by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Browse item from history by name:"
+   "Copy url from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--copy-url))
 
 ;;;###autoload
-(defun ibrowse-history-insert-org-link-by-name ()
+(defun ibrowse-history-insert-org-link ()
   "Insert org-link from history by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser history by name:"
+   "Insert org-link from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--insert-org-link))
 
 ;;;###autoload
-(defun ibrowse-history-insert-markdown-link-by-name ()
+(defun ibrowse-history-insert-markdown-link ()
   "Insert markdown-link from history by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser history by name:"
+   "Insert markdown-link from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--insert-markdown-link))
 
 ;;;###autoload
-(defun ibrowse-history-delete-by-name ()
+(defun ibrowse-history-delete ()
   "Select and delete browser item from history by name.
 
 It is currently not possible to delete history items while browsing,
@@ -171,7 +171,7 @@ because chromium-based browsers have an EXCLUSIVE lock on the relying
 SQlite database."
   (interactive)
   (ibrowse-core-act-by-name
-   "Delete browser item from history by name:"
+   "Delete item from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-history-delete-item))
 

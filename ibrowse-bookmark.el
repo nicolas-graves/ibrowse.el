@@ -27,10 +27,6 @@
 
 ;;; Commentary:
 ;; Interact with your browser from Emacs
-;;   Soft requirement: jq (URL <https://stedolan.github.io/jq/>).
-;;   Counsel-chrome-bm will work without jq, but it will be slow when you have
-;;   a lot of bookmarks.
-
 
 ;;; Code:
 
@@ -159,13 +155,13 @@ RECURSION-ID."
 ;;; Actions / Interaction
 
 (defun ibrowse-bookmark--delete-item (title url id)
-  "Delete item from bookmarks by name."
+  "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
   (ibrowse-bookmark--write-file
    (delete `(,title ,url ,id) (ibrowse-bookmark--get-candidates))
    ibrowse-bookmark-file))
 
 (defun ibrowse-bookmark-add-item-1 (title url)
-  "Add item to bookmarks."
+  "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
   (ibrowse-bookmark--write-file
    (append `((,title ,url ,(concat ".Bookmarks bar." title)))
            (ibrowse-bookmark--get-candidates))
@@ -173,6 +169,8 @@ RECURSION-ID."
 
 ;;;###autoload
 (defun ibrowse-bookmark-add-item (&optional title url)
+  "Add item to bookmarks.  Item is a list of TITLE URL and a recursion \
+id to put the bookmark in the Bookmarks bar folder."
   "Delete item from bookmarks by name."
   (interactive)
   (unless (and title url)
@@ -181,47 +179,47 @@ RECURSION-ID."
   (ibrowse-bookmark-add-item-1 title url))
 
 ;;;###autoload
-(defun ibrowse-bookmark-browse-url-by-name ()
+(defun ibrowse-bookmark-browse-url ()
   "Select and browse item from bookmarks by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Browse item from history by name:"
+   "Browse item from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--browse-url))
 
 ;;;###autoload
-(defun ibrowse-bookmark-copy-url-by-name ()
+(defun ibrowse-bookmark-copy-url ()
   "Select and copy item from bookmarks by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Browse item from history by name:"
+   "Copy url from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--copy-url))
 
 ;;;###autoload
-(defun ibrowse-bookmark-insert-org-link-by-name ()
+(defun ibrowse-bookmark-insert-org-link ()
   "Insert org-link from bookmarks by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser bookmark by name:"
+   "Insert org-link from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--insert-org-link))
 
 ;;;###autoload
-(defun ibrowse-bookmark-insert-markdown-link-by-name ()
+(defun ibrowse-bookmark-insert-markdown-link ()
   "Insert markdown-link from bookmarks by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser bookmark by name:"
+   "Insert markdown-link from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--insert-markdown-link))
 
 ;;;###autoload
-(defun ibrowse-bookmark-delete-by-name ()
+(defun ibrowse-bookmark-delete ()
   "Delete item from bookmarks by name."
   (interactive)
   (ibrowse-core-act-by-name
-   "Delete item from history by name:"
+   "Delete item from browser bookmarks:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-bookmark--delete-item))
 

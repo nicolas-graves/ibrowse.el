@@ -50,9 +50,11 @@
 ;;; Actions
 
 (defun ibrowse-tab-activate (_title _url id)
+  "Active browser tab from ID using the chromium developer protocol."
   (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "activate/" id))))
 
 (defun ibrowse-tab-close (_title _url id)
+  "Close browser tab from ID using the chromium developer protocol."
   (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
 
 ;;;###autoload
