@@ -179,5 +179,23 @@ RECURSION-ID."
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--copy-url))
 
+;;;###autoload
+(defun ibrowse-bookmark-insert-org-link-by-name ()
+  "Insert org-link from bookmarks by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Copy url of browser bookmark by name:"
+   #'ibrowse-bookmark--get-candidates
+   #'ibrowse-core--insert-org-link))
+
+;;;###autoload
+(defun ibrowse-bookmark-insert-markdown-link-by-name ()
+  "Insert markdown-link from bookmarks by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Copy url of browser bookmark by name:"
+   #'ibrowse-bookmark--get-candidates
+   #'ibrowse-core--insert-markdown-link))
+
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here
