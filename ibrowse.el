@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "24.3") (let-alist "1.0.4") (seq "1.11") (dash "2.12.1"))
+;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: browser, tabs, switch
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 

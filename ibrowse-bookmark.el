@@ -5,7 +5,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "25.1"))
+;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: browser, tabs, switch
 ;; URL: https://git.sr.ht/~ngraves/ibrowser-bookmark.el
 
@@ -37,6 +37,7 @@
 (require 'json)
 (require 'dash)
 (require 'seq)
+(require 'radix-tree)
 (require 'ibrowse-core)
 
 ;;; Settings

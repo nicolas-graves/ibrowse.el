@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "24.3") (let-alist "1.0.4") (seq "1.11"))
+;; Package-Requires: ((emacs "24.3"))
 ;; Keywords: browser, tabs, switch, interactive
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -45,3 +45,7 @@
   ("u" ibrowse-tab-copy-url-by-name))
 
 (add-to-list 'embark-keymap-alist '(browser-tab . embark-browser-tab-actions))
+
+(provide 'ibrowse-embark)
+
+;;; ibrowse-embark.el ends here
