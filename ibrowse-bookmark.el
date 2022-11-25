@@ -6,7 +6,7 @@
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
 ;; Package-Requires: ((emacs "26.1"))
-;; Keywords: browser, tabs, switch
+;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowser-bookmark.el
 
 ;;; License:

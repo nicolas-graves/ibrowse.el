@@ -5,7 +5,7 @@
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.0.0
 ;; Package-Requires: ((emacs "24.3"))
-;; Keywords: browser, tabs, switch, interactive
+;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
 ;; This program is free software; you can redistribute it and/or modify
