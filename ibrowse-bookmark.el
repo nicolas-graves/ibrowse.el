@@ -157,13 +157,17 @@ RECURSION-ID."
    bookmark-list))
 
 ;;; Actions / Interaction
-;; ibrowse-bookmark-delete-by-name
 ;; ibrowse-bookmark-add
 
-;;;###autoload
+(defun ibrowse-bookmark--delete-item (title url id)
+  "Delete item from bookmarks by name."
+  (ibrowse-bookmark--write-file
+   (delete `(,title ,url ,id) (ibrowse-bookmark--get-candidates))
+   ibrowse-bookmark-file))
 
+;;;###autoload
 (defun ibrowse-bookmark-browse-url-by-name ()
-  "Select and browse item from bookmark by name."
+  "Select and browse item from bookmarks by name."
   (interactive)
   (ibrowse-core-act-by-name
    "Browse item from history by name:"
@@ -196,6 +200,15 @@ RECURSION-ID."
    "Copy url of browser bookmark by name:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--insert-markdown-link))
+
+;;;###autoload
+(defun ibrowse-bookmark-delete-by-name ()
+  "Delete item from bookmarks by name."
+  (interactive)
+  (ibrowse-core-act-by-name
+   "Delete item from history by name:"
+   #'ibrowse-bookmark--get-candidates
+   #'ibrowse-bookmark--delete-item))
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here
