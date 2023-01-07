@@ -56,3 +56,7 @@ This file will introduce the following commands :
 After loading the file =ibrowse-embark.el=, you can also select commands once a tab is selected, in case you change your mind.
 
 Embark also allows to act on multiple entries as one (you can simply use embark actions to open several tabs or delete several history items at once).
+
+** Changelog
+
+- 0.1.0: Initial release for inclusion in Guix and Melpa.
