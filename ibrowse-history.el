@@ -88,10 +88,9 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   "Format TITLE and LAST-VISIT-TIME for `completing-read'."
   (format "%s | %s"
           (format-time-string
-           "%Y-%m-%d"
-           (- (/ (string-to-number last-visit-time) 1000000)
-              ;; https://stackoverflow.com/a/26233663/2999892
-              11644473600))
+           "%F" (- (/ (string-to-number last-visit-time) 1000000)
+                   ;; https://stackoverflow.com/a/26233663/2999892
+                   11644473600))
           title))
 
 (defvar ibrowse-history-candidates nil
