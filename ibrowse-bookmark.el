@@ -1,4 +1,4 @@
-;; ibrowser-bookmark.el --- Interact with your browser from Emacs -*- lexical-binding: t -*-
+;;; ibrowse-bookmark.el --- Interact with your browser -*- lexical-binding: t -*-
 
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;; Copyright © 2021 BlueBoxWare

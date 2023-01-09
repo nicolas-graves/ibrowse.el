@@ -1,4 +1,4 @@
-;; ibrowse-history.el --- Interact with your browser from Emacs -*- lexical-binding: t -*-
+;;; ibrowse-history.el --- Interact with your browser -*- lexical-binding: t -*-
 
 ;; Copyright © 2019 Xu Chunyang <mail@xuchunyang.me> (original author)
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr> (heavy rewrite and adding deletions)

@@ -1,4 +1,4 @@
-;; ibrowse-core.el --- Interact with your browser from Emacs -*- lexical-binding: t -*-
+;;; ibrowse-core.el --- Interact with your browser -*- lexical-binding: t -*-
 
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;; Some snippets have been written by
