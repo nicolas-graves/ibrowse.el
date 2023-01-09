@@ -32,7 +32,15 @@
 (require 'marginalia)
 
 ;;; ibrowse-tab
-(when (fboundp #'ibrowse-tab--get-candidates)
+
+;; Declaring function existence for byte-compiling.
+(declare-function ibrowse-tab-select               "ibrowse-tab" ())
+(declare-function ibrowse-tab-close                "ibrowse-tab" ())
+(declare-function ibrowse-tab-copy-url             "ibrowse-tab" ())
+(declare-function ibrowse-tab-insert-org-link      "ibrowse-tab" ())
+(declare-function ibrowse-tab-insert-markdown-link "ibrowse-tab" ())
+
+(when (fboundp 'ibrowse-tab--get-candidates)
   (add-to-list
    'marginalia-prompt-categories
    '("\\<browser tab by title\\>" . browser-tab))
@@ -50,7 +58,15 @@
    '(browser-tab . embark-browser-tab-actions)))
 
 ;;; ibrowse-history
-(when (fboundp #'ibrowse-history--get-candidates)
+
+;; Declaring function existence for byte-compiling.
+(declare-function ibrowse-history-browse-url           "ibrowse-history" ())
+(declare-function ibrowse-history-delete               "ibrowse-history" ())
+(declare-function ibrowse-history-copy-url             "ibrowse-history" ())
+(declare-function ibrowse-history-insert-org-link      "ibrowse-history" ())
+(declare-function ibrowse-history-insert-markdown-link "ibrowse-history" ())
+
+(when (fboundp 'ibrowse-history--get-candidates)
   (add-to-list
    'marginalia-prompt-categories
    '("\\<from browser history\\>" . browser-history))
@@ -68,7 +84,15 @@
    '(browser-history . embark-browser-history-actions)))
 
 ;;; ibrowse-bookmark
-(when (fboundp #'ibrowse-bookmark--get-candidates)
+
+;; Declaring function existence for byte-compiling.
+(declare-function ibrowse-bookmark-browse-url           "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-delete               "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-copy-url             "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-insert-org-link      "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-insert-markdown-link "ibrowse-bookmark" ())
+
+(when (fboundp 'ibrowse-bookmark--get-candidates)
   (add-to-list
    'marginalia-prompt-categories
    '("\\<from browser bookmarks\\>" . browser-bookmark))
