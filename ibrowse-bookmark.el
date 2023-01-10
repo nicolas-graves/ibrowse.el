@@ -4,7 +4,7 @@
 ;; Copyright © 2021 BlueBoxWare
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
-;; Version: 0.0.0
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowser-bookmark.el
