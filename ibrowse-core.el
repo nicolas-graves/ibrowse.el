@@ -111,11 +111,17 @@ Does nothing if `markdown-insert-inline-link' is unavailable."
   (if (fboundp 'markdown-insert-inline-link)
       (with-current-buffer (markdown-insert-inline-link title url))))
 
-(defun ibrowse-core-act-by-name (prompt get-candidates action)
+(defun ibrowse-core-act-by-name (prompt get-candidates action categ)
   "GET-CANDIDATES using PROMPT and call the function ACTION on the \
 selected item."
   (let* ((candidates (funcall get-candidates))
-         (selected   (completing-read prompt candidates)))
+         (selected   (completing-read
+                      prompt
+                      (lambda (string predicate action)
+                        (if (eq action 'metadata)
+                            `(metadata (category . ,categ))
+                          (complete-with-action
+                           action candidates string predicate))))))
     (pcase (assoc selected candidates)
       (`(,title ,url ,id)
        (funcall action title url id)))))

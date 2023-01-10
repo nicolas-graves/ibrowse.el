@@ -62,7 +62,8 @@
   (ibrowse-core-act-by-name
    "Select browser tab by title:"
    #'ibrowse-tab--get-candidates
-   #'ibrowse-tab--activate))
+   #'ibrowse-tab--activate
+   'browser-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-close ()
@@ -71,7 +72,8 @@
   (ibrowse-core-act-by-name
    "Close browser tab by title:"
    #'ibrowse-tab--get-candidates
-   #'ibrowse-tab--close))
+   #'ibrowse-tab--close
+   'browser-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-copy-url ()
@@ -80,7 +82,8 @@
   (ibrowse-core-act-by-name
    "Copy url of browser tab by title:"
    #'ibrowse-tab--get-candidates
-   #'ibrowse-core--copy-url))
+   #'ibrowse-core--copy-url
+   'browser-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-org-link ()
@@ -89,7 +92,8 @@
   (ibrowse-core-act-by-name
   "Insert org-link of browser tab by title:"
    #'ibrowse-tab--get-candidates
-   #'ibrowse-core--insert-org-link))
+   #'ibrowse-core--insert-org-link
+   'browser-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-markdown-link ()
@@ -98,7 +102,8 @@
   (ibrowse-core-act-by-name
    "Insert markdown-link of browser tab by title:"
    #'ibrowse-tab--get-candidates
-   #'ibrowse-core--insert-markdown-link))
+   #'ibrowse-core--insert-markdown-link
+   'browser-tab))
 
 (provide 'ibrowse-tab)
 ;;; ibrowse-tab.el ends here

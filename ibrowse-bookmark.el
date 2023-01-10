@@ -186,7 +186,8 @@ the Bookmarks bar folder."
   (ibrowse-core-act-by-name
    "Browse item from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--browse-url))
+   #'ibrowse-core--browse-url
+   'browser-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-copy-url ()
@@ -195,7 +196,8 @@ the Bookmarks bar folder."
   (ibrowse-core-act-by-name
    "Copy url from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--copy-url))
+   #'ibrowse-core--copy-url
+   'browser-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-org-link ()
@@ -204,7 +206,8 @@ the Bookmarks bar folder."
   (ibrowse-core-act-by-name
    "Insert org-link from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--insert-org-link))
+   #'ibrowse-core--insert-org-link
+   'browser-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-markdown-link ()
@@ -213,7 +216,8 @@ the Bookmarks bar folder."
   (ibrowse-core-act-by-name
    "Insert markdown-link from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--insert-markdown-link))
+   #'ibrowse-core--insert-markdown-link
+   'browser-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-delete ()
@@ -222,7 +226,8 @@ the Bookmarks bar folder."
   (ibrowse-core-act-by-name
    "Delete item from browser bookmarks:"
    #'ibrowse-bookmark--get-candidates
-   #'ibrowse-bookmark--delete-item))
+   #'ibrowse-bookmark--delete-item
+   'browser-bookmark))
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here

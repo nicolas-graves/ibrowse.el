@@ -29,7 +29,6 @@
 ;;; Code:
 
 (require 'embark)
-(require 'marginalia)
 
 ;;; ibrowse-tab
 
@@ -41,10 +40,6 @@
 (declare-function ibrowse-tab-insert-markdown-link "ibrowse-tab" ())
 
 (when (fboundp 'ibrowse-tab--get-candidates)
-  (add-to-list
-   'marginalia-prompt-categories
-   '("\\<browser tab by title\\>" . browser-tab))
-
   (embark-define-keymap embark-browser-tab-actions
     "Keymap for actions for browser tabs (when mentioned by title)."
     ("s" ibrowse-tab-select)
@@ -67,10 +62,6 @@
 (declare-function ibrowse-history-insert-markdown-link "ibrowse-history" ())
 
 (when (fboundp 'ibrowse-history--get-candidates)
-  (add-to-list
-   'marginalia-prompt-categories
-   '("\\<from browser history\\>" . browser-history))
-
   (embark-define-keymap embark-browser-history-actions
     "Keymap for actions for browser history items (when mentioned by name)."
     ("b" ibrowse-history-browse-url)
@@ -93,10 +84,6 @@
 (declare-function ibrowse-bookmark-insert-markdown-link "ibrowse-bookmark" ())
 
 (when (fboundp 'ibrowse-bookmark--get-candidates)
-  (add-to-list
-   'marginalia-prompt-categories
-   '("\\<from browser bookmarks\\>" . browser-bookmark))
-
   (embark-define-keymap embark-browser-bookmark-actions
     "Keymap for actions for browser bookmark items (when mentioned by name)."
     ("b" ibrowse-bookmark-browse-url)

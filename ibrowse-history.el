@@ -128,7 +128,8 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (ibrowse-core-act-by-name
    "Browse from browser history:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-core--browse-url))
+   #'ibrowse-core--browse-url
+   'browser-history))
 
 ;;;###autoload
 (defun ibrowse-history-copy-url ()
@@ -137,7 +138,8 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (ibrowse-core-act-by-name
    "Copy url from browser history:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-core--copy-url))
+   #'ibrowse-core--copy-url
+   'browser-history))
 
 ;;;###autoload
 (defun ibrowse-history-insert-org-link ()
@@ -146,7 +148,8 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (ibrowse-core-act-by-name
    "Insert org-link from browser history:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-core--insert-org-link))
+   #'ibrowse-core--insert-org-link
+   'browser-history))
 
 ;;;###autoload
 (defun ibrowse-history-insert-markdown-link ()
@@ -155,7 +158,8 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (ibrowse-core-act-by-name
    "Insert markdown-link from browser history:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-core--insert-markdown-link))
+   #'ibrowse-core--insert-markdown-link
+   'browser-history))
 
 ;;;###autoload
 (defun ibrowse-history-delete ()
@@ -168,7 +172,8 @@ SQlite database."
   (ibrowse-core-act-by-name
    "Delete item from browser history:"
    #'ibrowse-history--get-candidates
-   #'ibrowse-history-delete-item))
+   #'ibrowse-history-delete-item
+   'browser-history))
 
 (provide 'ibrowse-history)
 ;;; ibrowse-history.el ends here
