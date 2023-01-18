@@ -59,5 +59,6 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 ** Changelog
 
+- 0.1.2: Add embark dependency.
 - 0.1.1: Melpa corrections and remove marginalia dependency.
 - 0.1.0: Initial release for inclusion in Guix and Melpa.
