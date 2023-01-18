@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.1.1
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.3") (embark "0.17"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
