@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.1.2
-;; Package-Requires: ((emacs "24.3") (embark "0.17"))
+;; Package-Requires: ((emacs "24.3"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -28,8 +28,6 @@
 
 ;;; Code:
 
-(require 'embark)
-
 ;;; ibrowse-tab
 
 ;; Declaring function existence for byte-compiling.
@@ -39,18 +37,16 @@
 (declare-function ibrowse-tab-insert-org-link      "ibrowse-tab" ())
 (declare-function ibrowse-tab-insert-markdown-link "ibrowse-tab" ())
 
-(when (fboundp 'ibrowse-tab--get-candidates)
-  (embark-define-keymap embark-browser-tab-actions
-    "Keymap for actions for browser tabs (when mentioned by title)."
-    ("s" ibrowse-tab-select)
-    ("k" ibrowse-tab-close)
-    ("u" ibrowse-tab-copy-url)
-    ("o" ibrowse-tab-insert-org-link)
-    ("m" ibrowse-tab-insert-markdown-link))
-
-  (add-to-list
-   'embark-keymap-alist
-   '(browser-tab . embark-browser-tab-actions)))
+;; Declaring keymap.
+(defvar embark-browser-tab-actions
+  (let ((map (make-sparse-keymap)))
+    (define-key map "s" #'ibrowse-tab-select)
+    (define-key map "k" #'ibrowse-tab-close)
+    (define-key map "u" #'ibrowse-tab-copy-url)
+    (define-key map "o" #'ibrowse-tab-insert-org-link)
+    (define-key map "m" #'ibrowse-tab-insert-markdown-link)
+    map)
+  "Keymap for actions for browser tabs.")
 
 ;;; ibrowse-history
 
@@ -61,18 +57,16 @@
 (declare-function ibrowse-history-insert-org-link      "ibrowse-history" ())
 (declare-function ibrowse-history-insert-markdown-link "ibrowse-history" ())
 
-(when (fboundp 'ibrowse-history--get-candidates)
-  (embark-define-keymap embark-browser-history-actions
-    "Keymap for actions for browser history items (when mentioned by name)."
-    ("b" ibrowse-history-browse-url)
-    ("d" ibrowse-history-delete)
-    ("u" ibrowse-history-copy-url)
-    ("o" ibrowse-history-insert-org-link)
-    ("m" ibrowse-history-insert-markdown-link))
-
-  (add-to-list
-   'embark-keymap-alist
-   '(browser-history . embark-browser-history-actions)))
+;; Declaring keymap.
+(defvar embark-browser-history-actions
+  (let ((map (make-sparse-keymap)))
+    (define-key map "b" #'ibrowse-history-browse-url)
+    (define-key map "d" #'ibrowse-history-delete)
+    (define-key map "u" #'ibrowse-history-copy-url)
+    (define-key map "o" #'ibrowse-history-insert-org-link)
+    (define-key map "m" #'ibrowse-history-insert-markdown-link)
+    map)
+    "Keymap for actions for browser history items.")
 
 ;;; ibrowse-bookmark
 
@@ -83,18 +77,34 @@
 (declare-function ibrowse-bookmark-insert-org-link      "ibrowse-bookmark" ())
 (declare-function ibrowse-bookmark-insert-markdown-link "ibrowse-bookmark" ())
 
-(when (fboundp 'ibrowse-bookmark--get-candidates)
-  (embark-define-keymap embark-browser-bookmark-actions
-    "Keymap for actions for browser bookmark items (when mentioned by name)."
-    ("b" ibrowse-bookmark-browse-url)
-    ("d" ibrowse-bookmark-delete)
-    ("u" ibrowse-bookmark-copy-url)
-    ("o" ibrowse-bookmark-insert-org-link)
-    ("m" ibrowse-bookmark-insert-markdown-link))
+;; Declaring keymap.
+(defvar embark-browser-bookmark-actions
+  (let ((map (make-sparse-keymap)))
+    (define-key map "b" #'ibrowse-bookmark-browse-url)
+    (define-key map "d" #'ibrowse-bookmark-delete)
+    (define-key map "u" #'ibrowse-bookmark-copy-url)
+    (define-key map "o" #'ibrowse-bookmark-insert-org-link)
+    (define-key map "m" #'ibrowse-bookmark-insert-markdown-link)
+    map)
+  "Keymap for actions for browser bookmark items.")
 
-  (add-to-list
-   'embark-keymap-alist
-   '(browser-bookmark . embark-browser-bookmark-actions)))
+
+;;; Define embark-keymap-alist.
+
+(defvar embark-keymap-alist)
+(with-eval-after-load 'embark
+  (when (fboundp 'ibrowse-tab--get-candidates)
+    (add-to-list
+     'embark-keymap-alist
+     '(browser-tab . embark-browser-tab-actions)))
+  (when (fboundp 'ibrowse-history--get-candidates)
+    (add-to-list
+     'embark-keymap-alist
+     '(browser-history . embark-browser-history-actions)))
+  (when (fboundp 'ibrowse-bookmark--get-candidates)
+    (add-to-list
+     'embark-keymap-alist
+     '(browser-bookmark . embark-browser-bookmark-actions))))
 
 (provide 'ibrowse-embark)
 
