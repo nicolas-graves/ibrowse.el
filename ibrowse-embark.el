@@ -28,16 +28,7 @@
 
 ;;; Code:
 
-;;; ibrowse-tab
-
-;; Declaring function existence for byte-compiling.
-(declare-function ibrowse-tab-select               "ibrowse-tab" ())
-(declare-function ibrowse-tab-close                "ibrowse-tab" ())
-(declare-function ibrowse-tab-copy-url             "ibrowse-tab" ())
-(declare-function ibrowse-tab-insert-org-link      "ibrowse-tab" ())
-(declare-function ibrowse-tab-insert-markdown-link "ibrowse-tab" ())
-
-;; Declaring keymap.
+;; Declaring keymaps.
 (defvar embark-browser-tab-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "s" #'ibrowse-tab-select)
@@ -48,16 +39,6 @@
     map)
   "Keymap for actions for browser tabs.")
 
-;;; ibrowse-history
-
-;; Declaring function existence for byte-compiling.
-(declare-function ibrowse-history-browse-url           "ibrowse-history" ())
-(declare-function ibrowse-history-delete               "ibrowse-history" ())
-(declare-function ibrowse-history-copy-url             "ibrowse-history" ())
-(declare-function ibrowse-history-insert-org-link      "ibrowse-history" ())
-(declare-function ibrowse-history-insert-markdown-link "ibrowse-history" ())
-
-;; Declaring keymap.
 (defvar embark-browser-history-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-history-browse-url)
@@ -68,16 +49,6 @@
     map)
     "Keymap for actions for browser history items.")
 
-;;; ibrowse-bookmark
-
-;; Declaring function existence for byte-compiling.
-(declare-function ibrowse-bookmark-browse-url           "ibrowse-bookmark" ())
-(declare-function ibrowse-bookmark-delete               "ibrowse-bookmark" ())
-(declare-function ibrowse-bookmark-copy-url             "ibrowse-bookmark" ())
-(declare-function ibrowse-bookmark-insert-org-link      "ibrowse-bookmark" ())
-(declare-function ibrowse-bookmark-insert-markdown-link "ibrowse-bookmark" ())
-
-;; Declaring keymap.
 (defvar embark-browser-bookmark-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-bookmark-browse-url)
@@ -89,7 +60,7 @@
   "Keymap for actions for browser bookmark items.")
 
 
-;;; Define embark-keymap-alist.
+;; Define embark-keymap-alist.
 
 (defvar embark-keymap-alist)
 (with-eval-after-load 'embark
