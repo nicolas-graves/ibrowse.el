@@ -6,7 +6,7 @@
 ;; Copyright © 2016 Taichi Kawabata <kawabata.taichi@gmail.com>
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
-;; Version: 0.1.2
+;; Version: 0.1.3
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el

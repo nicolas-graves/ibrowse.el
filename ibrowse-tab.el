@@ -3,7 +3,7 @@
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
-;; Version: 0.1.2
+;; Version: 0.1.3
 ;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
