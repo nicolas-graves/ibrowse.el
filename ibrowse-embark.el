@@ -28,7 +28,16 @@
 
 ;;; Code:
 
-;; Declaring keymaps.
+;;; ibrowse-tab
+
+;; Declaring function existence.
+(declare-function ibrowse-tab-select               "ibrowse-tab" ())
+(declare-function ibrowse-tab-close                "ibrowse-tab" ())
+(declare-function ibrowse-tab-copy-url             "ibrowse-tab" ())
+(declare-function ibrowse-tab-insert-org-link      "ibrowse-tab" ())
+(declare-function ibrowse-tab-insert-markdown-link "ibrowse-tab" ())
+
+;; Declaring keymap.
 (defvar ibrowse-embark-tab-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "s" #'ibrowse-tab-select)
@@ -39,6 +48,16 @@
     map)
   "Keymap for actions for browser tabs.")
 
+;;; ibrowse-history
+
+;; Declaring function existence.
+(declare-function ibrowse-history-browse-url           "ibrowse-history" ())
+(declare-function ibrowse-history-delete               "ibrowse-history" ())
+(declare-function ibrowse-history-copy-url             "ibrowse-history" ())
+(declare-function ibrowse-history-insert-org-link      "ibrowse-history" ())
+(declare-function ibrowse-history-insert-markdown-link "ibrowse-history" ())
+
+;; Declaring keymap.
 (defvar ibrowse-embark-history-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-history-browse-url)
@@ -49,6 +68,14 @@
     map)
     "Keymap for actions for browser history items.")
 
+;; Declaring function existence.
+(declare-function ibrowse-bookmark-browse-url           "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-delete               "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-copy-url             "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-insert-org-link      "ibrowse-bookmark" ())
+(declare-function ibrowse-bookmark-insert-markdown-link "ibrowse-bookmark" ())
+
+;;; ibrowse-bookmark
 (defvar ibrowse-embark-bookmark-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-bookmark-browse-url)
@@ -60,7 +87,7 @@
   "Keymap for actions for browser bookmark items.")
 
 
-;; Define embark-keymap-alist.
+;;; Define embark-keymap-alist.
 
 (defvar embark-keymap-alist)
 (with-eval-after-load 'embark
