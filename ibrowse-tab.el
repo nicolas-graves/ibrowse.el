@@ -56,50 +56,50 @@
 
 ;;;###autoload
 (defun ibrowse-tab-select ()
-  "Activate browser tab by title."
+  "Activate browser tab."
   (interactive)
   (ibrowse-core-act-by-name
-   "Select browser tab by title:"
+   "Select browser tab:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-tab--activate
    'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-close ()
-  "Close browser tab by title."
+  "Close browser tab."
   (interactive)
   (ibrowse-core-act-by-name
-   "Close browser tab by title:"
+   "Close browser tab:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-tab--close
    'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-copy-url ()
-  "Copy url of the browser tab by title."
+  "Copy url of the browser tab."
   (interactive)
   (ibrowse-core-act-by-name
-   "Copy url of browser tab by title:"
+   "Copy url of browser tab:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--copy-url
    'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-org-link ()
-  "Insert org-link of the browser tab by title."
+  "Insert org-link of the browser tab."
   (interactive)
   (ibrowse-core-act-by-name
-  "Insert org-link of browser tab by title:"
+  "Insert org-link of browser tab:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--insert-org-link
    'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-markdown-link ()
-  "Insert markdown-link of the browser tab by title."
+  "Insert markdown-link of the browser tab."
   (interactive)
   (ibrowse-core-act-by-name
-   "Insert markdown-link of browser tab by title:"
+   "Insert markdown-link of browser tab:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--insert-markdown-link
    'ibrowse-tab))

@@ -6,7 +6,7 @@
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.1.5
 ;; Keywords: comm, data, files, tools
-;; URL: https://git.sr.ht/~ngraves/ibrowser-bookmark.el
+;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
 ;;; License:
 
@@ -180,7 +180,7 @@ the Bookmarks bar folder."
 
 ;;;###autoload
 (defun ibrowse-bookmark-browse-url ()
-  "Select and browse item from bookmarks by name."
+  "Select and browse item from bookmarks."
   (interactive)
   (ibrowse-core-act-by-name
    "Browse item from browser bookmark:"
@@ -190,7 +190,7 @@ the Bookmarks bar folder."
 
 ;;;###autoload
 (defun ibrowse-bookmark-copy-url ()
-  "Select and copy item from bookmarks by name."
+  "Select and copy item from bookmarks."
   (interactive)
   (ibrowse-core-act-by-name
    "Copy url from browser bookmark:"
@@ -200,7 +200,7 @@ the Bookmarks bar folder."
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-org-link ()
-  "Insert org-link from bookmarks by name."
+  "Insert org-link from bookmarks."
   (interactive)
   (ibrowse-core-act-by-name
    "Insert org-link from browser bookmark:"
@@ -210,7 +210,7 @@ the Bookmarks bar folder."
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-markdown-link ()
-  "Insert markdown-link from bookmarks by name."
+  "Insert markdown-link from bookmarks."
   (interactive)
   (ibrowse-core-act-by-name
    "Insert markdown-link from browser bookmark:"
@@ -220,7 +220,7 @@ the Bookmarks bar folder."
 
 ;;;###autoload
 (defun ibrowse-bookmark-delete ()
-  "Delete item from bookmarks by name."
+  "Delete item from bookmarks."
   (interactive)
   (ibrowse-core-act-by-name
    "Delete item from browser bookmarks:"

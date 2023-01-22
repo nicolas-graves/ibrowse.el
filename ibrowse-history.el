@@ -6,7 +6,7 @@
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.1.5
 ;; Keywords: comm, data, files, tools
-;; URL: https://git.sr.ht/~ngraves/ibrowse-history.el
+;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
 
 ;;;###autoload
 (defun ibrowse-history-browse-url ()
-  "Select and browse item from history by name."
+  "Select and browse item from history."
   (interactive)
   (ibrowse-core-act-by-name
    "Browse from browser history:"
@@ -132,7 +132,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
 
 ;;;###autoload
 (defun ibrowse-history-copy-url ()
-  "Select and copy url from history by name."
+  "Select and copy url from history."
   (interactive)
   (ibrowse-core-act-by-name
    "Copy url from browser history:"
@@ -142,7 +142,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
 
 ;;;###autoload
 (defun ibrowse-history-insert-org-link ()
-  "Insert org-link from history by name."
+  "Insert org-link from history."
   (interactive)
   (ibrowse-core-act-by-name
    "Insert org-link from browser history:"
@@ -152,7 +152,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
 
 ;;;###autoload
 (defun ibrowse-history-insert-markdown-link ()
-  "Insert markdown-link from history by name."
+  "Insert markdown-link from history."
   (interactive)
   (ibrowse-core-act-by-name
    "Insert markdown-link from browser history:"
@@ -162,7 +162,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
 
 ;;;###autoload
 (defun ibrowse-history-delete ()
-  "Select and delete browser item from history by name.
+  "Select and delete browser item from history.
 
 It is currently not possible to delete history items while browsing,
 because chromium-based browsers have an EXCLUSIVE lock on the relying
