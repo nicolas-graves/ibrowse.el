@@ -29,7 +29,7 @@
 ;;; Code:
 
 ;; Declaring keymaps.
-(defvar embark-browser-tab-actions
+(defvar ibrowse-embark-tab-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "s" #'ibrowse-tab-select)
     (define-key map "k" #'ibrowse-tab-close)
@@ -39,7 +39,7 @@
     map)
   "Keymap for actions for browser tabs.")
 
-(defvar embark-browser-history-actions
+(defvar ibrowse-embark-history-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-history-browse-url)
     (define-key map "d" #'ibrowse-history-delete)
@@ -49,7 +49,7 @@
     map)
     "Keymap for actions for browser history items.")
 
-(defvar embark-browser-bookmark-actions
+(defvar ibrowse-embark-bookmark-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-bookmark-browse-url)
     (define-key map "d" #'ibrowse-bookmark-delete)
@@ -67,15 +67,15 @@
   (when (fboundp 'ibrowse-tab--get-candidates)
     (add-to-list
      'embark-keymap-alist
-     '(browser-tab . embark-browser-tab-actions)))
+     '(browser-tab . ibrowse-embark-tab-actions)))
   (when (fboundp 'ibrowse-history--get-candidates)
     (add-to-list
      'embark-keymap-alist
-     '(browser-history . embark-browser-history-actions)))
+     '(browser-history . ibrowse-embark-history-actions)))
   (when (fboundp 'ibrowse-bookmark--get-candidates)
     (add-to-list
      'embark-keymap-alist
-     '(browser-bookmark . embark-browser-bookmark-actions))))
+     '(browser-bookmark . ibrowse-embark-bookmark-actions))))
 
 (provide 'ibrowse-embark)
 
