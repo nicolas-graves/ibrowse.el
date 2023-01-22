@@ -29,7 +29,6 @@
 (require 'ibrowse-tab)
 (require 'ibrowse-bookmark)
 (require 'ibrowse-history)
-(require 'ibrowse-embark)
 
 (provide 'ibrowse)
 ;;; ibrowse.el ends here
