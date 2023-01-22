@@ -186,7 +186,7 @@ the Bookmarks bar folder."
    "Browse item from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--browse-url
-   'browser-bookmark))
+   'ibrowse-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-copy-url ()
@@ -196,7 +196,7 @@ the Bookmarks bar folder."
    "Copy url from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--copy-url
-   'browser-bookmark))
+   'ibrowse-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-org-link ()
@@ -206,7 +206,7 @@ the Bookmarks bar folder."
    "Insert org-link from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--insert-org-link
-   'browser-bookmark))
+   'ibrowse-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-markdown-link ()
@@ -216,7 +216,7 @@ the Bookmarks bar folder."
    "Insert markdown-link from browser bookmark:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-core--insert-markdown-link
-   'browser-bookmark))
+   'ibrowse-bookmark))
 
 ;;;###autoload
 (defun ibrowse-bookmark-delete ()
@@ -226,11 +226,11 @@ the Bookmarks bar folder."
    "Delete item from browser bookmarks:"
    #'ibrowse-bookmark--get-candidates
    #'ibrowse-bookmark--delete-item
-   'browser-bookmark))
+   'ibrowse-bookmark))
 
 ;;; Embark
 
-(defvar ibrowse-embark-bookmark-actions
+(defvar ibrowse-bookmark-embark-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-bookmark-browse-url)
     (define-key map "d" #'ibrowse-bookmark-delete)
@@ -244,7 +244,7 @@ the Bookmarks bar folder."
 (with-eval-after-load 'embark
   (add-to-list
    'embark-keymap-alist
-   '(browser-bookmark . ibrowse-embark-bookmark-actions)))
+   '(ibrowse-bookmark . ibrowse-bookmark-embark-actions)))
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here

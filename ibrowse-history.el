@@ -128,7 +128,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
    "Browse from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--browse-url
-   'browser-history))
+   'ibrowse-history))
 
 ;;;###autoload
 (defun ibrowse-history-copy-url ()
@@ -138,7 +138,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
    "Copy url from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--copy-url
-   'browser-history))
+   'ibrowse-history))
 
 ;;;###autoload
 (defun ibrowse-history-insert-org-link ()
@@ -148,7 +148,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
    "Insert org-link from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--insert-org-link
-   'browser-history))
+   'ibrowse-history))
 
 ;;;###autoload
 (defun ibrowse-history-insert-markdown-link ()
@@ -158,7 +158,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
    "Insert markdown-link from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-core--insert-markdown-link
-   'browser-history))
+   'ibrowse-history))
 
 ;;;###autoload
 (defun ibrowse-history-delete ()
@@ -172,11 +172,11 @@ SQlite database."
    "Delete item from browser history:"
    #'ibrowse-history--get-candidates
    #'ibrowse-history-delete-item
-   'browser-history))
+   'ibrowse-history))
 
 ;;; Embark
 
-(defvar ibrowse-embark-history-actions
+(defvar ibrowse-history-embark-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "b" #'ibrowse-history-browse-url)
     (define-key map "d" #'ibrowse-history-delete)
@@ -190,7 +190,7 @@ SQlite database."
 (with-eval-after-load 'embark
   (add-to-list
    'embark-keymap-alist
-   '(browser-history . ibrowse-embark-history-actions)))
+   '(ibrowse-history . ibrowse-history-embark-actions)))
 
 (provide 'ibrowse-history)
 ;;; ibrowse-history.el ends here

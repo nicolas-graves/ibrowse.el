@@ -62,7 +62,7 @@
    "Select browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-tab--activate
-   'browser-tab))
+   'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-close ()
@@ -72,7 +72,7 @@
    "Close browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-tab--close
-   'browser-tab))
+   'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-copy-url ()
@@ -82,7 +82,7 @@
    "Copy url of browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--copy-url
-   'browser-tab))
+   'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-org-link ()
@@ -92,7 +92,7 @@
   "Insert org-link of browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--insert-org-link
-   'browser-tab))
+   'ibrowse-tab))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-markdown-link ()
@@ -102,11 +102,11 @@
    "Insert markdown-link of browser tab by title:"
    #'ibrowse-tab--get-candidates
    #'ibrowse-core--insert-markdown-link
-   'browser-tab))
+   'ibrowse-tab))
 
 ;;; Embark
 
-(defvar ibrowse-embark-tab-actions
+(defvar ibrowse-tab-embark-actions
   (let ((map (make-sparse-keymap)))
     (define-key map "s" #'ibrowse-tab-select)
     (define-key map "k" #'ibrowse-tab-close)
@@ -120,7 +120,7 @@
 (with-eval-after-load 'embark
   (add-to-list
    'embark-keymap-alist
-   '(browser-tab . ibrowse-embark-tab-actions)))
+   '(ibrowse-tab . ibrowse-tab-embark-actions)))
 
 (provide 'ibrowse-tab)
 ;;; ibrowse-tab.el ends here
