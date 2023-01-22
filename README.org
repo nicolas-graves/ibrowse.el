@@ -53,12 +53,13 @@ This file will introduce the following commands :
 
 ** Embark functionalities
 
-After loading the file =ibrowse-embark.el=, you can also select commands once a tab is selected, in case you change your mind.
+If you have =embark= installed, all actions for tabs, bookmark or history items can be swapped with another one (/Actually.../ and /But first.../ =embark-act= functionality).
 
 Embark also allows to act on multiple entries as one (you can simply use embark actions to open several tabs or delete several history items at once).
 
 ** Changelog
 
+- 0.1.6: Renaming and factorising.
 - 0.1.5: Move embark configuration to module files.
 - 0.1.4: Various packaging fixes.
 - 0.1.3: Delete embark dependency.
