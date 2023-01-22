@@ -174,5 +174,23 @@ SQlite database."
    #'ibrowse-history-delete-item
    'browser-history))
 
+;;; Embark
+
+(defvar ibrowse-embark-history-actions
+  (let ((map (make-sparse-keymap)))
+    (define-key map "b" #'ibrowse-history-browse-url)
+    (define-key map "d" #'ibrowse-history-delete)
+    (define-key map "u" #'ibrowse-history-copy-url)
+    (define-key map "o" #'ibrowse-history-insert-org-link)
+    (define-key map "m" #'ibrowse-history-insert-markdown-link)
+    map)
+    "Keymap for actions for browser history items.")
+
+(defvar embark-keymap-alist)
+(with-eval-after-load 'embark
+  (add-to-list
+   'embark-keymap-alist
+   '(browser-history . ibrowse-embark-history-actions)))
+
 (provide 'ibrowse-history)
 ;;; ibrowse-history.el ends here

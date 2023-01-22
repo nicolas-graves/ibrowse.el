@@ -104,5 +104,23 @@
    #'ibrowse-core--insert-markdown-link
    'browser-tab))
 
+;;; Embark
+
+(defvar ibrowse-embark-tab-actions
+  (let ((map (make-sparse-keymap)))
+    (define-key map "s" #'ibrowse-tab-select)
+    (define-key map "k" #'ibrowse-tab-close)
+    (define-key map "u" #'ibrowse-tab-copy-url)
+    (define-key map "o" #'ibrowse-tab-insert-org-link)
+    (define-key map "m" #'ibrowse-tab-insert-markdown-link)
+    map)
+  "Keymap for actions for browser tabs.")
+
+(defvar embark-keymap-alist)
+(with-eval-after-load 'embark
+  (add-to-list
+   'embark-keymap-alist
+   '(browser-tab . ibrowse-embark-tab-actions)))
+
 (provide 'ibrowse-tab)
 ;;; ibrowse-tab.el ends here

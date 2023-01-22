@@ -228,5 +228,23 @@ the Bookmarks bar folder."
    #'ibrowse-bookmark--delete-item
    'browser-bookmark))
 
+;;; Embark
+
+(defvar ibrowse-embark-bookmark-actions
+  (let ((map (make-sparse-keymap)))
+    (define-key map "b" #'ibrowse-bookmark-browse-url)
+    (define-key map "d" #'ibrowse-bookmark-delete)
+    (define-key map "u" #'ibrowse-bookmark-copy-url)
+    (define-key map "o" #'ibrowse-bookmark-insert-org-link)
+    (define-key map "m" #'ibrowse-bookmark-insert-markdown-link)
+    map)
+  "Keymap for actions for browser bookmark items.")
+
+(defvar embark-keymap-alist)
+(with-eval-after-load 'embark
+  (add-to-list
+   'embark-keymap-alist
+   '(browser-bookmark . ibrowse-embark-bookmark-actions)))
+
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here
