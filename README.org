@@ -59,6 +59,7 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 ** Changelog
 
+- 0.1.5: Move embark configuration to module files.
 - 0.1.4: Various packaging fixes.
 - 0.1.3: Delete embark dependency.
 - 0.1.2: Add embark dependency.
