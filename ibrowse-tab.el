@@ -54,55 +54,53 @@
   "Close browser tab from ID using the chromium developer protocol."
   (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
 
+(defun ibrowse-tab-act (prompt action)
+  "Wrapper transmitting arguments PROMPT and ACTION to `ibrowse-core-act' \
+for `ibrowse-tab'."
+  (ibrowse-core-act prompt
+                    #'ibrowse-tab--get-candidates
+                    action
+                    'ibrowse-tab))
+
 ;;;###autoload
 (defun ibrowse-tab-select ()
   "Activate browser tab."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-tab-act
    "Select browser tab:"
-   #'ibrowse-tab--get-candidates
-   #'ibrowse-tab--activate
-   'ibrowse-tab))
+   #'ibrowse-tab--activate))
 
 ;;;###autoload
 (defun ibrowse-tab-close ()
   "Close browser tab."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-tab-act
    "Close browser tab:"
-   #'ibrowse-tab--get-candidates
-   #'ibrowse-tab--close
-   'ibrowse-tab))
+   #'ibrowse-tab--close))
 
 ;;;###autoload
 (defun ibrowse-tab-copy-url ()
   "Copy url of the browser tab."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-tab-act
    "Copy url of browser tab:"
-   #'ibrowse-tab--get-candidates
-   #'ibrowse-core--copy-url
-   'ibrowse-tab))
+   #'ibrowse-core--copy-url))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-org-link ()
   "Insert org-link of the browser tab."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-tab-act
   "Insert org-link of browser tab:"
-   #'ibrowse-tab--get-candidates
-   #'ibrowse-core--insert-org-link
-   'ibrowse-tab))
+   #'ibrowse-core--insert-org-link))
 
 ;;;###autoload
 (defun ibrowse-tab-insert-markdown-link ()
   "Insert markdown-link of the browser tab."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-tab-act
    "Insert markdown-link of browser tab:"
-   #'ibrowse-tab--get-candidates
-   #'ibrowse-core--insert-markdown-link
-   'ibrowse-tab))
+   #'ibrowse-core--insert-markdown-link))
 
 ;;; Embark
 

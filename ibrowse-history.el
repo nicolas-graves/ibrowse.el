@@ -120,15 +120,21 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   ;; Delete cache.
   (setq ibrowse-history-candidates nil))
 
+(defun ibrowse-history-act (prompt action)
+  "Wrapper transmitting arguments PROMPT and ACTION to `ibrowse-core-act' \
+for `ibrowse-history'."
+  (ibrowse-core-act prompt
+                    #'ibrowse-history--get-candidates
+                    action
+                    'ibrowse-history))
+
 ;;;###autoload
 (defun ibrowse-history-browse-url ()
   "Select and browse item from history."
   (interactive)
   (ibrowse-core-act-by-name
    "Browse from browser history:"
-   #'ibrowse-history--get-candidates
-   #'ibrowse-core--browse-url
-   'ibrowse-history))
+   #'ibrowse-core--browse-url))
 
 ;;;###autoload
 (defun ibrowse-history-copy-url ()
@@ -136,9 +142,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (interactive)
   (ibrowse-core-act-by-name
    "Copy url from browser history:"
-   #'ibrowse-history--get-candidates
-   #'ibrowse-core--copy-url
-   'ibrowse-history))
+   #'ibrowse-core--copy-url))
 
 ;;;###autoload
 (defun ibrowse-history-insert-org-link ()
@@ -146,9 +150,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (interactive)
   (ibrowse-core-act-by-name
    "Insert org-link from browser history:"
-   #'ibrowse-history--get-candidates
-   #'ibrowse-core--insert-org-link
-   'ibrowse-history))
+   #'ibrowse-core--insert-org-link))
 
 ;;;###autoload
 (defun ibrowse-history-insert-markdown-link ()
@@ -156,9 +158,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (interactive)
   (ibrowse-core-act-by-name
    "Insert markdown-link from browser history:"
-   #'ibrowse-history--get-candidates
-   #'ibrowse-core--insert-markdown-link
-   'ibrowse-history))
+   #'ibrowse-core--insert-markdown-link))
 
 ;;;###autoload
 (defun ibrowse-history-delete ()
@@ -170,9 +170,7 @@ SQlite database."
   (interactive)
   (ibrowse-core-act-by-name
    "Delete item from browser history:"
-   #'ibrowse-history--get-candidates
-   #'ibrowse-history-delete-item
-   'ibrowse-history))
+   #'ibrowse-history-delete-item))
 
 ;;; Embark
 

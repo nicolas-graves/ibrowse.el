@@ -178,55 +178,53 @@ the Bookmarks bar folder."
     (setq url (read-string "Url: ")))
   (ibrowse-bookmark-add-item-1 title url))
 
+(defun ibrowse-bookmark-act (prompt action)
+  "Wrapper transmitting arguments PROMPT and ACTION to `ibrowse-core-act' \
+for `ibrowse-bookmark'."
+  (ibrowse-core-act prompt
+                    #'ibrowse-bookmark--get-candidates
+                    action
+                    'ibrowse-bookmark))
+
 ;;;###autoload
 (defun ibrowse-bookmark-browse-url ()
   "Select and browse item from bookmarks."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-bookmark-act
    "Browse item from browser bookmark:"
-   #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--browse-url
-   'ibrowse-bookmark))
+   #'ibrowse-core--browse-url))
 
 ;;;###autoload
 (defun ibrowse-bookmark-copy-url ()
   "Select and copy item from bookmarks."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-bookmark-act
    "Copy url from browser bookmark:"
-   #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--copy-url
-   'ibrowse-bookmark))
+   #'ibrowse-core--copy-url))
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-org-link ()
   "Insert org-link from bookmarks."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-bookmark-act
    "Insert org-link from browser bookmark:"
-   #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--insert-org-link
-   'ibrowse-bookmark))
+   #'ibrowse-core--insert-org-link))
 
 ;;;###autoload
 (defun ibrowse-bookmark-insert-markdown-link ()
   "Insert markdown-link from bookmarks."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-bookmark-act
    "Insert markdown-link from browser bookmark:"
-   #'ibrowse-bookmark--get-candidates
-   #'ibrowse-core--insert-markdown-link
-   'ibrowse-bookmark))
+   #'ibrowse-core--insert-markdown-link))
 
 ;;;###autoload
 (defun ibrowse-bookmark-delete ()
   "Delete item from bookmarks."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-bookmark-act
    "Delete item from browser bookmarks:"
-   #'ibrowse-bookmark--get-candidates
-   #'ibrowse-bookmark--delete-item
-   'ibrowse-bookmark))
+   #'ibrowse-bookmark--delete-item))
 
 ;;; Embark
 
