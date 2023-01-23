@@ -121,8 +121,7 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (setq ibrowse-history-candidates nil))
 
 (defun ibrowse-history-act (prompt action)
-  "Wrapper transmitting arguments PROMPT and ACTION to \
-`ibrowse-core-act' for `ibrowse-history'."
+  "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
   (ibrowse-core-act prompt
                     #'ibrowse-history--get-candidates
                     action

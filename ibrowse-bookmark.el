@@ -179,8 +179,7 @@ the Bookmarks bar folder."
   (ibrowse-bookmark-add-item-1 title url))
 
 (defun ibrowse-bookmark-act (prompt action)
-  "Wrapper transmitting arguments PROMPT and ACTION to \
-`ibrowse-core-act' for `ibrowse-bookmark'."
+  "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
   (ibrowse-core-act prompt
                     #'ibrowse-bookmark--get-candidates
                     action
