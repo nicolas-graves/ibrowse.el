@@ -121,8 +121,8 @@ Don't change \"select title, url, id, last_visit_time\" part.")
   (setq ibrowse-history-candidates nil))
 
 (defun ibrowse-history-act (prompt action)
-  "Wrapper transmitting arguments PROMPT and ACTION to `ibrowse-core-act' \
-for `ibrowse-history'."
+  "Wrapper transmitting arguments PROMPT and ACTION to \
+`ibrowse-core-act' for `ibrowse-history'."
   (ibrowse-core-act prompt
                     #'ibrowse-history--get-candidates
                     action
@@ -132,7 +132,7 @@ for `ibrowse-history'."
 (defun ibrowse-history-browse-url ()
   "Select and browse item from history."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-history-act
    "Browse from browser history:"
    #'ibrowse-core--browse-url))
 
@@ -140,7 +140,7 @@ for `ibrowse-history'."
 (defun ibrowse-history-copy-url ()
   "Select and copy url from history."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-history-act
    "Copy url from browser history:"
    #'ibrowse-core--copy-url))
 
@@ -148,7 +148,7 @@ for `ibrowse-history'."
 (defun ibrowse-history-insert-org-link ()
   "Insert org-link from history."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-history-act
    "Insert org-link from browser history:"
    #'ibrowse-core--insert-org-link))
 
@@ -156,7 +156,7 @@ for `ibrowse-history'."
 (defun ibrowse-history-insert-markdown-link ()
   "Insert markdown-link from history."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-history-act
    "Insert markdown-link from browser history:"
    #'ibrowse-core--insert-markdown-link))
 
@@ -168,7 +168,7 @@ It is currently not possible to delete history items while browsing,
 because chromium-based browsers have an EXCLUSIVE lock on the relying
 SQlite database."
   (interactive)
-  (ibrowse-core-act-by-name
+  (ibrowse-history-act
    "Delete item from browser history:"
    #'ibrowse-history-delete-item))
 

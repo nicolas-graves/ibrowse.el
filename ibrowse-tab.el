@@ -55,8 +55,8 @@
   (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
 
 (defun ibrowse-tab-act (prompt action)
-  "Wrapper transmitting arguments PROMPT and ACTION to `ibrowse-core-act' \
-for `ibrowse-tab'."
+  "Wrapper transmitting arguments PROMPT and ACTION to \
+`ibrowse-core-act' for `ibrowse-tab'."
   (ibrowse-core-act prompt
                     #'ibrowse-tab--get-candidates
                     action
