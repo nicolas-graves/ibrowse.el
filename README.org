@@ -59,6 +59,7 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 ** Changelog
 
+- 0.1.8: Various packaging fixes.
 - 0.1.7: Various packaging fixes.
 - 0.1.6: Renaming and factorising.
 - 0.1.5: Move embark configuration to module files.

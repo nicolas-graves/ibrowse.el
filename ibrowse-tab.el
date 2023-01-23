@@ -3,7 +3,7 @@
 ;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
-;; Version: 0.1.7
+;; Version: 0.1.8
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
