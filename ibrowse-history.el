@@ -47,6 +47,29 @@ consider adjusting the SQL.
 
 Don't change \"select title, url, id, last_visit_time\" part.")
 
+(defvar ibrowse-history--cache (make-hash-table :test #'equal))
+
+(defvar ibrowse-history--temp-db-path
+  (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory))
+
+(defun ibrowse-history--ensure-db! (&optional force-update?)
+  "Ensure database by copying it to system temp file directory with a temp name.
+
+If FORCE-UPDATE? is non-nil and database was copied, delete it first."
+  (cl-flet ((update-db! ()
+              ;; The copy is necessary because our SQL query action
+              ;; may conflicts with running Firefox.
+              (copy-file ibrowse-history-file
+                         ibrowse-history--temp-db-path)
+              (clrhash ibrowse-history--cache)))
+    (let* ((path ibrowse-history--temp-db-path))
+      (if (file-exists-p path)
+          (when force-update?
+            (delete-file path)
+            (update-db!))
+        (update-db!))
+      nil)))
+
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
   (concat "DELETE FROM urls WHERE id=" id ";"
@@ -75,13 +98,12 @@ Don't change \"select title, url, id, last_visit_time\" part.")
 (defun ibrowse-history--extract-fields (callback)
   "Read `ibrowse-history-file' and call the CALLBACK function."
   (ibrowse-core--file-check "History")
+  (ibrowse-history--ensure-db!)
   (with-temp-buffer
-    (let ((tmp (make-temp-name "ibrowse-history")))
-      (copy-file ibrowse-history-file tmp)
-      (ibrowse-history--apply-sql-command
-       callback
-       tmp
-       ibrowse-history-sql))))
+    (ibrowse-history--apply-sql-command
+     callback
+     ibrowse-history--temp-db-path
+     ibrowse-history-sql)))
 
 (defun ibrowse-history-format-title (title last-visit-time)
   "Format TITLE and LAST-VISIT-TIME for `completing-read'."
