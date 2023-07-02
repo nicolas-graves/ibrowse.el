@@ -85,14 +85,13 @@ If FORCE-UPDATE? is non-nil and database was copied, delete it first."
       (funcall callback file)
     (error "Command sqlite3 failed: %s" (buffer-string))))
 
-(defun ibrowse-history--sql-command-read-callback (file)
-  "Function applied to the result of the SQL query, using the file FILE."
+(defun ibrowse-history--sql-command-read-callback ()
+  "Function applied to the result of the SQL query."
   (let (result)
     (goto-char (point-min))
     ;; -ascii delimited by 0x1F and 0x1E
     (while (re-search-forward (rx (group (+? anything)) "\x1e") nil t)
       (push (split-string (match-string 1) "\x1f") result))
-    (delete-file file)
     (nreverse result)))
 
 (defun ibrowse-history--extract-fields (callback)
