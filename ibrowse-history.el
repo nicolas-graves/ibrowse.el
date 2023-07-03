@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'ibrowse-core)
+(require 'emacsql-compiler)
 
 (eval-when-compile
   (require 'subr-x)
@@ -38,14 +39,6 @@
 (defvar ibrowse-history-file (concat ibrowse-core-db-dir "History")
   "Chrome history SQLite database file.")
 
-(defvar ibrowse-history-sql
-  "SELECT title, url, id, last_visit_time FROM urls ORDER BY id DESC LIMIT 100000"
-  "The SQL command used to extract history.
-
-If you have too many history and worry about the memory use,
-consider adjusting the SQL.
-
-Don't change \"select title, url, id, last_visit_time\" part.")
 
 (defvar ibrowse-history--cache (make-hash-table :test #'equal))
 
@@ -70,10 +63,33 @@ If FORCE-UPDATE? is non-nil and database was copied, delete it first."
         (update-db!))
       nil)))
 
+(defsubst ibrowse-history--prepare-sql-stmt (&rest sql-args-list)
+  "Prepare a series of SQL commands.
+SQL-ARGS-LIST should be a list of SQL command s-expressions SQL DSL.
+Returns a single string of SQL commands separated by semicolons."
+  (mapconcat
+   (lambda (sql-args) (concat (apply #'emacsql-format
+                                     (emacsql-prepare (car sql-args))
+                                     (cdr sql-args))
+                              ";"))
+   sql-args-list
+   "\n"))
+
+(defvar ibrowse-history-sql
+  (list [:select [title url id last_visit_time]
+         :from urls
+         :order-by id
+         :desc
+         :limit 100000])
+  "The SQL command used to extract history.
+
+If you have too many history and worry about the memory use,
+consider adjusting the SQL.")
+
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
-  (concat "DELETE FROM urls WHERE id=" id ";"
-          "DELETE FROM visits WHERE url=" id ";"))
+  `([:delete :from urls :where (= id ,id)]
+    [:delete :from visits :where (= url ,id)]))
 
 (defun ibrowse-history--apply-sql-command (callback file sql-function)
   "Apply the SQL-FUNCTION command using the SQL FILE, then call CALLBACK."
