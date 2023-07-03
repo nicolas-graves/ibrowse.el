@@ -35,7 +35,7 @@
 
 ;;; Backend
 
-(defvar ibrowse-history-file (concat ibrowse-core-default-folder "History")
+(defvar ibrowse-history-file (concat ibrowse-core-db-dir "History")
   "Chrome history SQLite database file.")
 
 (defvar ibrowse-history-sql

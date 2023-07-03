@@ -41,8 +41,8 @@
           ibrowse-core--cdp-debugging-port
           query))
 
-;; Change this variable to use another profile.
-(defvar ibrowse-core-default-folder-name "Default")
+(defvar ibrowse-core-chromium-profile "Default"
+  "Name of the Chromium profile to use.")
 
 (defvar ibrowse-core-base-folder-list
   '("~/.config/google-chrome"
@@ -61,8 +61,8 @@
     "~/Library/Application Support/Vivaldi"
     "~/AppData/Local/Google/Chrome/User Data/Default/"))
 
-(defun ibrowse-core-guess-default-folder ()
-  "Guess the folder containing the History and Bookmarks files."
+(defun ibrowse-core-guess-db-dir ()
+  "Guess the directory containing the History and Bookmarks files."
   (concat
    (car
     (seq-sort
@@ -70,18 +70,18 @@
      (seq-filter
       (lambda (p)
         (substitute-in-file-name
-         (concat p "/" ibrowse-core-default-folder-name "/History")))
+         (concat p "/" ibrowse-core-chromium-profile "/History")))
       ibrowse-core-base-folder-list)))
-   "/" ibrowse-core-default-folder-name "/"))
+   "/" ibrowse-core-chromium-profile "/"))
 
-(defvar ibrowse-core-default-folder (ibrowse-core-guess-default-folder)
-  "Chromium-based browsers profile folder.")
+(defvar ibrowse-core-db-dir (ibrowse-core-guess-db-dir)
+  "Browser database directory.")
 
 ;;; Functions
 
 (defun ibrowse-core--file-check (file)
   "Check if FILE exists."
-  (pcase (concat ibrowse-core-default-folder file)
+  (pcase (concat ibrowse-core-db-dir file)
     ('nil (user-error "`ibrowse-history-file' is not set"))
     ((pred file-exists-p) nil)
     (f (user-error "'%s' doesn't exist, please reset `ibrowse-history-file'" f))))

@@ -36,7 +36,7 @@
 ;;; Settings
 
 (defvar ibrowse-bookmark-file
-  (concat ibrowse-core-default-folder "Bookmarks")
+  (concat ibrowse-core-db-dir "Bookmarks")
   "Chromium-based browsers Bookmarks file.")
 
 (defconst ibrowse-bookmark--separator ".")
@@ -55,8 +55,8 @@
     (type . "url")
     (url . ,(cdr title-url))))
 
-(defun ibrowse-bookmark--generate-folder (content name)
-  "Generate a bookmark folder entry from CONTENT and with the foldername NAME."
+(defun ibrowse-bookmark--generate-dir (content name)
+  "Generate a bookmark directory entry from CONTENT named NAME."
   `((children . ,(vconcat (ibrowse-bookmark--generate-children content)))
     (date_added . "")
     (date_last_used . "")
@@ -67,23 +67,23 @@
     (type . "folder")))
 
 (defun ibrowse-bookmark--generate-children (content)
-  "Generate a bookmark children array from folder entry from CONTENT."
+  "Generate a bookmark children array from directory entry from CONTENT."
   (mapcar
    (lambda (cand)
      (if (not (nested-alist-p cand))
          (ibrowse-bookmark--generate-item cand)
-       ;; Case when a bookmark begins with the same name as a folder.
+       ;; Case when a bookmark begins with the same name as a directory.
        (if (not (string-match-p "\\." (car cand)))
            (ibrowse-bookmark--generate-children
             (mapcar
              (lambda (y) (cons (concat (car cand) (car y)) (cdr y)))
              (cdr cand)))
-         ;; Case when better split the folder.
+         ;; Case when better split the directory.
          (if (not (string-suffix-p "." (car cand)))
              (let ((prefix (car (split-string (car cand) "\\."))))
-               (ibrowse-bookmark--generate-folder
+               (ibrowse-bookmark--generate-dir
                 (radix-tree-subtree (list cand) (concat prefix ".")) prefix))
-           (ibrowse-bookmark--generate-folder
+           (ibrowse-bookmark--generate-dir
             (radix-tree-subtree (list cand) (car cand))
             (string-remove-suffix "." (car cand)))))))
    content))
@@ -96,9 +96,9 @@
          (synced       (radix-tree-subtree (caddr radix) ".Mobile bookmarks.")))
     `((checksum . "")
       (roots
-       (bookmark_bar . ,(ibrowse-bookmark--generate-folder bookmark-bar "Bookmarks bar"))
-       (other .        ,(ibrowse-bookmark--generate-folder other "Other bookmarks"))
-       (synced .       ,(ibrowse-bookmark--generate-folder synced "Mobile bookmarks")))
+       (bookmark_bar . ,(ibrowse-bookmark--generate-dir bookmark-bar "Bookmarks bar"))
+       (other .        ,(ibrowse-bookmark--generate-dir other "Other bookmarks"))
+       (synced .       ,(ibrowse-bookmark--generate-dir synced "Mobile bookmarks")))
       (version . 1))))
 
 (defun ibrowse-bookmark--write-file (bookmark-list filename)
@@ -118,7 +118,7 @@ BOOKMARK-LIST."
                                         ibrowse-bookmark-file)))))
 
 (defun ibrowse-bookmark--extract-fields (item recursion-id)
-  "Prepare a search result ITEM for display and store folder data to \
+  "Prepare a search result ITEM for display and store directory data to \
 RECURSION-ID."
   (let-alist item
     (if (and .children (string= .type "folder"))
@@ -171,7 +171,7 @@ RECURSION-ID."
   "Add the item constructed from TITLE and URL to bookmarks.
 
 Item is a list of TITLE URL and a recursion id to put the bookmark in
-the Bookmarks bar folder."
+the Bookmarks bar directory."
   (interactive)
   (unless (and title url)
     (setq title (read-string "Title: "))
