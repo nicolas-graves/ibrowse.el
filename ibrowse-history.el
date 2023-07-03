@@ -91,13 +91,13 @@ consider adjusting the SQL.")
   `([:delete :from urls :where (= id ,id)]
     [:delete :from visits :where (= url ,id)]))
 
-(defun ibrowse-history--apply-sql-command (callback file sql-function)
-  "Apply the SQL-FUNCTION command using the SQL FILE, then call CALLBACK."
+(defun ibrowse-history--apply-sql-command (callback file queries)
+  "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
   (if (zerop
        (call-process "sqlite3" nil t nil
                      "-ascii"
                      file
-                     sql-function))
+                     (ibrowse-history--prepare-sql-stmt queries)))
       (funcall callback file)
     (error "Command sqlite3 failed: %s" (buffer-string))))
 
