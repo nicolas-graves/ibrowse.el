@@ -112,8 +112,12 @@ chosen directory will be the most recently used profile."
       (if (file-newer-than-file-p
            (concat chromium-directory "History")
            (concat firefox-directory "places.sqlite"))
-          chromium-directory
-        firefox-directory))
+          (progn
+            (setq ibrowse-core-browser 'Chromium)
+            chromium-directory)
+        (progn
+          (setq ibrowse-core-browser 'Firefox)
+          firefox-directory)))
      (chromium-directory chromium-directory)
      (firefox-directory firefox-directory)
      (t (user-error "The browser database directory is not found!")))))
