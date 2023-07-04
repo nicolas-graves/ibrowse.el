@@ -30,7 +30,6 @@
 
 (require 'ibrowse-core)
 (require 'ibrowse-sql)
-(require 'emacsql-compiler)
 
 (eval-when-compile
   (require 'subr-x)
@@ -73,16 +72,6 @@ If FORCE-UPDATE? is non-nil and database was copied, delete it first."
         (update-db!))
       nil)))
 
-(defsubst ibrowse-history--prepare-sql-stmt (sql-args-list)
-  "Prepare a series of SQL commands.
-SQL-ARGS-LIST should be a list of SQL command s-expressions SQL DSL.
-Returns a single string of SQL commands separated by semicolons."
-  (mapconcat
-   (lambda (sql-args)
-     (concat (emacsql-format (emacsql-prepare sql-args)) ";"))
-   sql-args-list
-   "\n"))
-
 (defvar ibrowse-history-limit 100000
   "Limit set to the database history extraction.")
 
@@ -114,28 +103,12 @@ consider adjusting the SQL."
         `([:delete :from moz_places :where (= id ,num-id)]
           [:delete :from moz_historyvisits :where (= place_id ,num-id)])))))
 
-(defun ibrowse-history--apply-sql-command (callback file queries)
-  "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
-  (let ((sql-command (ibrowse-history--prepare-sql-stmt queries)))
-    (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
-        (funcall callback file)
-      (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string)))))
-
-(defun ibrowse-history--sql-command-read-callback (_)
-  "Function applied to the result of the SQL query."
-  (let (result)
-    (goto-char (point-min))
-    ;; -ascii delimited by 0x1F and 0x1E
-    (while (re-search-forward (rx (group (+? anything)) "\x1e") nil t)
-      (push (split-string (match-string 1) "\x1f") result))
-    (nreverse result)))
-
 (defun ibrowse-history--extract-fields (callback)
   "Read `ibrowse-history-file' and call the CALLBACK function."
   (ibrowse-core--file-check ibrowse-history-file "ibrowse-history-file")
   (ibrowse-history--ensure-db!)
   (with-temp-buffer
-    (ibrowse-history--apply-sql-command
+    (ibrowse-sql--apply-command
      callback
      ibrowse-history--temp-db-path
      (ibrowse-history-sql))))
@@ -157,7 +130,7 @@ consider adjusting the SQL."
            (pcase-lambda (`(,title ,url ,id ,last-visit-time))
              (list (ibrowse-history-format last-visit-time title url) url id))
            (ibrowse-history--extract-fields
-            #'ibrowse-history--sql-command-read-callback))))
+            #'ibrowse-sql--read-callback))))
   ibrowse-history-candidates)
 
 ;;; Interaction
@@ -166,7 +139,7 @@ consider adjusting the SQL."
   "Delete browser ID item using sqlite."
   (ibrowse-core--file-check ibrowse-history-file "ibrowse-history-file")
   (with-temp-buffer
-    (ibrowse-history--apply-sql-command
+    (ibrowse-sql--apply-command
      (lambda (_) nil)
      ibrowse-history-file
      (ibrowse-history-delete-sql id)))

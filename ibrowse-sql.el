@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'ibrowse-core)
+(require 'emacsql-compiler)
 
 ;;; Variables
 
@@ -99,6 +100,32 @@ chosen directory will be the most recently used profile."
 
 (defvar ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir)
   "Browser database directory.")
+
+(defsubst ibrowse-sql--prepare-stmt (sql-args-list)
+  "Prepare a series of SQL commands.
+SQL-ARGS-LIST should be a list of SQL command s-expressions SQL DSL.
+Returns a single string of SQL commands separated by semicolons."
+  (mapconcat
+   (lambda (sql-args)
+     (concat (emacsql-format (emacsql-prepare sql-args)) ";"))
+   sql-args-list
+   "\n"))
+
+(defun ibrowse-sql--apply-command (callback file queries)
+  "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
+  (let ((sql-command (ibrowse-sql--prepare-stmt queries)))
+    (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
+        (funcall callback file)
+      (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string)))))
+
+(defun ibrowse-sql--read-callback (_)
+  "Function applied to the result of the SQL query."
+  (let (result)
+    (goto-char (point-min))
+    ;; -ascii delimited by 0x1F and 0x1E
+    (while (re-search-forward (rx (group (+? anything)) "\x1e") nil t)
+      (push (split-string (match-string 1) "\x1f") result))
+    (nreverse result)))
 
 (provide 'ibrowse-sql)
 ;;; ibrowse-sql.el ends here
