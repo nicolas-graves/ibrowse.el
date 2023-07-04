@@ -131,14 +131,13 @@ consider adjusting the SQL.")
      ibrowse-history--temp-db-path
      ibrowse-history-sql)))
 
-(defun ibrowse-history-format-title (title last-visit-time)
-  "Format TITLE and LAST-VISIT-TIME for `completing-read'."
-  (format "%s | %s"
-          (format-time-string
-           "%F" (- (/ (string-to-number last-visit-time) 1000000)
-                   ;; https://stackoverflow.com/a/26233663/2999892
-                   11644473600))
-          title))
+(defun ibrowse-history-format-title (title date-in-ms)
+  "Format TITLE and DATE-IN-MS for `completing-read'."
+  (let* ((date (/ (string-to-number date-in-ms) 1000000))
+         (date (if (eq ibrowse-core-browser 'Chromium)
+                   (- date 11644473600) ; https://stackoverflow.com/a/26233663/2999892
+                 date)))
+    (format "%s | %s" (format-time-string "%F"  date) title)))
 
 (defun ibrowse-history--get-candidates ()
   "Build candidates."
