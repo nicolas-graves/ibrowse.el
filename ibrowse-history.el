@@ -82,22 +82,25 @@ Returns a single string of SQL commands separated by semicolons."
    sql-args-list
    "\n"))
 
-(defvar ibrowse-history-sql
-  (pcase ibrowse-core-browser
-    ('Chromium (list [:select [title url id last_visit_time]
-                      :from urls
-                      :order-by (desc id)
-                      :limit 100000]))
-    ('Firefox (list [:select [p:title p:url p:id h:visit_date]
-                     :from (as moz_historyvisits h)
-                     :inner-join (as moz_places p)
-                     :where (= h:place_id p:id)
-                     :order-by (desc h:visit_date)
-                     :limit 100000])))
+(defvar ibrowse-history-limit 100000
+  "Limit set to the database history extraction.")
+
+(defun ibrowse-history-sql ()
   "The SQL command used to extract history.
 
 If you have too many history and worry about the memory use,
-consider adjusting the SQL.")
+consider adjusting the SQL."
+  (pcase ibrowse-core-browser
+    ('Chromium `([:select [title url id last_visit_time]
+                  :from urls
+                  :order-by (desc id)
+                  :limit ,ibrowse-history-limit]))
+    ('Firefox  `([:select [p:title p:url p:id h:visit_date]
+                  :from (as moz_historyvisits h)
+                  :inner-join (as moz_places p)
+                  :where (= h:place_id p:id)
+                  :order-by (desc h:visit_date)
+                  :limit ,ibrowse-history-limit]))))
 
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
@@ -132,7 +135,7 @@ consider adjusting the SQL.")
     (ibrowse-history--apply-sql-command
      callback
      ibrowse-history--temp-db-path
-     ibrowse-history-sql)))
+     (ibrowse-history-sql))))
 
 (defun ibrowse-history-format (date-in-ms &rest rest)
   "Format DATE-IN-MS with additional REST variables for `completing-read'."
