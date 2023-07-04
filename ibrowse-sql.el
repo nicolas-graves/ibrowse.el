@@ -101,6 +101,21 @@ chosen directory will be the most recently used profile."
 (defvar ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir)
   "Browser database directory.")
 
+(defun ibrowse-sql--ensure-db (file tempfile &optional force-update?)
+  "Ensure database by copying FILE to TEMPFILE.
+
+If FORCE-UPDATE? is non-nil and database was copied, delete it first."
+  (cl-flet ((update-db ()
+              ;; The copy is necessary because our SQL query action
+              ;; may conflict with running browser.
+              (copy-file file tempfile)))
+    (if (file-exists-p tempfile)
+        (when force-update?
+          (delete-file tempfile)
+          (update-db))
+      (update-db))
+    nil))
+
 (defsubst ibrowse-sql--prepare-stmt (sql-args-list)
   "Prepare a series of SQL commands.
 SQL-ARGS-LIST should be a list of SQL command s-expressions SQL DSL.

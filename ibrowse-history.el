@@ -45,32 +45,14 @@
           ((file-exists-p places-file) places-file)
           (t (user-error "The history file has not been found!")))))
 
-(defvar ibrowse-history-file (ibrowse-history-guess-file)
+(defvar ibrowse-history-db (ibrowse-history-guess-file)
   "Browser history SQLite database file.")
 
-(defvar ibrowse-history--temp-db-path
+(defvar ibrowse-history--temp-db
   (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory))
 
 (defvar ibrowse-history-candidates nil
   "The `ibrowse-history' alist cache.")
-
-(defun ibrowse-history--ensure-db! (&optional force-update?)
-  "Ensure database by copying it to system temp file directory with a temp name.
-
-If FORCE-UPDATE? is non-nil and database was copied, delete it first."
-  (cl-flet ((update-db! ()
-              ;; The copy is necessary because our SQL query action
-              ;; may conflict with running browser.
-              (copy-file ibrowse-history-file
-                         ibrowse-history--temp-db-path)
-              (setq ibrowse-history-candidates nil)))
-    (let* ((path ibrowse-history--temp-db-path))
-      (if (file-exists-p path)
-          (when force-update?
-            (delete-file path)
-            (update-db!))
-        (update-db!))
-      nil)))
 
 (defvar ibrowse-history-limit 100000
   "Limit set to the database history extraction.")
@@ -104,13 +86,14 @@ consider adjusting the SQL."
           [:delete :from moz_historyvisits :where (= place_id ,num-id)])))))
 
 (defun ibrowse-history--extract-fields (callback)
-  "Read `ibrowse-history-file' and call the CALLBACK function."
-  (ibrowse-core--file-check ibrowse-history-file "ibrowse-history-file")
-  (ibrowse-history--ensure-db!)
+  "Read `ibrowse-history-db' and call the CALLBACK function."
+  (ibrowse-core--file-check ibrowse-history-db "ibrowse-history-db")
+  (ibrowse-sql--ensure-db ibrowse-history-db ibrowse-history--temp-db)
+  (setq ibrowse-history-candidates nil)
   (with-temp-buffer
     (ibrowse-sql--apply-command
      callback
-     ibrowse-history--temp-db-path
+     ibrowse-history--temp-db
      (ibrowse-history-sql))))
 
 (defun ibrowse-history-format (date-in-ms &rest rest)
@@ -137,14 +120,15 @@ consider adjusting the SQL."
 
 (defun ibrowse-history-delete-item (_title _url id)
   "Delete browser ID item using sqlite."
-  (ibrowse-core--file-check ibrowse-history-file "ibrowse-history-file")
+  (ibrowse-core--file-check ibrowse-history-db "ibrowse-history-db")
   (with-temp-buffer
     (ibrowse-sql--apply-command
      (lambda (_) nil)
-     ibrowse-history-file
+     ibrowse-history-db
      (ibrowse-history-delete-sql id)))
   ;; Delete cache.
-  (ibrowse-history--ensure-db! t))
+  (ibrowse-sql--ensure-db ibrowse-history-db ibrowse-history--temp-db t)
+  (setq ibrowse-history-candidates nil))
 
 (defun ibrowse-history-act (prompt action)
   "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
