@@ -106,16 +106,10 @@ consider adjusting the SQL.")
 
 (defun ibrowse-history--apply-sql-command (callback file queries)
   "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
-  (let ((check-locking-query "PRAGMA database_list;")
-        (sql-command (ibrowse-history--prepare-sql-stmt queries)))
-    (print sql-command)
-    (if (with-temp-buffer
-          (zerop (call-process "sqlite3" nil t nil "-ascii" file check-locking-query)))
-        (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
-            (funcall callback file)
-          (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string)))
-      (error
-       "The database %s is locked, it can't be changed externally!" file))))
+  (let ((sql-command (ibrowse-history--prepare-sql-stmt queries)))
+    (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
+        (funcall callback file)
+      (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string))))))
 
 (defun ibrowse-history--sql-command-read-callback (_)
   "Function applied to the result of the SQL query."
