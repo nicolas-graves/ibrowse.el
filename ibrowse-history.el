@@ -109,7 +109,7 @@ consider adjusting the SQL.")
   (let ((sql-command (ibrowse-history--prepare-sql-stmt queries)))
     (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
         (funcall callback file)
-      (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string))))))
+      (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string)))))
 
 (defun ibrowse-history--sql-command-read-callback (_)
   "Function applied to the result of the SQL query."
