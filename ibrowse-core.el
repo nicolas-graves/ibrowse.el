@@ -29,11 +29,27 @@
 ;;; Code:
 
 (require 'seq)
+(require 'cl-lib)
 
 ;;; Variables
 
+(defgroup ibrowse nil
+  "Group for ibrowse customizations."
+  :group 'applications
+  :prefix "ibrowse-")
+
 (defconst ibrowse-core--cdp-debugging-port
   "9222")
+
+(defcustom ibrowse-core-browser nil
+  "The browser choice for ibrowse.
+
+This variable can take one of the three symbols: 'Chromium, 'Firefox or nil.
+When nil, the most recently used profile (Chromium or Firefox) will be chosen."
+  :type '(choice (const :tag "Chromium" Chromium)
+                 (const :tag "Firefox" Firefox)
+                 (const :tag "Auto" nil))
+  :group 'ibrowse)
 
 (defun ibrowse-core--cdp-url (query)
   "Return the url of the chromium developer protocol QUERY."
@@ -44,35 +60,60 @@
 (defvar ibrowse-core-chromium-profile "Default"
   "Name of the Chromium profile to use.")
 
-(defvar ibrowse-core-base-folder-list
-  '("~/.config/google-chrome"
-    "~/.config/chromium"
-    "$LOCALAPPDATA/Google/Chrome/User Data"
-    "$LOCALAPPDATA/Chromium/User Data"
-    "$USERPROFILE/Local Settings/Application Data/Google/Chrome/User Data"
-    "$USERPROFILE/Local Settings/Application Data/Chromium/User Data"
-    "$LOCALAPPDATA/Microsoft/Edge/User Data"
-    "$USERPROFILE/Local Settings/Application Data/Microsoft/Edge/User Data"
-    "~/Library/Application Support/Google/Chrome"
-    "~/Library/Application Support/Chromium"
-    "~/.config/vivaldi"
-    "$LOCALAPPDATA/Vivaldi/User Data"
-    "$USERPROFILE/Local Settings/Application Data/Vivaldi/User Data"
-    "~/Library/Application Support/Vivaldi"
-    "~/AppData/Local/Google/Chrome/User Data/Default/"))
-
 (defun ibrowse-core-guess-db-dir ()
-  "Guess the directory containing the History and Bookmarks files."
-  (concat
-   (car
-    (seq-sort
-     #'file-newer-than-file-p
-     (seq-filter
-      (lambda (p)
-        (substitute-in-file-name
-         (concat p "/" ibrowse-core-chromium-profile "/History")))
-      ibrowse-core-base-folder-list)))
-   "/" ibrowse-core-chromium-profile "/"))
+  "Guess the directory containing main database files.
+
+These main database files are `History' and `Bookmarks' in the case of
+Chromium, `places.sqlite' in the case of Firefox.  By default, the
+chosen directory will be the most recently used profile."
+  (let* ((chromium-dirlist
+          (seq-filter
+           (lambda (p)
+             (file-exists-p
+              (substitute-in-file-name
+               (concat p "/" ibrowse-core-chromium-profile "/History"))))
+           '("~/.config/chromium"
+             "~/.config/google-chrome"
+             "$LOCALAPPDATA/Google/Chrome/User Data"
+             "$LOCALAPPDATA/Chromium/User Data"
+             "$USERPROFILE/Local Settings/Application Data/Google/Chrome/User Data"
+             "$USERPROFILE/Local Settings/Application Data/Chromium/User Data"
+             "$LOCALAPPDATA/Microsoft/Edge/User Data"
+             "$USERPROFILE/Local Settings/Application Data/Microsoft/Edge/User Data"
+             "~/Library/Application Support/Google/Chrome"
+             "~/Library/Application Support/Chromium"
+             "~/.config/vivaldi"
+             "$LOCALAPPDATA/Vivaldi/User Data"
+             "$USERPROFILE/Local Settings/Application Data/Vivaldi/User Data"
+             "~/Library/Application Support/Vivaldi"
+             "~/AppData/Local/Google/Chrome/User Data/")))
+         (firefox-dirlist
+          (append
+           (file-expand-wildcards "~/.mozilla/firefox/*.default")
+           (file-expand-wildcards
+            (expand-file-name "Mozilla/Firefox/Profiles/*"
+                              (getenv "APPDATA")))))
+         (chromium-directory
+          (when (or (eq ibrowse-core-browser 'Chromium) (not ibrowse-core-browser))
+            (concat
+             (expand-file-name
+              (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
+              (getenv "HOME"))
+             "/" ibrowse-core-chromium-profile "/")))
+         (firefox-directory
+          (when (or (eq ibrowse-core-browser 'Firefox) (not ibrowse-core-browser))
+            (concat
+             (car (seq-sort #'file-newer-than-file-p firefox-dirlist)) "/"))))
+    (cond
+     ((and chromium-directory firefox-directory)
+      (if (file-newer-than-file-p
+           (concat chromium-directory "History")
+           (concat firefox-directory "places.sqlite"))
+          chromium-directory
+        firefox-directory))
+     (chromium-directory chromium-directory)
+     (firefox-directory firefox-directory)
+     (t (user-error "The browser database directory is not found!")))))
 
 (defvar ibrowse-core-db-dir (ibrowse-core-guess-db-dir)
   "Browser database directory.")
