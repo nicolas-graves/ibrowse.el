@@ -118,7 +118,7 @@ BOOKMARK-LIST."
                                         ibrowse-bookmark-file)))))
 
 (defun ibrowse-bookmark--extract-fields (item recursion-id)
-  "Prepare a search result ITEM for display and store directory data to \
+  "Prepare a search result ITEM for display and store directory to \
 RECURSION-ID."
   (let-alist item
     (if (and .children (string= .type "folder"))
