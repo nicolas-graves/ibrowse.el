@@ -134,9 +134,9 @@ consider adjusting the SQL.")
 (defun ibrowse-history-format-title (title date-in-ms)
   "Format TITLE and DATE-IN-MS for `completing-read'."
   (let* ((date (/ (string-to-number date-in-ms) 1000000))
-         (date (if (eq ibrowse-core-browser 'Chromium)
-                   (- date 11644473600) ; https://stackoverflow.com/a/26233663/2999892
-                 date)))
+         (date (pcase ibrowse-core-browser
+                 ('Chromium (- date 11644473600)) ; https://stackoverflow.com/a/26233663/2999892
+                 ('Firefox date))))
     (format "%s | %s" (format-time-string "%F"  date) title)))
 
 (defun ibrowse-history--get-candidates ()
