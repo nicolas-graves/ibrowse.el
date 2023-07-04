@@ -103,7 +103,10 @@ chosen directory will be the most recently used profile."
          (firefox-directory
           (when (or (eq ibrowse-core-browser 'Firefox) (not ibrowse-core-browser))
             (concat
-             (car (seq-sort #'file-newer-than-file-p firefox-dirlist)) "/"))))
+             (expand-file-name
+              (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
+              (getenv "HOME"))
+             "/"))))
     (cond
      ((and chromium-directory firefox-directory)
       (if (file-newer-than-file-p
