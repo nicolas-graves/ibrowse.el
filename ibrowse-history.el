@@ -156,7 +156,7 @@ consider adjusting the SQL.")
 
 (defun ibrowse-history-delete-item (_title _url id)
   "Delete browser ID item using sqlite."
-  (ibrowse-core--file-check "History")
+  (ibrowse-core--file-check ibrowse-history-file "ibrowse-history-file")
   (with-temp-buffer
     (ibrowse-history--apply-sql-command
      (lambda (_) nil)
