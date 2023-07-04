@@ -109,14 +109,6 @@ BOOKMARK-LIST."
   (with-temp-file filename
     (insert (json-encode (ibrowse-bookmark--generate-file bookmark-list)))))
 
-(defun ibrowse-bookmark--check-for-problems ()
-  "Check for issues and throws an error if any issue is found."
-  (cond ((not ibrowse-bookmark-file)
-         (error "Variable ibrowse-bookmark-file is not set"))
-        ((not (file-readable-p ibrowse-bookmark-file))
-         (error "Can not read file %s" (expand-file-name
-                                        ibrowse-bookmark-file)))))
-
 (defun ibrowse-bookmark--extract-fields (item recursion-id)
   "Prepare a search result ITEM for display and store directory to \
 RECURSION-ID."
@@ -155,12 +147,14 @@ RECURSION-ID."
 
 (defun ibrowse-bookmark--delete-item (title url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
+  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
   (ibrowse-bookmark--write-file
    (delete `(,title ,url ,id) (ibrowse-bookmark--get-candidates))
    ibrowse-bookmark-file))
 
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
+  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
   (ibrowse-bookmark--write-file
    (append `((,title ,url ,(concat ".Bookmarks bar." title)))
            (ibrowse-bookmark--get-candidates))
