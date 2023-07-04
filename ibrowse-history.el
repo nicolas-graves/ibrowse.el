@@ -92,7 +92,8 @@ Returns a single string of SQL commands separated by semicolons."
                      :from (as moz_historyvisits h)
                      :inner-join (as moz_places p)
                      :where (= h:place_id p:id)
-                     :order-by (desc h:visit_date)])))
+                     :order-by (desc h:visit_date)
+                     :limit 100000])))
   "The SQL command used to extract history.
 
 If you have too many history and worry about the memory use,
