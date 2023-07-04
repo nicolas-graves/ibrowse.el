@@ -1,7 +1,8 @@
 ;;; ibrowse-history.el --- Interact with your browser -*- lexical-binding: t -*-
 
-;; Copyright © 2019 Xu Chunyang <mail@xuchunyang.me> (original author)
-;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr> (heavy rewrite and adding deletions)
+;; Copyright © 2019 Xu Chunyang <mail@xuchunyang.me> (original author, Chromium)
+;; Copyright © 2019 Zhu Zihao <all_but_last@163.com> (original author, Firefox)
+;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr> (heavy rewrite)
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.1.8
@@ -36,14 +37,22 @@
 
 ;;; Backend
 
-(defvar ibrowse-history-file (concat ibrowse-core-db-dir "History")
-  "Chrome history SQLite database file.")
+(defun ibrowse-history-guess-file ()
+  "Guess the sql file containing history."
+  (let* ((history-file (concat ibrowse-core-db-dir "History"))
+         (places-file (concat ibrowse-core-db-dir "places.sqlite")))
+    (cond ((file-exists-p history-file) history-file)
+          ((file-exists-p places-file) places-file)
+          (t (user-error "The history file has not been found!")))))
 
-
-(defvar ibrowse-history--cache (make-hash-table :test #'equal))
+(defvar ibrowse-history-file (ibrowse-history-guess-file)
+  "Browser history SQLite database file.")
 
 (defvar ibrowse-history--temp-db-path
   (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory))
+
+(defvar ibrowse-history-candidates nil
+  "The `ibrowse-history' alist cache.")
 
 (defun ibrowse-history--ensure-db! (&optional force-update?)
   "Ensure database by copying it to system temp file directory with a temp name.
@@ -51,10 +60,10 @@
 If FORCE-UPDATE? is non-nil and database was copied, delete it first."
   (cl-flet ((update-db! ()
               ;; The copy is necessary because our SQL query action
-              ;; may conflicts with running Firefox.
+              ;; may conflict with running browser.
               (copy-file ibrowse-history-file
                          ibrowse-history--temp-db-path)
-              (clrhash ibrowse-history--cache)))
+              (setq ibrowse-history-candidates nil)))
     (let* ((path ibrowse-history--temp-db-path))
       (if (file-exists-p path)
           (when force-update?
@@ -63,15 +72,13 @@ If FORCE-UPDATE? is non-nil and database was copied, delete it first."
         (update-db!))
       nil)))
 
-(defsubst ibrowse-history--prepare-sql-stmt (&rest sql-args-list)
+(defsubst ibrowse-history--prepare-sql-stmt (sql-args-list)
   "Prepare a series of SQL commands.
 SQL-ARGS-LIST should be a list of SQL command s-expressions SQL DSL.
 Returns a single string of SQL commands separated by semicolons."
   (mapconcat
-   (lambda (sql-args) (concat (apply #'emacsql-format
-                                     (emacsql-prepare (car sql-args))
-                                     (cdr sql-args))
-                              ";"))
+   (lambda (sql-args)
+     (concat (emacsql-format (emacsql-prepare sql-args)) ";"))
    sql-args-list
    "\n"))
 
@@ -88,20 +95,24 @@ consider adjusting the SQL.")
 
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
-  `([:delete :from urls :where (= id ,id)]
-    [:delete :from visits :where (= url ,id)]))
+  (let ((num-id (string-to-number id)))
+    `([:delete :from urls :where (= id ,num-id)]
+      [:delete :from visits :where (= url ,num-id)])))
 
 (defun ibrowse-history--apply-sql-command (callback file queries)
   "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
-  (if (zerop
-       (call-process "sqlite3" nil t nil
-                     "-ascii"
-                     file
-                     (ibrowse-history--prepare-sql-stmt queries)))
-      (funcall callback file)
-    (error "Command sqlite3 failed: %s" (buffer-string))))
+  (let ((check-locking-query "PRAGMA database_list;")
+        (sql-command (ibrowse-history--prepare-sql-stmt queries)))
+    (print sql-command)
+    (if (with-temp-buffer
+          (zerop (call-process "sqlite3" nil t nil "-ascii" file check-locking-query)))
+        (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
+            (funcall callback file)
+          (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string)))
+      (error
+       "The database %s is locked, it can't be changed externally!" file))))
 
-(defun ibrowse-history--sql-command-read-callback ()
+(defun ibrowse-history--sql-command-read-callback (_)
   "Function applied to the result of the SQL query."
   (let (result)
     (goto-char (point-min))
@@ -129,9 +140,6 @@ consider adjusting the SQL.")
                    11644473600))
           title))
 
-(defvar ibrowse-history-candidates nil
-  "The `ibrowse-history' cache.")
-
 (defun ibrowse-history--get-candidates ()
   "Build candidates."
   (unless ibrowse-history-candidates
@@ -155,7 +163,7 @@ consider adjusting the SQL.")
      ibrowse-history-file
      (ibrowse-history-delete-sql id)))
   ;; Delete cache.
-  (setq ibrowse-history-candidates nil))
+  (ibrowse-history--ensure-db! t))
 
 (defun ibrowse-history-act (prompt action)
   "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
