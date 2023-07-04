@@ -32,11 +32,12 @@
 (require 'json)
 (require 'radix-tree)
 (require 'ibrowse-core)
+(require 'ibrowse-sql)
 
 ;;; Settings
 
 (defvar ibrowse-bookmark-file
-  (concat ibrowse-core-db-dir "Bookmarks")
+  (concat ibrowse-sql-db-dir "Bookmarks")
   "Chromium-based browsers Bookmarks file.")
 
 (defconst ibrowse-bookmark--separator ".")

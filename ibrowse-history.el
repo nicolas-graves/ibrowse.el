@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'ibrowse-core)
+(require 'ibrowse-sql)
 (require 'emacsql-compiler)
 
 (eval-when-compile
@@ -39,8 +40,8 @@
 
 (defun ibrowse-history-guess-file ()
   "Guess the sql file containing history."
-  (let* ((history-file (concat ibrowse-core-db-dir "History"))
-         (places-file (concat ibrowse-core-db-dir "places.sqlite")))
+  (let* ((history-file (concat ibrowse-sql-db-dir "History"))
+         (places-file (concat ibrowse-sql-db-dir "places.sqlite")))
     (cond ((file-exists-p history-file) history-file)
           ((file-exists-p places-file) places-file)
           (t (user-error "The history file has not been found!")))))
