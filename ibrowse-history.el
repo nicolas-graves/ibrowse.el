@@ -35,7 +35,7 @@
   (require 'subr-x)
   (require 'url-parse))
 
-;;; Backend
+;;; Settings
 
 (defun ibrowse-history-guess-file ()
   "Guess the sql file containing history."
@@ -49,13 +49,16 @@
   "Browser history SQLite database file.")
 
 (defvar ibrowse-history--temp-db
-  (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory))
+  (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory)
+  "Temporary copy of the browser history SQLite database file.")
 
 (defvar ibrowse-history-candidates nil
   "The `ibrowse-history' alist cache.")
 
 (defvar ibrowse-history-limit 100000
   "Limit set to the database history extraction.")
+
+;;; Backend
 
 (defun ibrowse-history-sql ()
   "The SQL command used to extract history.
