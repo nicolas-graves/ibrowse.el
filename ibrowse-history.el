@@ -136,13 +136,13 @@ consider adjusting the SQL.")
      ibrowse-history--temp-db-path
      ibrowse-history-sql)))
 
-(defun ibrowse-history-format-title (title date-in-ms)
-  "Format TITLE and DATE-IN-MS for `completing-read'."
+(defun ibrowse-history-format (date-in-ms &rest rest)
+  "Format DATE-IN-MS with additional REST variables for `completing-read'."
   (let* ((date (/ (string-to-number date-in-ms) 1000000))
          (date (pcase ibrowse-core-browser
                  ('Chromium (- date 11644473600)) ; https://stackoverflow.com/a/26233663/2999892
                  ('Firefox date))))
-    (format "%s | %s" (format-time-string "%F"  date) title)))
+    (format "%s| %s" (format-time-string "%F"  date) (string-join rest " | "))))
 
 (defun ibrowse-history--get-candidates ()
   "Build candidates."
@@ -151,7 +151,7 @@ consider adjusting the SQL.")
     (setq ibrowse-history-candidates
           (mapcar
            (pcase-lambda (`(,title ,url ,id ,last-visit-time))
-             (list (ibrowse-history-format-title title last-visit-time) url id))
+             (list (ibrowse-history-format last-visit-time title url) url id))
            (ibrowse-history--extract-fields
             #'ibrowse-history--sql-command-read-callback))))
   ibrowse-history-candidates)
