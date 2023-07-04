@@ -123,7 +123,7 @@ consider adjusting the SQL.")
 
 (defun ibrowse-history--extract-fields (callback)
   "Read `ibrowse-history-file' and call the CALLBACK function."
-  (ibrowse-core--file-check "History")
+  (ibrowse-core--file-check ibrowse-history-file "ibrowse-history-file")
   (ibrowse-history--ensure-db!)
   (with-temp-buffer
     (ibrowse-history--apply-sql-command

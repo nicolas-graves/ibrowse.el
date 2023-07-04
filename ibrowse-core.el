@@ -123,12 +123,12 @@ chosen directory will be the most recently used profile."
 
 ;;; Functions
 
-(defun ibrowse-core--file-check (file)
-  "Check if FILE exists."
-  (pcase (concat ibrowse-core-db-dir file)
-    ('nil (user-error "`ibrowse-history-file' is not set"))
+(defun ibrowse-core--file-check (file var)
+  "Check if FILE exists, used in the definition of VAR."
+  (pcase file
+    ('nil (user-error "`%s' is not set" var))
     ((pred file-exists-p) nil)
-    (f (user-error "'%s' doesn't exist, please reset `ibrowse-history-file'" f))))
+    (f (user-error "'%s' doesn't exist, please reset `%s'" f var))))
 
 (defun ibrowse-core--copy-url (_title url _id)
   "Action to copy URL."
