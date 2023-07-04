@@ -83,11 +83,16 @@ Returns a single string of SQL commands separated by semicolons."
    "\n"))
 
 (defvar ibrowse-history-sql
-  (list [:select [title url id last_visit_time]
-         :from urls
-         :order-by id
-         :desc
-         :limit 100000])
+  (pcase ibrowse-core-browser
+    ('Chromium (list [:select [title url id last_visit_time]
+                      :from urls
+                      :order-by (desc id)
+                      :limit 100000]))
+    ('Firefox (list [:select [p:title p:url p:id h:visit_date]
+                     :from (as moz_historyvisits h)
+                     :inner-join (as moz_places p)
+                     :where (= h:place_id p:id)
+                     :order-by (desc h:visit_date)])))
   "The SQL command used to extract history.
 
 If you have too many history and worry about the memory use,
