@@ -101,8 +101,11 @@ consider adjusting the SQL.")
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
   (let ((num-id (string-to-number id)))
-    `([:delete :from urls :where (= id ,num-id)]
-      [:delete :from visits :where (= url ,num-id)])))
+    (pcase ibrowse-core-browser
+      ('Chromium `([:delete :from urls :where (= id ,num-id)]
+                   [:delete :from visits :where (= url ,num-id)]))
+      ('Firefox `([:delete :from moz_places :where (= id ,num-id)]
+                  [:delete :from moz_historyvisits :where (= place_id ,num-id)])))))
 
 (defun ibrowse-history--apply-sql-command (callback file queries)
   "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
