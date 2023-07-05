@@ -62,12 +62,11 @@
             "$USERPROFILE/Local Settings/Application Data/Vivaldi/User Data"
             "~/Library/Application Support/Vivaldi"
             "~/AppData/Local/Google/Chrome/User Data/"))))
-    (when (or (eq ibrowse-core-browser 'Chromium) (not ibrowse-core-browser))
-      (concat
-       (expand-file-name
-        (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
-        (getenv "HOME"))
-       "/" ibrowse-sql-chromium-profile "/"))))
+    (concat
+     (expand-file-name
+      (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
+      (getenv "HOME"))
+     "/" ibrowse-sql-chromium-profile "/")))
 
 (defun ibrowse-sql-get-firefox-dir ()
   "Try to get the Firefox data directory."
@@ -77,14 +76,13 @@
            (file-expand-wildcards
             (expand-file-name "Mozilla/Firefox/Profiles/*"
                               (getenv "APPDATA"))))))
-    (when (or (eq ibrowse-core-browser 'Firefox) (not ibrowse-core-browser))
-      (concat
-       (expand-file-name
-        (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
-        (getenv "HOME"))
-       "/"))))
+    (concat
+     (expand-file-name
+      (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
+      (getenv "HOME"))
+     "/")))
 
-(defun ibrowse-sql-guess-db-dir ()
+(defun ibrowse-sql-guess-db-dir! ()
   "Guess the directory containing main database files.
 
 These main database files are `History' and `Bookmarks' in the case of
@@ -109,9 +107,9 @@ chosen directory will be the most recently used profile."
   (pcase ibrowse-core-browser
     ('Chromium (ibrowse-sql-get-chromium-dir))
     ('Firefox (ibrowse-sql-get-firefox-dir))
-    (_ (ibrowse-sql-guess-db-dir))))
+    (_ (ibrowse-sql-guess-db-dir!))))
 
-(defvar ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir)
+(defvar ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir!)
   "Browser database directory.")
 
 (defun ibrowse-sql--ensure-db (file tempfile &optional force-update?)
