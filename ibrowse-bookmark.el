@@ -163,8 +163,10 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
 (defun ibrowse-bookmark-delete-sql (id)
   "The SQL command used to delete the item ID from bookmarks."
   (let ((num-id (string-to-number id)))
-    `([:delete :from moz_places :where (= id ,num-id)]
-      [:delete :from moz_bookmarks :where (= fk ,num-id)])))
+    `([:begin-transaction]
+      [:delete :from moz_places :where (= id ,num-id)]
+      [:delete :from moz_bookmarks :where (= fk ,num-id)]
+      [:commit-transaction])))
 
 (defun ibrowse-bookmark--max-id ()
   "The SQL command used to return the max id from moz_places."
