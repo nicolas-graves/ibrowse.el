@@ -144,6 +144,14 @@ RECURSION-ID."
 
 ;;;; Backend / Helper for Firefox
 
+(defun ibrowse-bookmark--random-alphanumeric (length)
+  "Generate a random alphanumeric symbol of LENGTH."
+  (let* ((charset "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+         (result ""))
+    (intern
+     (dotimes (_ length result)
+       (setq result (concat result (string (seq-random-elt charset))))))))
+
 (defun ibrowse-bookmark-sql ()
   "The SQL command used to extract bookmarks.
 bm:type 1 ensures we extract bookmarks and not folders or separators."
@@ -153,10 +161,62 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
          :where (and (= bm:fk p:id) (= bm:type 1))]))
 
 (defun ibrowse-bookmark-delete-sql (id)
-  "The SQL command used to delete the item ID from history."
+  "The SQL command used to delete the item ID from bookmarks."
   (let ((num-id (string-to-number id)))
     `([:delete :from moz_places :where (= id ,num-id)]
       [:delete :from moz_bookmarks :where (= fk ,num-id)])))
+
+(defun ibrowse-bookmark--max-id ()
+  "The SQL command used to return the max id from moz_places."
+  `([:select (funcall max id) :from moz_places]))
+
+(defun ibrowse-bookmark-add-sql (title url)
+  "The SQL commands used to add a new bookmark from TITLE and URL."
+  (let ((guid (ibrowse-bookmark--random-alphanumeric 12))
+        (id (1+
+             (string-to-number
+              (caar
+               (ibrowse-sql--extract-fields (ibrowse-bookmark-get-file)
+                                            ibrowse-bookmark--temp-db
+                                            #'ibrowse-bookmark--max-id
+                                            "ibrowse-bookmark-get-file"
+                                            #'ibrowse-sql--read-callback))))))
+    `([:begin-transaction]
+      [:insert-into moz_places
+       :values [,id ;id
+                ,(intern url) ;url
+                ,(intern title) ;title
+                nil ; rev_host
+                nil ; visit_count
+                0 ; hidden
+                0 ; typed
+                -1 ; frecency
+                nil ; last_visit_date
+                ,guid ; guid
+                0 ; foreign_count
+                0 ; url_hash
+                nil ; description
+                nil ; preview_image_url
+                nil ; site_name
+                nil ; origin_id
+                0 ; recalc_frecency
+                ]]
+     [:insert-into moz_bookmarks
+      :values [nil ;id
+               1 ; type 1=bookmark, 2=folders, 3=separators
+               ,id ; fk
+               3 ; parent 3=unfiled
+               nil ; position
+               ,(intern title) ; title
+               nil ; keyword_id
+               nil ; folder_type
+               nil ; dateAdded
+               nil ; lastModified
+               ,guid ; guid
+               0 ; syncStatus
+               1 ; syncChangeCounter
+               ]]
+     [:commit-transaction])))
 
 ;;;; Common backend / helper
 
