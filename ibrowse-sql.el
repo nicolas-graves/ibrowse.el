@@ -129,11 +129,12 @@ Returns a single string of SQL commands separated by semicolons."
    sql-args-list
    "\n"))
 
-(defun ibrowse-sql--apply-command (callback file queries)
+(defun ibrowse-sql--apply-command (file queries &optional callback)
   "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
   (let ((sql-command (ibrowse-sql--prepare-stmt queries)))
     (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
-        (funcall callback file)
+        (when callback
+          (funcall callback file))
       (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string)))))
 
 (defun ibrowse-sql--read-callback (_)
@@ -145,16 +146,13 @@ Returns a single string of SQL commands separated by semicolons."
       (push (split-string (match-string 1) "\x1f") result))
     (nreverse result)))
 
-(defun ibrowse-sql--extract-fields (db temp-db query varname callback)
+(defun ibrowse-sql--extract-fields (db temp-db query varname &optional callback)
   "Read TEMP-DB generated from DB, reset the CACHE and call the CALLBACK function."
   (ibrowse-core--file-check db varname)
   (ibrowse-sql--ensure-db db temp-db)
   (setq ibrowse-sql-candidates nil)
   (with-temp-buffer
-    (ibrowse-sql--apply-command
-     callback
-     temp-db
-     (funcall query))))
+    (ibrowse-sql--apply-command temp-db (funcall query) callback)))
 
 (defun ibrowse-sql--get-candidates
     (db temp-db query varname &optional candidate-format)

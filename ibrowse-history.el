@@ -110,10 +110,8 @@ consider adjusting `ibrowse-history-limit'."
   "Delete browser ID item using sqlite."
   (ibrowse-core--file-check (ibrowse-history-get-db) "ibrowse-history-get-db")
   (with-temp-buffer
-    (ibrowse-sql--apply-command
-     (lambda (_) nil)
-     (ibrowse-history-get-db)
-     (ibrowse-history-delete-sql id)))
+    (ibrowse-sql--apply-command (ibrowse-history-get-db)
+                                (ibrowse-history-delete-sql id)))
   ;; Delete cache.
   (ibrowse-sql--ensure-db (ibrowse-history-get-db) ibrowse-history--temp-db t)
   (setq ibrowse-sql-candidates nil))

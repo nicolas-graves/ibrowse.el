@@ -190,10 +190,8 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
       (ibrowse-bookmark-get-file)))
     ('Firefox
      (with-temp-buffer
-       (ibrowse-sql--apply-command
-        (lambda (_) nil)
-        (ibrowse-bookmark-get-file)
-        (ibrowse-bookmark-delete-sql id)))
+       (ibrowse-sql--apply-command (ibrowse-bookmark-get-file)
+                                   (ibrowse-bookmark-delete-sql id)))
      ;; Delete cache.
      (ibrowse-sql--ensure-db (ibrowse-bookmark-get-file)
                              ibrowse-bookmark--temp-db t)
@@ -210,10 +208,8 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
       (ibrowse-bookmark-get-file)))
     ('Firefox
      (with-temp-buffer
-       (ibrowse-sql--apply-command
-        (lambda (_) nil)
-        (ibrowse-bookmark-get-file)
-        (ibrowse-bookmark-add-sql title url)))
+       (ibrowse-sql--apply-command (ibrowse-bookmark-get-file)
+                                   (ibrowse-bookmark-add-sql title url)))
      ;; Delete cache.
      (ibrowse-sql--ensure-db (ibrowse-bookmark-get-file)
                              ibrowse-bookmark--temp-db t)
