@@ -36,19 +36,11 @@
 
 ;;; Settings
 
-(defun ibrowse-bookmark-guess-file ()
-  "Guess the file containing bookmarks."
-  (let* ((history-file (concat ibrowse-sql-db-dir "Bookmarks"))
-         (places-file (concat ibrowse-sql-db-dir "places.sqlite")))
-    (cond ((file-exists-p history-file) history-file)
-          ((file-exists-p places-file) places-file)
-          (t (user-error "The bookmarks file has not been found!")))))
-
-(defvar ibrowse-bookmark-file (ibrowse-bookmark-guess-file)
-  "Browser bookmarks file.
-
-It is either SQLite database for Firefox, or a simple file for
-Chromium.")
+(defun ibrowse-bookmark-get-file ()
+  "Get the SQLite database file containing bookmarks."
+  (pcase ibrowse-core-browser
+    ('Chromium (concat ibrowse-sql-db-dir "Bookmarks"))
+    ('Firefox (concat ibrowse-sql-db-dir "places.sqlite"))))
 
 (defvar ibrowse-bookmark--temp-db
   (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory)
@@ -178,31 +170,33 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
       (delq nil
             (mapcar (lambda (x)
                       (ibrowse-bookmark--extract-fields (cdr x) ""))
-                    (alist-get 'roots (json-read-file ibrowse-bookmark-file))))))
+                    (alist-get 'roots (json-read-file
+                                       (ibrowse-bookmark-get-file)))))))
     ('Firefox
-     (ibrowse-sql--get-candidates ibrowse-bookmark-file
+     (ibrowse-sql--get-candidates (ibrowse-bookmark-get-file)
                                   ibrowse-bookmark--temp-db
                                   #'ibrowse-bookmark-sql
-                                  "ibrowse-bookmark-file"))))
+                                  "ibrowse-bookmark-get-file"))))
 
 ;;; Actions / Interaction
 
 (defun ibrowse-bookmark--delete-item (title url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
-  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
+  (ibrowse-core--file-check (ibrowse-bookmark-get-file) "ibrowse-bookmark-get-file")
   (pcase ibrowse-core-browser
     ('Chromium
      (ibrowse-bookmark--write-file
       (delete `(,title ,url ,id) (ibrowse-bookmark--get-candidates))
-      ibrowse-bookmark-file))
+      (ibrowse-bookmark-get-file)))
     ('Firefox
      (with-temp-buffer
        (ibrowse-sql--apply-command
         (lambda (_) nil)
-        ibrowse-bookmark-file
+        (ibrowse-bookmark-get-file)
         (ibrowse-bookmark-delete-sql id)))
      ;; Delete cache.
-     (ibrowse-sql--ensure-db ibrowse-bookmark-file ibrowse-bookmark--temp-db t)
+     (ibrowse-sql--ensure-db (ibrowse-bookmark-get-file)
+                             ibrowse-bookmark--temp-db t)
      (setq ibrowse-sql-candidates nil))))
 
 (defun ibrowse-bookmark-add-item-1 (title url)
@@ -221,7 +215,8 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
         (ibrowse-bookmark-get-file)
         (ibrowse-bookmark-add-sql title url)))
      ;; Delete cache.
-     (ibrowse-sql--ensure-db ibrowse-bookmark-file ibrowse-bookmark--temp-db t)
+     (ibrowse-sql--ensure-db (ibrowse-bookmark-get-file)
+                             ibrowse-bookmark--temp-db t)
      (setq ibrowse-sql-candidates nil))))
 
 ;;;###autoload
