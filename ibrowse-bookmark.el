@@ -177,7 +177,6 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
              (string-to-number
               (caar
                (ibrowse-sql--extract-fields (ibrowse-bookmark-get-file)
-                                            ibrowse-bookmark--temp-db
                                             #'ibrowse-bookmark--max-id
                                             "ibrowse-bookmark-get-file"
                                             #'ibrowse-sql--read-callback))))))
