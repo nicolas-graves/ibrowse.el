@@ -3,17 +3,20 @@
 
 Ibrowse stands for interactive browse, its goal is to be able to control your browser through common actions, be it on browser tabs, history or bookmarks using Emacs.
 
-It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. For now, it is only implemented for the Chromium Developer Protocol (and thus chromium-based browsers), which should soon be implemented by firefox-based browsers. PR are welcome for other protocols!
+It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox) :
 
-This package is originally inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts and the [[https://github.com/cpitclaudel/biblio.el][biblio.el]] package, but aspires to have broader functionalities, more integrated with Emacs. While writing the package, I also stumbled upon (and occasionally copied parts of):
+| package             | last commit | tab        | bookmark                | history          |
+|---------------------+-------------+------------+-------------------------+------------------|
+| [[https://github.com/kawabata/helm-chrome][helm-chrome]]         |        2016 |            | c (json)                |                  |
+| [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]] |        2019 |            |                         | c (sql)          |
+| [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]] |        2019 | c (mac+js) |                         |                  |
+| [[https://github.com/anticomputer/chrome.el][chrome.el]]           |        2021 | c (cdp)    |                         |                  |
+| [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |        2021 |            | c (json)                |                  |
+| [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |        2019 |            | f (sql)                 | f (sql)          |
+| [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |        2023 | c (cdp)    | c (json+radix), f (sql) | c (sql), f (sql) |
+|                     |             |            |                         |                  |
 
-- [[https://github.com/kawabata/helm-chrome][helm-chrome]]
-- [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]]
-- [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]]
-- [[https://github.com/anticomputer/chrome.el][chrome.el]]
-- [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]
-
-All implement very close features to ibrowse, but are either more developped (=chrome.el= has a major mode frontend, which I considered unnecessary for a daily use with embark and the minibuffer), rely on =helm= or javascript code, or have more limited functionality. All (except [[https://github.com/anticomputer/chrome.el][chrome.el]], which I didn't copied code from) are licensed under GPLv3+, making this package an "aggregate" also under GPLv3+.
+Please note that the depth of actions is not comparable, much more actions are available in this package, see below. PR are welcome for other browsers/protocols/functionalities!
 
 It is composed of three control functionalities for your browser :
 
@@ -68,3 +71,15 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 - 0.1.2: Add embark dependency.
 - 0.1.1: Melpa corrections and remove marginalia dependency.
 - 0.1.0: Initial release for inclusion in Guix and Melpa.
+
+** Inspiration
+
+This package is originally inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts and the [[https://github.com/cpitclaudel/biblio.el][biblio.el]] package, but aspires to have broader functionalities, more integrated with Emacs. While writing the package, I also stumbled upon (and occasionally copied parts of):
+
+- [[https://github.com/kawabata/helm-chrome][helm-chrome]]
+- [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]]
+- [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]]
+- [[https://github.com/anticomputer/chrome.el][chrome.el]]
+- [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]
+
+All implement very close features to ibrowse, but are either more developped (=chrome.el= has a major mode frontend, which I considered unnecessary for a daily use with embark and the minibuffer), rely on =helm= or javascript code, or have more limited functionality. All (except [[https://github.com/anticomputer/chrome.el][chrome.el]], which I didn't copied code from) are licensed under GPLv3+, making this package an "aggregate" also under GPLv3+.
