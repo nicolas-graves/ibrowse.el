@@ -39,67 +39,77 @@
 (defvar ibrowse-sql-candidates nil
   "The ibrowse alist cache.")
 
+(defun ibrowse-sql-get-chromium-dir ()
+  "Try to get the Chromium data directory."
+  (let ((chromium-dirlist
+         (seq-filter
+          (lambda (p)
+            (file-exists-p
+             (substitute-in-file-name
+              (concat p "/" ibrowse-sql-chromium-profile "/History"))))
+          '("~/.config/chromium"
+            "~/.config/google-chrome"
+            "$LOCALAPPDATA/Google/Chrome/User Data"
+            "$LOCALAPPDATA/Chromium/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Google/Chrome/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Chromium/User Data"
+            "$LOCALAPPDATA/Microsoft/Edge/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Microsoft/Edge/User Data"
+            "~/Library/Application Support/Google/Chrome"
+            "~/Library/Application Support/Chromium"
+            "~/.config/vivaldi"
+            "$LOCALAPPDATA/Vivaldi/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Vivaldi/User Data"
+            "~/Library/Application Support/Vivaldi"
+            "~/AppData/Local/Google/Chrome/User Data/"))))
+    (when (or (eq ibrowse-core-browser 'Chromium) (not ibrowse-core-browser))
+      (concat
+       (expand-file-name
+        (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
+        (getenv "HOME"))
+       "/" ibrowse-sql-chromium-profile "/"))))
+
+(defun ibrowse-sql-get-firefox-dir ()
+  "Try to get the Firefox data directory."
+  (let* ((firefox-dirlist
+          (append
+           (file-expand-wildcards "~/.mozilla/firefox/*.default")
+           (file-expand-wildcards
+            (expand-file-name "Mozilla/Firefox/Profiles/*"
+                              (getenv "APPDATA"))))))
+    (when (or (eq ibrowse-core-browser 'Firefox) (not ibrowse-core-browser))
+      (concat
+       (expand-file-name
+        (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
+        (getenv "HOME"))
+       "/"))))
+
 (defun ibrowse-sql-guess-db-dir ()
   "Guess the directory containing main database files.
 
 These main database files are `History' and `Bookmarks' in the case of
 Chromium, `places.sqlite' in the case of Firefox.  By default, the
 chosen directory will be the most recently used profile."
-  (let* ((chromium-dirlist
-          (seq-filter
-           (lambda (p)
-             (file-exists-p
-              (substitute-in-file-name
-               (concat p "/" ibrowse-sql-chromium-profile "/History"))))
-           '("~/.config/chromium"
-             "~/.config/google-chrome"
-             "$LOCALAPPDATA/Google/Chrome/User Data"
-             "$LOCALAPPDATA/Chromium/User Data"
-             "$USERPROFILE/Local Settings/Application Data/Google/Chrome/User Data"
-             "$USERPROFILE/Local Settings/Application Data/Chromium/User Data"
-             "$LOCALAPPDATA/Microsoft/Edge/User Data"
-             "$USERPROFILE/Local Settings/Application Data/Microsoft/Edge/User Data"
-             "~/Library/Application Support/Google/Chrome"
-             "~/Library/Application Support/Chromium"
-             "~/.config/vivaldi"
-             "$LOCALAPPDATA/Vivaldi/User Data"
-             "$USERPROFILE/Local Settings/Application Data/Vivaldi/User Data"
-             "~/Library/Application Support/Vivaldi"
-             "~/AppData/Local/Google/Chrome/User Data/")))
-         (firefox-dirlist
-          (append
-           (file-expand-wildcards "~/.mozilla/firefox/*.default")
-           (file-expand-wildcards
-            (expand-file-name "Mozilla/Firefox/Profiles/*"
-                              (getenv "APPDATA")))))
-         (chromium-directory
-          (when (or (eq ibrowse-core-browser 'Chromium) (not ibrowse-core-browser))
-            (concat
-             (expand-file-name
-              (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
-              (getenv "HOME"))
-             "/" ibrowse-sql-chromium-profile "/")))
-         (firefox-directory
-          (when (or (eq ibrowse-core-browser 'Firefox) (not ibrowse-core-browser))
-            (concat
-             (expand-file-name
-              (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
-              (getenv "HOME"))
-             "/"))))
-    (cond
-     ((and chromium-directory firefox-directory)
-      (if (file-newer-than-file-p
-           (concat chromium-directory "History")
-           (concat firefox-directory "places.sqlite"))
+  (let* ((chromium-directory (ibrowse-sql-get-chromium-dir))
+         (firefox-directory (ibrowse-sql-get-firefox-dir)))
+    (if (and (ibrowse-sql-get-chromium-dir) (ibrowse-sql-get-firefox-dir))
+        (if (file-newer-than-file-p
+             (concat chromium-directory "History")
+             (concat firefox-directory "places.sqlite"))
+            (progn
+              (setq ibrowse-core-browser 'Chromium)
+              chromium-directory)
           (progn
-            (setq ibrowse-core-browser 'Chromium)
-            chromium-directory)
-        (progn
-          (setq ibrowse-core-browser 'Firefox)
-          firefox-directory)))
-     (chromium-directory chromium-directory)
-     (firefox-directory firefox-directory)
-     (t (user-error "The browser database directory is not found!")))))
+            (setq ibrowse-core-browser 'Firefox)
+            firefox-directory))
+      (user-error "The browser database directory is not found!"))))
+
+(defun ibrowse-sql-get-db-dir ()
+  "Get the directory containing main database files."
+  (pcase ibrowse-core-browser
+    ('Chromium (ibrowse-sql-get-chromium-dir))
+    ('Firefox (ibrowse-sql-get-firefox-dir))
+    (_ (ibrowse-sql-guess-db-dir))))
 
 (defvar ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir)
   "Browser database directory.")
