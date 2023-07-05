@@ -88,17 +88,6 @@ consider adjusting the SQL."
         `([:delete :from moz_places :where (= id ,num-id)]
           [:delete :from moz_historyvisits :where (= place_id ,num-id)])))))
 
-(defun ibrowse-history--extract-fields (callback)
-  "Read `ibrowse-history-db' and call the CALLBACK function."
-  (ibrowse-core--file-check ibrowse-history-db "ibrowse-history-db")
-  (ibrowse-sql--ensure-db ibrowse-history-db ibrowse-history--temp-db)
-  (setq ibrowse-history-candidates nil)
-  (with-temp-buffer
-    (ibrowse-sql--apply-command
-     callback
-     ibrowse-history--temp-db
-     (ibrowse-history-sql))))
-
 (defun ibrowse-history-format (date-in-ms &rest rest)
   "Format DATE-IN-MS with additional REST variables for `completing-read'."
   (let* ((date (/ (string-to-number date-in-ms) 1000000))
@@ -107,17 +96,17 @@ consider adjusting the SQL."
                  ('Firefox date))))
     (format "%s| %s" (format-time-string "%F"  date) (string-join rest " | "))))
 
+(defun ibrowse-history-candidate-format (candidate)
+  "Format a CANDIDATE from ibrowse-history."
+  (cl-destructuring-bind (title url id last-visit-time) candidate
+    (list (ibrowse-history-format last-visit-time title url) url id)))
+
 (defun ibrowse-history--get-candidates ()
-  "Build candidates."
-  (unless ibrowse-history-candidates
-    (message "[ibrowse-history] Building cache...")
-    (setq ibrowse-history-candidates
-          (mapcar
-           (pcase-lambda (`(,title ,url ,id ,last-visit-time))
-             (list (ibrowse-history-format last-visit-time title url) url id))
-           (ibrowse-history--extract-fields
-            #'ibrowse-sql--read-callback))))
-  ibrowse-history-candidates)
+  "Wrapper around `ibrowse-sql--get-candidates'."
+  (ibrowse-sql--get-candidates ibrowse-history-db
+                               ibrowse-history--temp-db
+                               #'ibrowse-history-sql
+                               #'ibrowse-history-candidate-format))
 
 ;;; Interaction
 
@@ -131,7 +120,7 @@ consider adjusting the SQL."
      (ibrowse-history-delete-sql id)))
   ;; Delete cache.
   (ibrowse-sql--ensure-db ibrowse-history-db ibrowse-history--temp-db t)
-  (setq ibrowse-history-candidates nil))
+  (setq ibrowse-sql-candidates nil))
 
 (defun ibrowse-history-act (prompt action)
   "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
