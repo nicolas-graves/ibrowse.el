@@ -84,15 +84,11 @@
 
 (defun ibrowse-sql--most-recent (file-list)
   "Return the most recent edit time from FILE-LIST."
-  (apply
-   #'max
-     (delq
-      nil
-      (mapcar
-       (lambda (f)
-         (when (and (file-exists-p f) (file-readable-p f))
-           (float-time (file-attribute-modification-time (file-attributes f)))))
-       file-list))))
+  (apply #'max
+           (mapcar (lambda (f)
+                     (float-time
+                      (file-attribute-modification-time (file-attributes f))))
+                   file-list)))
 
 (defun ibrowse-sql-guess-db-dir! ()
   "Guess the directory containing main database files.
@@ -105,11 +101,14 @@ chosen directory will be the most recently used profile."
     (if (and chromium-dir firefox-dir)
         (if (let* ((chromium-files (list (concat chromium-dir "History")
                                          (concat chromium-dir "History-journal")))
-                   (firefox-files (list (concat firefox-dir "places.sqlite")
-                                        (concat firefox-dir "places.sqlite-wal")))
+                   (firefox-files
+                    (delq nil
+                          (list (concat firefox-dir "places.sqlite")
+                                (let ((f (concat firefox-dir "places.sqlite-wal")))
+                                  (if (file-exists-p f) f nil)))))
                    (chromium-latest (ibrowse-sql--most-recent chromium-files))
                    (firefox-latest (ibrowse-sql--most-recent firefox-files)))
-            (> chromium-latest firefox-latest))
+              (> chromium-latest firefox-latest))
             (progn (setq ibrowse-core-browser 'Chromium)
                    chromium-dir)
           (progn (setq ibrowse-core-browser 'Firefox)
