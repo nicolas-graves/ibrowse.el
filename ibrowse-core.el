@@ -62,9 +62,9 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
 (defun ibrowse-core--file-check (file var)
   "Check if FILE exists, used in the definition of VAR."
   (pcase file
-    ('nil (user-error "`%s' is not set" var))
+    ('nil (user-error "`%s' returns nil!" var))
     ((pred file-exists-p) nil)
-    (f (user-error "'%s' doesn't exist, please reset `%s'" f var))))
+    (f (user-error "'%s' doesn't exist, please inspect `%s'" f var))))
 
 (defun ibrowse-core--copy-url (_title url _id)
   "Action to copy URL."

@@ -37,16 +37,11 @@
 
 ;;; Settings
 
-(defun ibrowse-history-guess-file ()
-  "Guess the sql file containing history."
-  (let* ((history-file (concat ibrowse-sql-db-dir "History"))
-         (places-file (concat ibrowse-sql-db-dir "places.sqlite")))
-    (cond ((file-exists-p history-file) history-file)
-          ((file-exists-p places-file) places-file)
-          (t (user-error "The history file has not been found!")))))
-
-(defvar ibrowse-history-db (ibrowse-history-guess-file)
-  "Browser history SQLite database file.")
+(defun ibrowse-history-get-db ()
+  "Get the SQLite database file containing history."
+  (pcase ibrowse-core-browser
+    ('Chromium (concat ibrowse-sql-db-dir "History"))
+    ('Firefox (concat ibrowse-sql-db-dir "places.sqlite"))))
 
 (defvar ibrowse-history--temp-db
   (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory)
@@ -64,7 +59,7 @@
   "The SQL command used to extract history.
 
 If you have too many history and worry about the memory use,
-consider adjusting the SQL."
+consider adjusting `ibrowse-history-limit'."
   (pcase ibrowse-core-browser
     ('Chromium `([:select [title url id last_visit_time]
                   :from urls
@@ -103,24 +98,24 @@ consider adjusting the SQL."
 
 (defun ibrowse-history--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
-  (ibrowse-sql--get-candidates ibrowse-history-db
+  (ibrowse-sql--get-candidates (ibrowse-history-get-db)
                                ibrowse-history--temp-db
                                #'ibrowse-history-sql
-                               "ibrowse-history-db"
+                               "ibrowse-history-get-db"
                                #'ibrowse-history-candidate-format))
 
 ;;; Interaction
 
 (defun ibrowse-history-delete-item (_title _url id)
   "Delete browser ID item using sqlite."
-  (ibrowse-core--file-check ibrowse-history-db "ibrowse-history-db")
+  (ibrowse-core--file-check (ibrowse-history-get-db) "ibrowse-history-get-db")
   (with-temp-buffer
     (ibrowse-sql--apply-command
      (lambda (_) nil)
-     ibrowse-history-db
+     (ibrowse-history-get-db)
      (ibrowse-history-delete-sql id)))
   ;; Delete cache.
-  (ibrowse-sql--ensure-db ibrowse-history-db ibrowse-history--temp-db t)
+  (ibrowse-sql--ensure-db (ibrowse-history-get-db) ibrowse-history--temp-db t)
   (setq ibrowse-sql-candidates nil))
 
 (defun ibrowse-history-act (prompt action)
