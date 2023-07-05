@@ -36,13 +36,28 @@
 
 ;;; Settings
 
-(defvar ibrowse-bookmark-file
-  (concat ibrowse-sql-db-dir "Bookmarks")
-  "Chromium-based browsers Bookmarks file.")
+(defun ibrowse-bookmark-guess-file ()
+  "Guess the file containing bookmarks."
+  (let* ((history-file (concat ibrowse-sql-db-dir "Bookmarks"))
+         (places-file (concat ibrowse-sql-db-dir "places.sqlite")))
+    (cond ((file-exists-p history-file) history-file)
+          ((file-exists-p places-file) places-file)
+          (t (user-error "The bookmarks file has not been found!")))))
+
+(defvar ibrowse-bookmark-file (ibrowse-bookmark-guess-file)
+  "Browser bookmarks file.
+
+It is either SQLite database for Firefox, or a simple file for
+Chromium.")
+
+(defvar ibrowse-bookmark--temp-db
+  (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory)
+  "Temporary copy of the Firefox bookmark SQLite database file.")
 
 (defconst ibrowse-bookmark--separator ".")
 
 ;;; Backend / Helpers
+;;;; Backend / Helper for Chromium
 
 (defun ibrowse-bookmark--generate-item (title-url)
   "Generate a bookmark item entry from TITLE-URL."
@@ -126,15 +141,6 @@ RECURSION-ID."
            (list .name .url
                  (concat recursion-id ibrowse-bookmark--separator .name)))))))
 
-(defun ibrowse-bookmark--get-candidates ()
-  "Get an alist with candidates."
-  (seq-mapcat
-   #'identity
-   (delq nil
-         (mapcar (lambda (x)
-                   (ibrowse-bookmark--extract-fields (cdr x) ""))
-                 (alist-get 'roots (json-read-file ibrowse-bookmark-file))))))
-
 (defun ibrowse-bookmark--radix-tree (bookmark-list)
   "Generate a radix-tree from BOOKMARK-LIST."
   (mapcar
@@ -144,14 +150,59 @@ RECURSION-ID."
                  radix-tree-empty))
    bookmark-list))
 
+;;;; Backend / Helper for Firefox
+
+(defun ibrowse-bookmark-sql ()
+  "The SQL command used to extract bookmarks."
+  (list [:select [bm:title p:url p:id]
+         :from (as moz_bookmarks bm)
+         :inner-join (as moz_places p)
+         :where (= bm:fk p:id)]))
+
+(defun ibrowse-bookmark-delete-sql (id)
+  "The SQL command used to delete the item ID from history."
+  (let ((num-id (string-to-number id)))
+    `([:delete :from moz_places :where (= id ,num-id)]
+      [:delete :from moz_bookmarks :where (= fk ,num-id)])))
+
+;;;; Common backend / helper
+
+(defun ibrowse-bookmark--get-candidates ()
+  "In the case of Chromium: get an alist with candidates.
+In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
+  (pcase ibrowse-core-browser
+    ('Chromium
+     (seq-mapcat
+      #'identity
+      (delq nil
+            (mapcar (lambda (x)
+                      (ibrowse-bookmark--extract-fields (cdr x) ""))
+                    (alist-get 'roots (json-read-file ibrowse-bookmark-file))))))
+    ('Firefox
+     (ibrowse-sql--get-candidates ibrowse-bookmark-file
+                                  ibrowse-bookmark--temp-db
+                                  #'ibrowse-bookmark-sql
+                                  "ibrowse-bookmark-file"))))
+
 ;;; Actions / Interaction
 
 (defun ibrowse-bookmark--delete-item (title url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
   (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
-  (ibrowse-bookmark--write-file
-   (delete `(,title ,url ,id) (ibrowse-bookmark--get-candidates))
-   ibrowse-bookmark-file))
+  (pcase ibrowse-core-browser
+    ('Chromium
+     (ibrowse-bookmark--write-file
+      (delete `(,title ,url ,id) (ibrowse-bookmark--get-candidates))
+      ibrowse-bookmark-file))
+    ('Firefox
+     (with-temp-buffer
+       (ibrowse-sql--apply-command
+        (lambda (_) nil)
+        ibrowse-bookmark-file
+        (ibrowse-bookmark-delete-sql id)))
+     ;; Delete cache.
+     (ibrowse-sql--ensure-db ibrowse-bookmark-file ibrowse-bookmark--temp-db t)
+     (setq ibrowse-sql-candidates nil))))
 
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
