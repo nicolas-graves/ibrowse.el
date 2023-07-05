@@ -82,24 +82,38 @@
       (getenv "HOME"))
      "/")))
 
+(defun ibrowse-sql--most-recent (file-list)
+  "Return the most recent edit time from FILE-LIST."
+  (apply
+   #'max
+     (delq
+      nil
+      (mapcar
+       (lambda (f)
+         (when (and (file-exists-p f) (file-readable-p f))
+           (float-time (file-attribute-modification-time (file-attributes f)))))
+       file-list))))
+
 (defun ibrowse-sql-guess-db-dir! ()
   "Guess the directory containing main database files.
 
 These main database files are `History' and `Bookmarks' in the case of
 Chromium, `places.sqlite' in the case of Firefox.  By default, the
 chosen directory will be the most recently used profile."
-  (let* ((chromium-directory (ibrowse-sql-get-chromium-dir))
-         (firefox-directory (ibrowse-sql-get-firefox-dir)))
-    (if (and (ibrowse-sql-get-chromium-dir) (ibrowse-sql-get-firefox-dir))
-        (if (file-newer-than-file-p
-             (concat chromium-directory "History")
-             (concat firefox-directory "places.sqlite"))
-            (progn
-              (setq ibrowse-core-browser 'Chromium)
-              chromium-directory)
-          (progn
-            (setq ibrowse-core-browser 'Firefox)
-            firefox-directory))
+  (let* ((chromium-dir (ibrowse-sql-get-chromium-dir))
+         (firefox-dir (ibrowse-sql-get-firefox-dir)))
+    (if (and chromium-dir firefox-dir)
+        (if (let* ((chromium-files (list (concat chromium-dir "History")
+                                         (concat chromium-dir "History-journal")))
+                   (firefox-files (list (concat firefox-dir "places.sqlite")
+                                        (concat firefox-dir "places.sqlite-wal")))
+                   (chromium-latest (ibrowse-sql--most-recent chromium-files))
+                   (firefox-latest (ibrowse-sql--most-recent firefox-files)))
+            (> chromium-latest firefox-latest))
+            (progn (setq ibrowse-core-browser 'Chromium)
+                   chromium-dir)
+          (progn (setq ibrowse-core-browser 'Firefox)
+                 firefox-dir))
       (user-error "The browser database directory is not found!"))))
 
 (defun ibrowse-sql-get-db-dir ()
@@ -111,6 +125,15 @@ chosen directory will be the most recently used profile."
 
 (defvar ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir!)
   "Browser database directory.")
+
+(defun ibrowse-update-browser ()
+  "Update variables if you have changed your current browser.
+
+More precisely, it updates `ibrowse-sql-db-dir' and
+`ibrowse-core-browser' variables."
+  (interactive)
+  (setq ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir!))
+  (setq ibrowse-sql-candidates nil))
 
 (defun ibrowse-sql--ensure-db (file tempfile &optional force-update?)
   "Ensure database by copying FILE to TEMPFILE.
