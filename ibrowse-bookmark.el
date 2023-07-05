@@ -153,11 +153,12 @@ RECURSION-ID."
 ;;;; Backend / Helper for Firefox
 
 (defun ibrowse-bookmark-sql ()
-  "The SQL command used to extract bookmarks."
+  "The SQL command used to extract bookmarks.
+bm:type 1 ensures we extract bookmarks and not folders or separators."
   (list [:select [bm:title p:url p:id]
          :from (as moz_bookmarks bm)
          :inner-join (as moz_places p)
-         :where (= bm:fk p:id)]))
+         :where (and (= bm:fk p:id) (= bm:type 1))]))
 
 (defun ibrowse-bookmark-delete-sql (id)
   "The SQL command used to delete the item ID from history."
