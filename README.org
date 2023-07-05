@@ -3,7 +3,7 @@
 
 Ibrowse stands for interactive browse, its goal is to be able to control your browser through common actions, be it on browser tabs, history or bookmarks using Emacs.
 
-It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox) :
+It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. Development constraints I'll try to respect are to avoid javascript or the need for any additional browser extension (try to rely on native options instead). For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox) :
 
 | package             | last commit | tab        | bookmark                | history          |
 |---------------------+-------------+------------+-------------------------+------------------|
@@ -14,7 +14,6 @@ It relies on the =completing-read= built-in interface, and thus benefits grealty
 | [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |        2021 |            | c (json)                |                  |
 | [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |        2019 |            | f (sql)                 | f (sql)          |
 | [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |        2023 | c (cdp)    | c (json+radix), f (sql) | c (sql), f (sql) |
-|                     |             |            |                         |                  |
 
 Please note that the depth of actions is not comparable, much more actions are available in this package, see below. PR are welcome for other browsers/protocols/functionalities!
 
