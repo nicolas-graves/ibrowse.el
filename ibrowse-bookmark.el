@@ -207,11 +207,22 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
-  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
-  (ibrowse-bookmark--write-file
-   (append `((,title ,url ,(concat ".Bookmarks bar." title)))
-           (ibrowse-bookmark--get-candidates))
-   ibrowse-bookmark-file))
+  (ibrowse-core--file-check (ibrowse-bookmark-get-file) "ibrowse-bookmark-get-file")
+  (pcase ibrowse-core-browser
+    ('Chromium
+     (ibrowse-bookmark--write-file
+      (append `((,title ,url ,(concat ".Bookmarks bar." title)))
+              (ibrowse-bookmark--get-candidates))
+      (ibrowse-bookmark-get-file)))
+    ('Firefox
+     (with-temp-buffer
+       (ibrowse-sql--apply-command
+        (lambda (_) nil)
+        (ibrowse-bookmark-get-file)
+        (ibrowse-bookmark-add-sql title url)))
+     ;; Delete cache.
+     (ibrowse-sql--ensure-db ibrowse-bookmark-file ibrowse-bookmark--temp-db t)
+     (setq ibrowse-sql-candidates nil))))
 
 ;;;###autoload
 (defun ibrowse-bookmark-add-item (&optional title url)
