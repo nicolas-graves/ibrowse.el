@@ -177,7 +177,11 @@ Returns a single string of SQL commands separated by semicolons."
     (nreverse result)))
 
 (defun ibrowse-sql--extract-fields (db temp-db query varname &optional callback)
-  "Read TEMP-DB generated from DB, reset the CACHE and call the CALLBACK function."
+  "QUERY the database TEMP-DB, and call the CALLBACK function.
+
+VARNAME is used to carry the name of the origin of the call, for debug
+purposes.  DB is the original database.  Nothing is done when CALLBACK
+is not provided."
   (ibrowse-core--file-check db varname)
   (ibrowse-sql--ensure-db db temp-db)
   (setq ibrowse-sql-candidates nil)
