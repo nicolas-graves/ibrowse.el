@@ -106,6 +106,7 @@ consider adjusting the SQL."
   (ibrowse-sql--get-candidates ibrowse-history-db
                                ibrowse-history--temp-db
                                #'ibrowse-history-sql
+                               "ibrowse-history-db"
                                #'ibrowse-history-candidate-format))
 
 ;;; Interaction
