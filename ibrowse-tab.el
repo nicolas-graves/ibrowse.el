@@ -34,7 +34,7 @@
   "Prepare a tab search result ITEM for display."
   (let-alist item
     (if (string= .type "page")
-        (list .title .url .id))))
+        (list (or .title .url) .url .id)))) ; no title in Firefox's CDP
 
 (defun ibrowse-tab--get-candidates ()
   "Get an alist with candidates."
