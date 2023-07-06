@@ -5,15 +5,16 @@ Ibrowse stands for interactive browse, its goal is to be able to control your br
 
 It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. Development constraints I'll try to respect are to avoid javascript or the need for any additional browser extension (try to rely on native options instead). For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox) :
 
-| package             | last commit | tab        | bookmark                | history          |
-|---------------------+-------------+------------+-------------------------+------------------|
-| [[https://github.com/kawabata/helm-chrome][helm-chrome]]         |        2016 |            | c (json)                |                  |
-| [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]] |        2019 |            |                         | c (sql)          |
-| [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]] |        2019 | c (mac+js) |                         |                  |
-| [[https://github.com/anticomputer/chrome.el][chrome.el]]           |        2021 | c (cdp)    |                         |                  |
-| [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |        2021 |            | c (json)                |                  |
-| [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |        2019 |            | f (sql)                 | f (sql)          |
-| [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |        2023 | c (cdp)    | c (json+radix), f (sql) | c (sql), f (sql) |
+| package             | updated | tab        | bookmark                | history          |
+|---------------------+---------+------------+-------------------------+------------------|
+| [[https://github.com/kawabata/helm-chrome][helm-chrome]]         |    2016 |            | c (json)                |                  |
+| [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]] |    2019 |            |                         | c (sql)          |
+| [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]] |    2019 | c (mac+js) |                         |                  |
+| [[https://github.com/anticomputer/chrome.el][chrome.el]]           |    2021 | c (cdp)    |                         |                  |
+| [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |    2021 |            | c (json)                |                  |
+| [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |    2019 |            | f (sql)                 | f (sql)          |
+| [[https://github.com/emacs-helm/helm-firefox][helm-firefox]]        |    2022 |            | f (html)                |                  |
+| [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |    2023 | c (cdp)    | c (json+radix), f (sql) | c (sql), f (sql) |
 
 Please note that the depth of actions is not comparable, much more actions are available in this package, see below. PR are welcome for other browsers/protocols/functionalities!
 
@@ -34,16 +35,19 @@ Copying url title is a native embark option.
 
 ** ibrowse-history.el
 
-This file has a dependency on =sqlite3=.
+This file has a dependency on =ibrowse-sql.el=, which itself depends on =sqlite3=.
+Warning about SQL : Actions on SQL databases can't work with an open browser (Chromium and Firefox lock their databases). More testing and development would be needed to make actions on databases work properly.
 
 This file will introduce the following commands :
 - =ibrowse-history-browse-url=
-- =ibrowse-history-delete= (Warning: This function can't work with an open browser, and is still alpha -- I haven't checked that every item linked to a history search is properly deleted.)
+- =ibrowse-history-delete=
 - =ibrowse-history-copy-url=
 - =ibrowse-history-insert-org-link=
 - =ibrowse-history-insert-markdown-link=
 
 ** ibrowse-bookmark.el
+
+For Firefox, this file has a dependency on =ibrowse-sql.el=.
 
 This file will introduce the following commands :
 - =ibrowse-bookmark-delete=
@@ -61,6 +65,10 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 ** Changelog
 
+- TODO : Implement Nyxt and Emacs' browsers interaction.
+- TODO : Find a way to delay SQLite database access when locked.
+
+- 0.1.9: Implement Firefox history and bookmark commands. Better SQL implementation. Handle browser switch.
 - 0.1.8: Various packaging fixes.
 - 0.1.7: Various packaging fixes.
 - 0.1.6: Renaming and factorising.
@@ -73,12 +81,4 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 ** Inspiration
 
-This package is originally inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts and the [[https://github.com/cpitclaudel/biblio.el][biblio.el]] package, but aspires to have broader functionalities, more integrated with Emacs. While writing the package, I also stumbled upon (and occasionally copied parts of):
-
-- [[https://github.com/kawabata/helm-chrome][helm-chrome]]
-- [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]]
-- [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]]
-- [[https://github.com/anticomputer/chrome.el][chrome.el]]
-- [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]
-
-All implement very close features to ibrowse, but are either more developped (=chrome.el= has a major mode frontend, which I considered unnecessary for a daily use with embark and the minibuffer), rely on =helm= or javascript code, or have more limited functionality. All (except [[https://github.com/anticomputer/chrome.el][chrome.el]], which I didn't copied code from) are licensed under GPLv3+, making this package an "aggregate" also under GPLv3+.
+This package is originally inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts and the [[https://github.com/cpitclaudel/biblio.el][biblio.el]] package, but aspires to have broader functionalities, more integrated with Emacs. While writing the package, I also stumbled upon other packages, shown in the upper table. All implement very close features to ibrowse, but are either more developped (=chrome.el= has a major mode frontend, which I considered unnecessary for a daily use with embark and the minibuffer), rely on =helm= or javascript code, or have more limited functionality. I occasionnally copied snippets of code from some of these packages, but gave credit to authors in copyrights and only copied GPLv3+ code, making this package an "aggregate" also under GPLv3+.
