@@ -14,7 +14,7 @@ It relies on the =completing-read= built-in interface, and thus benefits grealty
 | [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |    2021 |                  | c (json)                 |                    |
 | [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |    2019 |                  | f (sql*)                 | f (sql*)           |
 | [[https://github.com/emacs-helm/helm-firefox][helm-firefox]]        |    2022 |                  | f (html)                 |                    |
-| [[https://github.com/bitspook/spookfox][spookfox]]            |    2023 | c,f (custom ws*) |                          |                    |
+| [[https://github.com/bitspook/spookfox][spookfox]]            |    2023 | c,f (ws*)        |                          |                    |
 | [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |    2023 | c (cdp), f(cdp*) | c (json+radix), f (sql*) | c (sql*), f (sql*) |
 
 Please note that the depth of actions is not comparable, much more actions are available in this package, see below. PR are welcome for other browsers/protocols/functionalities!
@@ -25,7 +25,7 @@ It is composed of three control functionalities for your browser :
 
 To use the functions in =ibrowse-tab.el=, you need to use the Chromium Developer Protocol. Simply run your browser with the option =--remote-debugging-port=9222=.
 
-The Firefox CDP implementation is not complete, and actions =tab-close= and =tab-select= are only available in Chromium. Moreover, the Firefox CDP implementation does not include a title, thus displaying urls only.
+The Firefox CDP implementation is not complete, and action =tab-select= is only available in Chromium. It will probably only be available once the following feature is implemented in Firefox's webdriver bidi implementation : [[https://github.com/w3c/webdriver-bidi/pull/453][Add `browsingContext.activate` by OrKoN · Pull Request #453 · w3c/webdriver-bidi]].
 
 This file currently introduces the following commands :
 - =ibrowse-tab-select=
@@ -70,7 +70,8 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 - TODO : Implement Nyxt and Emacs' browsers interaction.
 - TODO : Find a way to delay SQLite database access when locked.
-- MAYBE : Replace CDP by Webdriver BiDi in a near future ?
+- TODO : Replace CDP by Webdriver BiDi in a near future.
+- TODO : Once using Webdriver BiDi, add actions to print or screenshot a page.
 
 - 0.1.9: Implement Firefox history and bookmark commands. Better SQL implementation. Handle browser switch.
 - 0.1.8: Various packaging fixes.

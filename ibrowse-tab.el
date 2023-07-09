@@ -27,6 +27,7 @@
 
 (require 'json)
 (require 'ibrowse-core)
+(require 'websocket)
 
 ;;; Backend
 
@@ -34,7 +35,7 @@
   "Prepare a tab search result ITEM for display."
   (let-alist item
     (if (string= .type "page")
-        (list (or .title .url) .url .id)))) ; no title in Firefox's CDP
+        (list (or .title .url) .url (or .id .targetId)))))
 
 (defun ibrowse-tab--get-candidates ()
   "Get an alist with candidates."
@@ -44,22 +45,92 @@
           (seq-map #'ibrowse-tab--extract-fields
                    (json-parse-buffer :object-type 'alist)))))
 
+(defun ibrowse-tab--get-ws-candidates (result)
+  "Get an alist with candidates from RESULT of the websocket message."
+  (lambda () (mapcar #'ibrowse-tab--extract-fields
+                       (cdr (assoc 'targetInfos result)))))
+
+(defvar ibrowse-tab--ws nil
+  "The WebSocket connection to the bidi webdriver.")
+
+(defun ibrowse-tab--firefox-get-ws ()
+  "Get the websocket address for Firefox actions."
+  (with-temp-buffer
+    (url-insert-file-contents (ibrowse-core--cdp-url "version"))
+    (let-alist (json-parse-buffer :object-type 'alist)
+      .webSocketDebuggerUrl)))
+
+(defun ibrowse-tab--ws-list ()
+  "Websocket alist to list tabs."
+  `(("id" . ,(number-to-string (random 100000)))
+    ("method" . "Target.getTargets")))
+
+(defun ibrowse-tab--ws--activate (id)
+  "Return the alist to activate tab ID."
+  `(("id" . ,(number-to-string (random 100000)))
+    ("method" . "Target.activateTarget")
+    ("params" . (("targetId" . ,id)))))
+
+(defun ibrowse-tab--ws--delete (id)
+  "Return the alist to delete tab ID."
+  `(("id" . ,(number-to-string (random 100000)))
+    ("method" . "Target.closeTarget")
+    ("params" . (("targetId" . ,id)))))
+
 ;;; Actions
 
 (defun ibrowse-tab--activate (_title _url id)
   "Active browser tab from ID using the chromium developer protocol."
-  (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "activate/" id))))
+  (pcase ibrowse-core-browser
+    ('Chromium
+      (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "activate/" id))))
+    ('Firefox
+      (error "Switching tabs is not currently implemented for Firefox"))))
 
-(defun ibrowse-tab--close (_title _url id)
-  "Close browser tab from ID using the chromium developer protocol."
-  (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
+(defun ibrowse-tab--close (_title _url id &optional ws)
+  "Close browser tab from ID using the chromium developer protocol.
+
+Optionally use the websocket WS when necessary."
+  (pcase ibrowse-core-browser
+    ('Chromium
+      (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
+    ('Firefox
+      (websocket-send-text ws (json-encode (ibrowse-tab--ws--delete id))))))
 
 (defun ibrowse-tab-act (prompt action)
   "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
-  (ibrowse-core-act prompt
-                    #'ibrowse-tab--get-candidates
-                    action
-                    'ibrowse-tab))
+  (pcase ibrowse-core-browser
+    ('Chromium (ibrowse-core-act prompt
+                                 #'ibrowse-tab--get-candidates
+                                 action
+                                 'ibrowse-tab))
+    ('Firefox
+      (let ((ws (websocket-open
+                 (ibrowse-tab--firefox-get-ws)
+                 :on-open
+                 (lambda (ws)
+                   (message "Websocket connection opened")
+                   (websocket-send-text ws (json-encode (ibrowse-tab--ws-list)))
+                   (message "Sent %s" (json-encode (ibrowse-tab--ws-list))))
+                 :on-close (lambda (_ws)
+                             (message "Websocket connection closed"))
+                 :on-error (lambda (_ws type err)
+                             (message "WebSocket error: %s %s" type err))
+                 :on-message
+                 (lambda (ws frame)
+                   (let* ((message (websocket-frame-text frame))
+                          (data (json-parse-string message :object-type 'alist))
+                          (result (cdr (assoc 'result data))))
+                     (if result
+                         (progn
+                           (message "Received: %s" result)
+                           (ibrowse-core-act prompt
+                                           (ibrowse-tab--get-ws-candidates result)
+                                           (lambda (title url id)
+                                             (funcall action title url id ws))
+                                           'ibrowse-tab))))))))
+        ;; Keep the websocket connection in a global variable so it's not garbage collected
+        (setq ibrowse-tab--ws ws)))))
 
 ;;;###autoload
 (defun ibrowse-tab-select ()
