@@ -6,7 +6,7 @@
 ;; Copyright © 2016 Taichi Kawabata <kawabata.taichi@gmail.com>
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
-;; Version: 0.1.4
+;; Version: 0.1.9
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -36,26 +36,14 @@
 (defvar ibrowse-sql-candidates nil
   "The ibrowse alist cache.")
 
+(defvar ibrowse-sql-queue nil
+  "Queue of SQL commands to execute.")
 
+(defvar ibrowse-sql-timer nil
+  "Timer that is set up for retrying SQL command execution.")
 
-(defun ibrowse-sql-get-db-dir ()
-  "Get the directory containing main database files."
-  (pcase ibrowse-browser
-    ('Chromium (ibrowse-sql-get-chromium-dir))
-    ('Firefox (ibrowse-sql-get-firefox-dir))
-    (_ (ibrowse-sql-guess-db-dir!))))
-
-(defvar ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir!)
-  "Browser database directory.")
-
-(defun ibrowse-update-browser ()
-  "Update variables if you have changed your current browser.
-
-More precisely, it updates `ibrowse-sql-db-dir' and
-`ibrowse-browser' variables."
-  (interactive)
-  (setq ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir!))
-  (setq ibrowse-sql-candidates nil))
+(defvar ibrowse-sql-retry-interval 5
+  "Interval in seconds between retries of SQL commands.")
 
 (defun ibrowse-sql--ensure-db (file tempfile &optional force-update?)
   "Ensure database by copying FILE to TEMPFILE.
@@ -82,13 +70,53 @@ Returns a single string of SQL commands separated by semicolons."
    sql-args-list
    "\n"))
 
-(defun ibrowse-sql--apply-command (file queries &optional callback)
-  "Apply the SQL QUERIES list using the SQL FILE, then call CALLBACK."
-  (let ((sql-command (ibrowse-sql--prepare-stmt queries)))
-    (if (zerop (call-process "sqlite3" nil t nil "-ascii" file sql-command))
-        (when callback
-          (funcall callback file))
-      (error "Command sqlite3 failed: %s: %s" sql-command (buffer-string)))))
+(defun ibrowse-sql--apply-command (database command &optional callback)
+  "Apply the SQL COMMAND using the SQL DATABASE, then call CALLBACK."
+  (with-temp-buffer
+    (if (zerop (call-process "sqlite3" nil t nil "-ascii" database command))
+        (progn
+          (when ibrowse-sql-timer
+            (cancel-timer ibrowse-sql-timer)
+            (setq ibrowse-sql-timer nil))
+          (when callback
+            (funcall callback (buffer-string))))
+      (let ((err-msg (buffer-string)))
+        (if (string-match-p "database is locked" err-msg)
+            (progn
+              (message "Database is locked, command will be retried in %s seconds."
+                       ibrowse-sql-retry-interval)
+              (push (cons database command) ibrowse-sql-queue)
+              (run-hooks 'ibrowse-sql-queue-changed-hook))
+          (error "Command sqlite3 failed: %s: %s" command err-msg))))))
+
+(defun ibrowse-sql--retry-commands ()
+  "Retry SQL commands in `ibrowse-sql-queue'."
+  (when ibrowse-sql-queue
+    (let* ((entry (pop ibrowse-sql-queue))
+           (database (car entry))
+           (command (cdr entry)))
+      (ibrowse-sql--apply-command database command nil))))
+
+(defun ibrowse-sql--initiate-retry-timer ()
+  "Initiates a timer retrying commands in `ibrowse-sql-queue'.
+Commands are retried while the queue is not empty."
+  (when (and ibrowse-sql-queue (not ibrowse-sql-timer))
+    (setq ibrowse-sql-timer
+          (run-with-timer ibrowse-sql-retry-interval ibrowse-sql-retry-interval #'ibrowse-sql--retry-commands))))
+
+(add-hook 'ibrowse-sql-queue-changed-hook 'ibrowse-sql--initiate-retry-timer)
+
+(defun ibrowse-sql-check-active-commands ()
+  "Check if there are active SQL commands before killing Emacs.
+If `ibrowse-sql-queue' is not empty, ask the user for confirmation
+before killing Emacs."
+  (or (not ibrowse-sql-queue)
+      (y-or-n-p
+       (concat "Active SQL commands exist, "
+               "you might want to close your browser; "
+               "kill them and exit anyway? "))))
+
+(add-hook 'kill-emacs-query-functions #'ibrowse-sql-check-active-commands)
 
 (defun ibrowse-sql--read-callback (_)
   "Function applied to the result of the SQL query."
@@ -109,7 +137,9 @@ is not provided."
   (ibrowse-sql--ensure-db db temp-db)
   (setq ibrowse-sql-candidates nil)
   (with-temp-buffer
-    (ibrowse-sql--apply-command temp-db (funcall query) callback)))
+    (ibrowse-sql--apply-command temp-db
+                                (ibrowse-sql--prepare-stmt (funcall query))
+                                callback)))
 
 (defun ibrowse-sql--get-candidates
     (db temp-db query varname &optional candidate-format)
@@ -126,6 +156,12 @@ with arguments DB, TEMP-DB, QUERY and VARNAME."
                 (mapcar candidate-format candidates)
               candidates))))
   ibrowse-sql-candidates)
+
+(defun ibrowse-sql-update-browser! ()
+  "Update `ibrowse-sql-candidates' if you have changed your current browser."
+  (setq ibrowse-sql-candidates nil))
+
+(add-hook 'ibrowse-update-hook 'ibrowse-sql-update-browser! -80)
 
 (provide 'ibrowse-sql)
 ;;; ibrowse-sql.el ends here
