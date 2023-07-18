@@ -189,9 +189,8 @@ selected item."
 
 More precisely, this function updates `ibrowse-browser' and
 `ibrowse-browser-dir'."
-  (cl-multiple-value-bind (browser dir) (ibrowse-core-guess)
-    (setq ibrowse-browser browser)
-    (setq ibrowse-browser-dir dir)))
+  (cl-multiple-value-setq
+      (ibrowse-browser ibrowse-browser-dir) (ibrowse-core-guess)))
 
 (defun ibrowse-update-browser ()
   "Update all necessary variables if you have changed your current browser."
