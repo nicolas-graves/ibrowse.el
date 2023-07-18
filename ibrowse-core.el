@@ -6,7 +6,7 @@
 ;; Copyright © 2016 Taichi Kawabata <kawabata.taichi@gmail.com>
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
-;; Version: 0.1.4
+;; Version: 0.1.9
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -49,6 +49,80 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
   :group 'ibrowse)
 
 ;;; Functions
+
+(defun ibrowse-core-get-chromium-dir ()
+  "Try to get the Chromium data directory."
+  (let ((chromium-dirlist
+         (seq-filter
+          (lambda (p)
+            (file-exists-p
+             (substitute-in-file-name
+              (concat p "/" ibrowse-core-chromium-profile "/History"))))
+          '("~/.config/chromium"
+            "~/.config/google-chrome"
+            "$LOCALAPPDATA/Google/Chrome/User Data"
+            "$LOCALAPPDATA/Chromium/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Google/Chrome/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Chromium/User Data"
+            "$LOCALAPPDATA/Microsoft/Edge/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Microsoft/Edge/User Data"
+            "~/Library/Application Support/Google/Chrome"
+            "~/Library/Application Support/Chromium"
+            "~/.config/vivaldi"
+            "$LOCALAPPDATA/Vivaldi/User Data"
+            "$USERPROFILE/Local Settings/Application Data/Vivaldi/User Data"
+            "~/Library/Application Support/Vivaldi"
+            "~/AppData/Local/Google/Chrome/User Data/"))))
+    (concat
+     (expand-file-name
+      (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
+      (getenv "HOME"))
+     "/" ibrowse-core-chromium-profile "/")))
+
+(defun ibrowse-core-get-firefox-dir ()
+  "Try to get the Firefox data directory."
+  (let* ((firefox-dirlist
+          (append
+           (file-expand-wildcards "~/.mozilla/firefox/*.default")
+           (file-expand-wildcards
+            (expand-file-name "Mozilla/Firefox/Profiles/*"
+                              (getenv "APPDATA"))))))
+    (concat
+     (expand-file-name
+      (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
+      (getenv "HOME"))
+     "/")))
+
+(defun ibrowse-core--most-recent (file-list)
+  "Return the most recent edit time from FILE-LIST."
+  (apply #'max
+           (mapcar (lambda (f)
+                     (float-time
+                      (file-attribute-modification-time (file-attributes f))))
+                   file-list)))
+
+(defun ibrowse-core-guess ()
+  "Guess the directory containing main database files.
+
+These main database files are `History' and `Bookmarks' in the case of
+Chromium, `places.sqlite' in the case of Firefox.  By default, the
+chosen directory will be the most recently used profile."
+  (let* ((chromium-dir (ibrowse-core-get-chromium-dir))
+         (firefox-dir (ibrowse-core-get-firefox-dir)))
+    (if (and chromium-dir firefox-dir)
+        (if (let* ((chromium-files (list (concat chromium-dir "History")
+                                         (concat chromium-dir "History-journal")))
+                   (firefox-files
+                    (delq nil
+                          (list (concat firefox-dir "places.sqlite")
+                                (let ((f (concat firefox-dir "places.sqlite-wal")))
+                                  (if (file-exists-p f) f nil)))))
+                   (chromium-latest (ibrowse-core--most-recent chromium-files))
+                   (firefox-latest (ibrowse-core--most-recent firefox-files)))
+              (> chromium-latest firefox-latest))
+            (cl-values 'Chromium chromium-dir)
+          (cl-values 'Firefox firefox-dir))
+      (user-error "The browser database directory is not found!"))))
 
 (defun ibrowse-core--file-check (file var)
   "Check if FILE exists, used in the definition of VAR."
