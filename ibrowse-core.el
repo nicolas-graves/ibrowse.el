@@ -38,9 +38,6 @@
   :group 'applications
   :prefix "ibrowse-")
 
-(defconst ibrowse-core--cdp-debugging-port
-  "9222")
-
 (defcustom ibrowse-browser nil
   "The browser choice for ibrowse.
 
@@ -50,12 +47,6 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
                  (const :tag "Firefox" Firefox)
                  (const :tag "Auto" nil))
   :group 'ibrowse)
-
-(defun ibrowse-core--cdp-url (query)
-  "Return the url of the chromium developer protocol QUERY."
-  (format "http://localhost:%s/json/%s"
-          ibrowse-core--cdp-debugging-port
-          query))
 
 ;;; Functions
 

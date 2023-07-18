@@ -31,6 +31,15 @@
 
 ;;; Backend
 
+(defconst ibrowse-tab--cdp-debugging-port
+  "9222")
+
+(defun ibrowse-tab--cdp-url (query)
+  "Return the url of the chromium developer protocol QUERY."
+  (format "http://localhost:%s/json/%s"
+          ibrowse-tab--cdp-debugging-port
+          query))
+
 (defun ibrowse-tab--extract-fields (item)
   "Prepare a tab search result ITEM for display."
   (let-alist item
@@ -40,7 +49,7 @@
 (defun ibrowse-tab--get-candidates ()
   "Get an alist with candidates."
   (with-temp-buffer
-    (url-insert-file-contents (ibrowse-core--cdp-url "list"))
+    (url-insert-file-contents (ibrowse-tab--cdp-url "list"))
     (delq nil
           (seq-map #'ibrowse-tab--extract-fields
                    (json-parse-buffer :object-type 'alist)))))
@@ -56,7 +65,7 @@
 (defun ibrowse-tab--firefox-get-ws ()
   "Get the websocket address for Firefox actions."
   (with-temp-buffer
-    (url-insert-file-contents (ibrowse-core--cdp-url "version"))
+    (url-insert-file-contents (ibrowse-tab--cdp-url "version"))
     (let-alist (json-parse-buffer :object-type 'alist)
       .webSocketDebuggerUrl)))
 
@@ -83,7 +92,7 @@
   "Active browser tab from ID using the chromium developer protocol."
   (pcase ibrowse-browser
     ('Chromium
-      (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "activate/" id))))
+      (url-retrieve-synchronously (ibrowse-tab--cdp-url (concat "activate/" id))))
     ('Firefox
       (error "Switching tabs is not currently implemented for Firefox"))))
 
@@ -93,7 +102,7 @@
 Optionally use the websocket WS when necessary."
   (pcase ibrowse-browser
     ('Chromium
-      (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
+      (url-retrieve-synchronously (ibrowse-tab--cdp-url (concat "close/" id))))
     ('Firefox
       (websocket-send-text ws (json-encode (ibrowse-tab--ws--delete id))))))
 
