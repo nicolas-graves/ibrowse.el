@@ -33,9 +33,6 @@
 
 ;;; Variables
 
-(defvar ibrowse-sql-chromium-profile "Default"
-  "Name of the Chromium profile to use.")
-
 (defvar ibrowse-sql-candidates nil
   "The ibrowse alist cache.")
 

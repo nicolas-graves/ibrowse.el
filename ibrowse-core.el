@@ -48,6 +48,20 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
                  (const :tag "Auto" nil))
   :group 'ibrowse)
 
+(defcustom ibrowse-browser-dir nil
+  "The data directory of `ibrowse-browser'."
+  :type '(choice (string :tag "String value")
+                 (const :tag "No value" nil))
+  :group 'ibrowse)
+
+(defcustom ibrowse-update-hook nil
+  "Hooks to run when `ibrowse-update-browser' is invoked."
+  :type 'hook
+  :group 'ibrowse)
+
+(defvar ibrowse-core-chromium-profile "Default"
+  "Name of the Chromium profile to use.")
+
 ;;; Functions
 
 (defun ibrowse-core-get-chromium-dir ()
@@ -170,5 +184,23 @@ selected item."
       (`(,title ,url ,id)
        (funcall action title url id)))))
 
+(defun ibrowse-core-update-browser! ()
+  "Update variables if you have changed your current browser.
+
+More precisely, this function updates `ibrowse-browser' and
+`ibrowse-browser-dir'."
+  (cl-multiple-value-bind (browser dir) (ibrowse-core-guess)
+    (setq ibrowse-browser browser)
+    (setq ibrowse-browser-dir dir)))
+
+(defun ibrowse-update-browser ()
+  "Update all necessary variables if you have changed your current browser."
+  (interactive)
+  (run-hooks 'ibrowse-update-hook))
+
+;; -90: Always the first hook to be run.
+(add-hook 'ibrowse-update-hook 'ibrowse-core-update-browser! -90)
+
 (provide 'ibrowse-core)
+(ibrowse-core-update-browser!)
 ;;; ibrowse-core.el ends here

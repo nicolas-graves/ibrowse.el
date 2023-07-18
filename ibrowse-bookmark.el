@@ -39,8 +39,11 @@
 (defun ibrowse-bookmark-get-file ()
   "Get the SQLite database file containing bookmarks."
   (pcase ibrowse-browser
-    ('Chromium (concat ibrowse-sql-db-dir "Bookmarks"))
-    ('Firefox (concat ibrowse-sql-db-dir "places.sqlite"))))
+    ('Chromium (concat ibrowse-browser-dir "Bookmarks"))
+    ('Firefox (concat ibrowse-browser-dir "places.sqlite"))))
+
+(defvar ibrowse-bookmark-file (ibrowse-bookmark-get-file)
+  "The file of SQLite database containing bookmarks.")
 
 (defvar ibrowse-bookmark--temp-db
   (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory)
@@ -244,7 +247,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 
 (defun ibrowse-bookmark--delete-item (title url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
-  (ibrowse-core--file-check (ibrowse-bookmark-get-file) "ibrowse-bookmark-get-file")
+  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
   (pcase ibrowse-browser
     ('Chromium
      (ibrowse-bookmark--write-file
@@ -261,7 +264,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
-  (ibrowse-core--file-check (ibrowse-bookmark-get-file) "ibrowse-bookmark-get-file")
+  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
   (pcase ibrowse-browser
     ('Chromium
      (ibrowse-bookmark--write-file
@@ -353,6 +356,12 @@ the Bookmarks bar directory."
   (add-to-list
    'embark-keymap-alist
    '(ibrowse-bookmark . ibrowse-bookmark-embark-actions)))
+
+(defun ibrowse-bookmark-update-browser! ()
+  "Update `ibrowse-bookmark-file' if you have changed your current browser."
+  (setq ibrowse-bookmark-file (ibrowse-bookmark-get-file)))
+
+(add-hook 'ibrowse-update-hook 'ibrowse-bookmark-update-browser!)
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here

@@ -40,8 +40,11 @@
 (defun ibrowse-history-get-db ()
   "Get the SQLite database file containing history."
   (pcase ibrowse-browser
-    ('Chromium (concat ibrowse-sql-db-dir "History"))
-    ('Firefox (concat ibrowse-sql-db-dir "places.sqlite"))))
+    ('Chromium (concat ibrowse-browser-dir "History"))
+    ('Firefox (concat ibrowse-browser-dir "places.sqlite"))))
+
+(defvar ibrowse-history-db (ibrowse-history-get-db)
+  "SQLite database file containing history.")
 
 (defvar ibrowse-history--temp-db
   (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory)
@@ -98,22 +101,23 @@ consider adjusting `ibrowse-history-limit'."
 
 (defun ibrowse-history--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
-  (ibrowse-sql--get-candidates (ibrowse-history-get-db)
+  (ibrowse-sql--get-candidates ibrowse-history-db
                                ibrowse-history--temp-db
                                #'ibrowse-history-sql
-                               "ibrowse-history-get-db"
+                               "ibrowse-history-db"
                                #'ibrowse-history-candidate-format))
 
 ;;; Interaction
 
 (defun ibrowse-history-delete-item (_title _url id)
   "Delete browser ID item using sqlite."
-  (ibrowse-core--file-check (ibrowse-history-get-db) "ibrowse-history-get-db")
+  (ibrowse-core--file-check ibrowse-history-db "ibrowse-history-db")
   (with-temp-buffer
-    (ibrowse-sql--apply-command (ibrowse-history-get-db)
-                                (ibrowse-history-delete-sql id)))
+    (ibrowse-sql--apply-command ibrowse-history-db
+                                (ibrowse-sql--prepare-stmt
+                                 (ibrowse-history-delete-sql id))))
   ;; Delete cache.
-  (ibrowse-sql--ensure-db (ibrowse-history-get-db) ibrowse-history--temp-db t)
+  (ibrowse-sql--ensure-db ibrowse-history-db ibrowse-history--temp-db t)
   (setq ibrowse-sql-candidates nil))
 
 (defun ibrowse-history-act (prompt action)
@@ -184,6 +188,18 @@ SQlite database."
   (add-to-list
    'embark-keymap-alist
    '(ibrowse-history . ibrowse-history-embark-actions)))
+
+(defun ibrowse-history-update-browser! ()
+  "Update variables if you have changed your current browser.
+
+More precisely, this function updates `ibrowse-history-candidates' and
+`ibrowse-history-db'."
+  (setq ibrowse-history-db (ibrowse-history-get-db))
+  (ibrowse-sql--ensure-db ibrowse-history-db
+                          ibrowse-history--temp-db t)
+  (setq ibrowse-history-candidates nil))
+
+(add-hook 'ibrowse-update-hook 'ibrowse-history-update-browser!)
 
 (provide 'ibrowse-history)
 ;;; ibrowse-history.el ends here
