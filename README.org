@@ -5,17 +5,17 @@ Ibrowse stands for interactive browse, its goal is to be able to control your br
 
 It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. Development constraints I'll try to respect are to avoid javascript or the need for any additional browser extension (try to rely on native options instead). For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox, * means the implementation is not fully functional) :
 
-| package             | updated | tab              | bookmark                 | history    |
-|---------------------+---------+------------------+--------------------------+------------|
-| [[https://github.com/kawabata/helm-chrome][helm-chrome]]         |    2016 |                  | c (json)                 |            |
-| [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]] |    2019 |                  |                          | c (sql*)   |
-| [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]] |    2019 | c (mac+js)       |                          |            |
-| [[https://github.com/anticomputer/chrome.el][chrome.el]]           |    2021 | c (cdp)          |                          |            |
-| [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |    2021 |                  | c (json)                 |            |
-| [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |    2019 |                  | f (sql*)                 | f (sql*)   |
-| [[https://github.com/emacs-helm/helm-firefox][helm-firefox]]        |    2022 |                  | f (html)                 |            |
-| [[https://github.com/bitspook/spookfox][spookfox]]            |    2023 | c,f (ws*)        |                          |            |
-| [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |    2023 | c (cdp), f(cdp*) | c (json+radix), f (sql*) | c,f (sql*) |
+| package             | updated | tab             | bookmark               | history   |
+|---------------------+---------+-----------------+------------------------+-----------|
+| [[https://github.com/kawabata/helm-chrome][helm-chrome]]         |    2016 |                 | c(json)                |           |
+| [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]] |    2019 |                 |                        | c(sql*)   |
+| [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]] |    2019 | c(mac+js)       |                        |           |
+| [[https://github.com/anticomputer/chrome.el][chrome.el]]           |    2021 | c(cdp)          |                        |           |
+| [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |    2021 |                 | c(json)                |           |
+| [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |    2019 |                 | f(sql*)                | f(sql*)   |
+| [[https://github.com/emacs-helm/helm-firefox][helm-firefox]]        |    2022 |                 | f(html)                |           |
+| [[https://github.com/bitspook/spookfox][spookfox]]            |    2023 | c,f(ws*)        |                        |           |
+| [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |    2023 | c(cdp), f(cdp*) | c(json+radix), f(sql*) | c,f(sql*) |
 
 Please note that the depth of actions is not comparable, much more actions are available in this package, see below. PR are welcome for other browsers/protocols/functionalities!
 
@@ -25,7 +25,7 @@ It is composed of three control functionalities for your browser :
 
 To use the functions in =ibrowse-tab.el=, you need to use the Chromium Developer Protocol. Simply run your browser with the option =--remote-debugging-port=9222=.
 
-The Firefox CDP implementation is not complete, and action =tab-select= is only available in Chromium. It will probably only be available once the following feature is implemented in Firefox's webdriver bidi implementation : [[https://github.com/w3c/webdriver-bidi/pull/453][Add `browsingContext.activate` by OrKoN · Pull Request #453 · w3c/webdriver-bidi]].
+The Firefox CDP implementation is not complete, and action =tab-select= is only available in Chromium. It will probably only be available once the following feature is implemented in Firefox's Webdriver BiDi implementation : [[https://bugzilla.mozilla.org/show_bug.cgi?id=1841004][browsingContext.activate]].
 
 This file currently introduces the following commands :
 - =ibrowse-tab-select=
@@ -39,7 +39,8 @@ Copying url title is a native embark option.
 ** ibrowse-history.el
 
 This file has a dependency on =ibrowse-sql.el=, which itself depends on =sqlite3=.
-Warning about SQL : Actions on SQL databases can't work with an open browser (Chromium and Firefox lock their databases). More testing and development would be needed to make actions on databases work properly.
+
+Warning about SQL : Actions on SQL databases can't work with an open browser (Chromium and Firefox lock their databases). =ibrowse-history= will record the command you want to execute on the database in =ibrowse-sql-queue=, and retry the command every =ibrowse-sql-retry-interval= seconds. If trying to close emacs without =ibrowse-sql-queue= empty, you will be prompted for a confirmation. Close the browser before Emacs for the commands to be applied.
 
 This file will introduce the following commands :
 - =ibrowse-history-browse-url=
@@ -50,7 +51,7 @@ This file will introduce the following commands :
 
 ** ibrowse-bookmark.el
 
-For Firefox, this file has a dependency on =ibrowse-sql.el=.
+For Firefox, this file has a dependency on =ibrowse-sql.el=, the warning above about SQL applies as well.
 
 This file will introduce the following commands :
 - =ibrowse-bookmark-delete=
@@ -69,9 +70,9 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 ** Changelog
 
 - TODO : Implement Nyxt and Emacs' browsers interaction.
-- TODO : Find a way to delay SQLite database access when locked.
 - TODO : Replace CDP by Webdriver BiDi in a near future.
-- TODO : Once using Webdriver BiDi, add actions to print or screenshot a page.
+- TODO : Add actions to print or screenshot a page.
+- TODO : Improve implementation of SQL based on the built-in Emacs SQL support.
 
 - 0.1.9: Implement Firefox history and bookmark commands. Better SQL implementation. Handle browser switch.
 - 0.1.8: Various packaging fixes.
