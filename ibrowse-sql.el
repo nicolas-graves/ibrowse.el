@@ -109,15 +109,15 @@ chosen directory will be the most recently used profile."
                    (chromium-latest (ibrowse-sql--most-recent chromium-files))
                    (firefox-latest (ibrowse-sql--most-recent firefox-files)))
               (> chromium-latest firefox-latest))
-            (progn (setq ibrowse-core-browser 'Chromium)
+            (progn (setq ibrowse-browser 'Chromium)
                    chromium-dir)
-          (progn (setq ibrowse-core-browser 'Firefox)
+          (progn (setq ibrowse-browser 'Firefox)
                  firefox-dir))
       (user-error "The browser database directory is not found!"))))
 
 (defun ibrowse-sql-get-db-dir ()
   "Get the directory containing main database files."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium (ibrowse-sql-get-chromium-dir))
     ('Firefox (ibrowse-sql-get-firefox-dir))
     (_ (ibrowse-sql-guess-db-dir!))))
@@ -129,7 +129,7 @@ chosen directory will be the most recently used profile."
   "Update variables if you have changed your current browser.
 
 More precisely, it updates `ibrowse-sql-db-dir' and
-`ibrowse-core-browser' variables."
+`ibrowse-browser' variables."
   (interactive)
   (setq ibrowse-sql-db-dir (ibrowse-sql-guess-db-dir!))
   (setq ibrowse-sql-candidates nil))

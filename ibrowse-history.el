@@ -39,7 +39,7 @@
 
 (defun ibrowse-history-get-db ()
   "Get the SQLite database file containing history."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium (concat ibrowse-sql-db-dir "History"))
     ('Firefox (concat ibrowse-sql-db-dir "places.sqlite"))))
 
@@ -60,7 +60,7 @@
 
 If you have too many history and worry about the memory use,
 consider adjusting `ibrowse-history-limit'."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium `([:select [title url id last_visit_time]
                   :from urls
                   :order-by (desc id)
@@ -75,7 +75,7 @@ consider adjusting `ibrowse-history-limit'."
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
   (let ((num-id (string-to-number id)))
-    (pcase ibrowse-core-browser
+    (pcase ibrowse-browser
       ('Chromium
         `([:delete :from urls :where (= id ,num-id)]
           [:delete :from visits :where (= url ,num-id)]))
@@ -86,7 +86,7 @@ consider adjusting `ibrowse-history-limit'."
 (defun ibrowse-history-format (date-in-ms &rest rest)
   "Format DATE-IN-MS with additional REST variables for `completing-read'."
   (let* ((date (/ (string-to-number date-in-ms) 1000000))
-         (date (pcase ibrowse-core-browser
+         (date (pcase ibrowse-browser
                  ('Chromium (- date 11644473600)) ; https://stackoverflow.com/a/26233663/2999892
                  ('Firefox date))))
     (format "%s| %s" (format-time-string "%F"  date) (string-join rest " | "))))

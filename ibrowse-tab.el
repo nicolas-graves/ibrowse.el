@@ -81,7 +81,7 @@
 
 (defun ibrowse-tab--activate (_title _url id)
   "Active browser tab from ID using the chromium developer protocol."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium
       (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "activate/" id))))
     ('Firefox
@@ -91,7 +91,7 @@
   "Close browser tab from ID using the chromium developer protocol.
 
 Optionally use the websocket WS when necessary."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium
       (url-retrieve-synchronously (ibrowse-core--cdp-url (concat "close/" id))))
     ('Firefox
@@ -99,7 +99,7 @@ Optionally use the websocket WS when necessary."
 
 (defun ibrowse-tab-act (prompt action)
   "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium (ibrowse-core-act prompt
                                  #'ibrowse-tab--get-candidates
                                  action

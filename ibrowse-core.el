@@ -41,7 +41,7 @@
 (defconst ibrowse-core--cdp-debugging-port
   "9222")
 
-(defcustom ibrowse-core-browser nil
+(defcustom ibrowse-browser nil
   "The browser choice for ibrowse.
 
 This variable can take one of the three symbols: 'Chromium, 'Firefox or nil.

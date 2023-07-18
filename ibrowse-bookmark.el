@@ -38,7 +38,7 @@
 
 (defun ibrowse-bookmark-get-file ()
   "Get the SQLite database file containing bookmarks."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium (concat ibrowse-sql-db-dir "Bookmarks"))
     ('Firefox (concat ibrowse-sql-db-dir "places.sqlite"))))
 
@@ -225,7 +225,7 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
 (defun ibrowse-bookmark--get-candidates ()
   "In the case of Chromium: get an alist with candidates.
 In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium
      (seq-mapcat
       #'identity
@@ -245,7 +245,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 (defun ibrowse-bookmark--delete-item (title url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
   (ibrowse-core--file-check (ibrowse-bookmark-get-file) "ibrowse-bookmark-get-file")
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium
      (ibrowse-bookmark--write-file
       (delete `(,title ,url ,id) (ibrowse-bookmark--get-candidates))
@@ -262,7 +262,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
   (ibrowse-core--file-check (ibrowse-bookmark-get-file) "ibrowse-bookmark-get-file")
-  (pcase ibrowse-core-browser
+  (pcase ibrowse-browser
     ('Chromium
      (ibrowse-bookmark--write-file
       (append `((,title ,url ,(concat ".Bookmarks bar." title)))
