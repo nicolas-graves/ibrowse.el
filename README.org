@@ -1,9 +1,9 @@
 
 * ibrowse
 
-Ibrowse stands for interactive browse, its goal is to be able to control your browser through common actions, be it on browser tabs, history or bookmarks using Emacs.
+Ibrowse stands for interactive browse, its goal is to be able to control your browser through common actions, be it on browser *tabs*, *history* or *bookmarks* using Emacs.
 
-It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, and =vertico=. Development constraints I'll try to respect are to avoid javascript or the need for any additional browser extension (try to rely on native options instead). For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox, * means the implementation is not fully functional) :
+It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, =vertico= and =embark=. Development constraints I'll try to respect are to avoid javascript or the need for any additional browser extension (try to rely on native options instead). For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox, * means the implementation is not fully functional) :
 
 | package             | updated | tab             | bookmark               | history   |
 |---------------------+---------+-----------------+------------------------+-----------|
@@ -63,7 +63,7 @@ This file will introduce the following commands :
 
 ** Embark functionalities
 
-If you have =embark= installed, all actions for tabs, bookmark or history items can be swapped with another one (/Actually.../ and /But first.../ =embark-act= functionality).
+If you have =embark= installed, all actions for tabs, bookmark or history items can be swapped with another one (/Actually.../ and /But first.../ =embark-act= functionality, see [[https://karthinks.com/software/fifteen-ways-to-use-embark/][this blog post]]).
 
 Embark also allows to act on multiple entries as one (you can simply use embark actions to open several tabs or delete several history items at once).
 
@@ -73,18 +73,11 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 - TODO : Replace CDP by Webdriver BiDi in a near future.
 - TODO : Add actions to print or screenshot a page.
 - TODO : Improve implementation of SQL based on the built-in Emacs SQL support. For this, we would need the built-in Emacs SQL support to handle open the file with =immutability=1=.
-- TODO : Proper testing would greatly help.
+- TODO : Proper testing in different environments would greatly help.
 
 - 0.2.0: Better file independence. Better SQL use. Better browser switch. Handle locked databases situation (queue + timer). Less file copies. Remove emacsql dependency. Split ibrowse-bookmark.
 - 0.1.9: Implement Firefox history and bookmark commands. Better SQL implementation. Handle browser switch.
-- 0.1.8: Various packaging fixes.
-- 0.1.7: Various packaging fixes.
-- 0.1.6: Renaming and factorising.
-- 0.1.5: Move embark configuration to module files.
-- 0.1.4: Various packaging fixes.
-- 0.1.3: Delete embark dependency.
-- 0.1.2: Add embark dependency.
-- 0.1.1: Melpa corrections and remove marginalia dependency.
+- 0.1.1 to 0.1.8: Various packaging fixes.
 - 0.1.0: Initial release for inclusion in Guix and Melpa.
 
 ** Inspiration
