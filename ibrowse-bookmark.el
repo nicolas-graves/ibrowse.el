@@ -4,7 +4,7 @@
 ;; Copyright © 2021 BlueBoxWare
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
-;; Version: 0.1.8
+;; Version: 0.2.0
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 

@@ -72,8 +72,10 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 - TODO : Implement Nyxt and Emacs' browsers interaction.
 - TODO : Replace CDP by Webdriver BiDi in a near future.
 - TODO : Add actions to print or screenshot a page.
-- TODO : Improve implementation of SQL based on the built-in Emacs SQL support.
+- TODO : Improve implementation of SQL based on the built-in Emacs SQL support. For this, we would need the built-in Emacs SQL support to handle open the file with =immutability=1=.
+- TODO : Proper testing would greatly help.
 
+- 0.2.0: Better file independence. Better SQL use. Better browser switch. Handle locked databases situation (queue + timer). Less file copies. Remove emacsql dependency. Split ibrowse-bookmark.
 - 0.1.9: Implement Firefox history and bookmark commands. Better SQL implementation. Handle browser switch.
 - 0.1.8: Various packaging fixes.
 - 0.1.7: Various packaging fixes.
