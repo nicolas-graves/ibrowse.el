@@ -29,7 +29,6 @@
 ;;; Code:
 
 (require 'ibrowse-core)
-(require 'emacsql-compiler)
 
 ;;; Variables
 
@@ -59,16 +58,6 @@ If FORCE-UPDATE? is non-nil and database was copied, delete it first."
           (update-db))
       (update-db))
     nil))
-
-(defsubst ibrowse-sql--prepare-stmt (sql-args-list)
-  "Prepare a series of SQL commands.
-SQL-ARGS-LIST should be a list of SQL command s-expressions SQL DSL.
-Returns a single string of SQL commands separated by semicolons."
-  (mapconcat
-   (lambda (sql-args)
-     (concat (emacsql-format (emacsql-prepare sql-args)) ";"))
-   sql-args-list
-   "\n"))
 
 (defun ibrowse-sql--apply-command (database command &optional callback)
   "Apply the SQL COMMAND using the SQL DATABASE, then call CALLBACK."
@@ -137,9 +126,7 @@ is not provided."
   (ibrowse-sql--ensure-db db temp-db)
   (setq ibrowse-sql-candidates nil)
   (with-temp-buffer
-    (ibrowse-sql--apply-command temp-db
-                                (ibrowse-sql--prepare-stmt (funcall query))
-                                callback)))
+    (ibrowse-sql--apply-command temp-db (funcall query) callback)))
 
 (defun ibrowse-sql--get-candidates
     (db temp-db query varname &optional candidate-format)

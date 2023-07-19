@@ -63,41 +63,47 @@
 
 If you have too many history and worry about the memory use,
 consider adjusting `ibrowse-history-limit'."
-  (pcase ibrowse-browser
-    ('Chromium `([:select [title url id last_visit_time]
-                  :from urls
-                  :order-by (desc id)
-                  :limit ,ibrowse-history-limit]))
-    ('Firefox  `([:select [p:title p:url p:id h:visit_date]
-                  :from (as moz_historyvisits h)
-                  :inner-join (as moz_places p)
-                  :where (= h:place_id p:id)
-                  :order-by (desc h:visit_date)
-                  :limit ,ibrowse-history-limit]))))
+  (let ((limit (number-to-string ibrowse-history-limit)))
+    (pcase ibrowse-browser
+      ('Chromium
+       (concat
+        "SELECT title, url, id, " ; https://stackoverflow.com/a/26233663/2999892
+        "strftime('%Y-%m-%d', last_visit_time/1000000-11644473600,'unixepoch') "
+        "FROM urls "
+        "ORDER BY id "
+        "DESC LIMIT " limit ";"))
+      ('Firefox
+       (concat
+        "SELECT p.title, p.url, p.id, "
+        "MAX(strftime('%Y-%m-%d', h.visit_date/1000000,'unixepoch')) AS visit_date "
+        "FROM moz_historyvisits AS h "
+        "INNER JOIN moz_places AS p "
+        "WHERE h.place_id = p.id "
+        "GROUP BY p.id "
+        "ORDER BY visit_date "
+        "DESC LIMIT " limit ";")))))
 
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
   (let ((num-id (string-to-number id)))
     (pcase ibrowse-browser
       ('Chromium
-        `([:delete :from urls :where (= id ,num-id)]
-          [:delete :from visits :where (= url ,num-id)]))
+       (concat
+        "BEGIN TRANSACTION; "
+        "DELETE FROM urls WHERE id = " num-id "; "
+        "DELETE FROM visits WHERE id = " num-id "; "
+        "COMMIT TRANSACTION;"))
       ('Firefox
-        `([:delete :from moz_places :where (= id ,num-id)]
-          [:delete :from moz_historyvisits :where (= place_id ,num-id)])))))
-
-(defun ibrowse-history-format (date-in-ms &rest rest)
-  "Format DATE-IN-MS with additional REST variables for `completing-read'."
-  (let* ((date (/ (string-to-number date-in-ms) 1000000))
-         (date (pcase ibrowse-browser
-                 ('Chromium (- date 11644473600)) ; https://stackoverflow.com/a/26233663/2999892
-                 ('Firefox date))))
-    (format "%s| %s" (format-time-string "%F"  date) (string-join rest " | "))))
+       (concat
+        "BEGIN TRANSACTION; "
+        "DELETE FROM moz_places WHERE id = " num-id "; "
+        "DELETE FROM moz_historyvisits WHERE place_id = " num-id "; "
+        "COMMIT TRANSACTION;")))))
 
 (defun ibrowse-history-candidate-format (candidate)
   "Format a CANDIDATE from ibrowse-history."
-  (cl-destructuring-bind (title url id last-visit-time) candidate
-    (list (ibrowse-history-format last-visit-time title url) url id)))
+  (cl-destructuring-bind (title url id date) candidate
+    (list (format "%s| %s | %s" date title url) url id)))
 
 (defun ibrowse-history--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
@@ -114,8 +120,7 @@ consider adjusting `ibrowse-history-limit'."
   (ibrowse-core--file-check ibrowse-history-db "ibrowse-history-db")
   (with-temp-buffer
     (ibrowse-sql--apply-command ibrowse-history-db
-                                (ibrowse-sql--prepare-stmt
-                                 (ibrowse-history-delete-sql id))))
+                                (ibrowse-history-delete-sql id)))
   ;; Delete cache.
   (ibrowse-sql--ensure-db ibrowse-history-db ibrowse-history--temp-db t)
   (setq ibrowse-sql-candidates nil))

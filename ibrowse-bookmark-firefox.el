@@ -47,22 +47,22 @@
 (defun ibrowse-bookmark-sql ()
   "The SQL command used to extract bookmarks.
 bm:type 1 ensures we extract bookmarks and not folders or separators."
-  (list [:select [bm:title p:url p:id]
-         :from (as moz_bookmarks bm)
-         :inner-join (as moz_places p)
-         :where (and (= bm:fk p:id) (= bm:type 1))]))
+  (concat
+   "SELECT bm.title, p.url, p.id "
+   "FROM moz_bookmarks AS bm INNER JOIN moz_places AS p "
+   "WHERE bm.fk = p.id AND bm.type = 1;"))
 
 (defun ibrowse-bookmark-delete-sql (id)
   "The SQL command used to delete the item ID from bookmarks."
-  (let ((num-id (string-to-number id)))
-    `([:begin-transaction]
-      [:delete :from moz_places :where (= id ,num-id)]
-      [:delete :from moz_bookmarks :where (= fk ,num-id)]
-      [:commit-transaction])))
+  (concat
+   "BEGIN TRANSACTION; "
+   "DELETE FROM moz_places WHERE id =" id "; "
+   "DELETE FROM moz_bookmarks WHERE fk = " id "; "
+   "COMMIT TRANSACTION;"))
 
 (defun ibrowse-bookmark--max-id ()
   "The SQL command used to return the max id from moz_places."
-  `([:select (funcall max id) :from moz_places]))
+  "SELECT max(id) FROM moz_places;")
 
 (defun ibrowse-bookmark-add-sql (title url)
   "The SQL commands used to add a new bookmark from TITLE and URL."
@@ -75,42 +75,41 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
                                             #'ibrowse-bookmark--max-id
                                             "ibrowse-bookmark-file"
                                             #'ibrowse-sql--read-callback))))))
-    `([:begin-transaction]
-      [:insert-into moz_places
-       :values [,id ;id
-                ,(intern url) ;url
-                ,(intern title) ;title
-                nil ; rev_host
-                nil ; visit_count
-                0 ; hidden
-                0 ; typed
-                -1 ; frecency
-                nil ; last_visit_date
-                ,guid ; guid
-                0 ; foreign_count
-                0 ; url_hash
-                nil ; description
-                nil ; preview_image_url
-                nil ; site_name
-                nil ; origin_id
-                0 ; recalc_frecency
-                ]]
-     [:insert-into moz_bookmarks
-      :values [nil ;id
-               1 ; type 1=bookmark, 2=folders, 3=separators
-               ,id ; fk
-               3 ; parent 3=unfiled
-               nil ; position
-               ,(intern title) ; title
-               nil ; keyword_id
-               nil ; folder_type
-               nil ; dateAdded
-               nil ; lastModified
-               ,guid ; guid
-               0 ; syncStatus
-               1 ; syncChangeCounter
-               ]]
-     [:commit-transaction])))
+    (concat
+     "BEGIN TRANSACTION; "
+     "INSERT INTO moz_places VALUES ("
+     id ", " ; id
+     url ", " ; url
+     title ", " ; title
+     "NULL, " ; rev_host
+     "NULL, " ; visit_count
+     "0, " ; hidden
+     "0, " ; typed
+     "-1, " ; frecency
+     "NULL, " ; last_visit_date
+     guid ", " ; guid
+     "0, " ; foreign_count
+     "0, " ; url_hash
+     "NULL, " ; description
+     "NULL, " ; preview_image_url
+     "NULL, " ; site_name
+     "NULL, " ; origin_id
+     "0); " ; recalc_frecency
+     "INSERT INTO moz_bookmarks VALUES ("
+     "NULL, " ; id
+     "1, " ; type 1=bookmark, 2=folders, 3=separators
+     id ", " ; fk
+     "3, " ; parent 3=unfiled
+     "NULL, " ; position
+     title ", " ; title
+     "NULL, " ; keyword_id
+     "NULL, " ; folder_type
+     "NULL, " ; dateAdded
+     "NULL, " ; lastModified
+     guid ", " ; guid
+     "0, " ; syncStatus
+     "1); " ; syncChangeCounter
+     "COMMIT TRANSACTION;")))
 
 (defun ibrowse-bookmark-firefox--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
@@ -123,8 +122,7 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
   (with-temp-buffer
     (ibrowse-sql--apply-command ibrowse-bookmark-file
-                                (ibrowse-sql--prepare-stmt
-                                 (ibrowse-bookmark-delete-sql id))))
+                                (ibrowse-bookmark-delete-sql id)))
   ;; Delete cache.
   (ibrowse-sql--ensure-db ibrowse-bookmark-file ibrowse-bookmark--temp-db t)
   (setq ibrowse-sql-candidates nil))
@@ -132,9 +130,8 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
 (defun ibrowse-bookmark-firefox-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
   (with-temp-buffer
-       (ibrowse-sql--apply-command ibrowse-bookmark-file
-                                   (ibrowse-sql--prepare-stmt
-                                    (ibrowse-bookmark-add-sql title url))))
+    (ibrowse-sql--apply-command ibrowse-bookmark-file
+                                (ibrowse-bookmark-add-sql title url)))
      ;; Delete cache.
      (ibrowse-sql--ensure-db ibrowse-bookmark-file
                              ibrowse-bookmark--temp-db t)
