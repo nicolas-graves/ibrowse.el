@@ -48,10 +48,6 @@
 (defvar ibrowse-bookmark-file (ibrowse-bookmark-get-file)
   "The file of SQLite database containing bookmarks.")
 
-(defvar ibrowse-bookmark--temp-db
-  (expand-file-name (make-temp-name "ibrowse-db") temporary-file-directory)
-  "Temporary copy of the Firefox bookmark SQLite database file.")
-
 ;;; Backend / Helpers
 
 (defun ibrowse-bookmark--get-candidates ()

@@ -34,7 +34,6 @@
 
 ;;; Settings
 (defvar ibrowse-bookmark-file)
-(defvar ibrowse-bookmark--temp-db)
 
 (defun ibrowse-bookmark--random-alphanumeric (length)
   "Generate a random alphanumeric symbol of LENGTH."
@@ -71,14 +70,13 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
              (string-to-number
               (caar
                (ibrowse-sql--extract-fields ibrowse-bookmark-file
-                                            ibrowse-bookmark--temp-db
                                             #'ibrowse-bookmark--max-id
                                             "ibrowse-bookmark-file"
                                             #'ibrowse-sql--read-callback))))))
     (concat
      "BEGIN TRANSACTION; "
      "INSERT INTO moz_places VALUES ("
-     id ", " ; id
+     (number-to-string id) ", " ; id
      url ", " ; url
      title ", " ; title
      "NULL, " ; rev_host
@@ -114,7 +112,6 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
 (defun ibrowse-bookmark-firefox--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
   (ibrowse-sql--get-candidates ibrowse-bookmark-file
-                               ibrowse-bookmark--temp-db
                                #'ibrowse-bookmark-sql
                                "ibrowse-bookmark-file"))
 
@@ -123,8 +120,6 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
   (with-temp-buffer
     (ibrowse-sql--apply-command ibrowse-bookmark-file
                                 (ibrowse-bookmark-delete-sql id)))
-  ;; Delete cache.
-  (ibrowse-sql--ensure-db ibrowse-bookmark-file ibrowse-bookmark--temp-db t)
   (setq ibrowse-sql-candidates nil))
 
 (defun ibrowse-bookmark-firefox-add-item-1 (title url)
@@ -132,9 +127,6 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
   (with-temp-buffer
     (ibrowse-sql--apply-command ibrowse-bookmark-file
                                 (ibrowse-bookmark-add-sql title url)))
-     ;; Delete cache.
-     (ibrowse-sql--ensure-db ibrowse-bookmark-file
-                             ibrowse-bookmark--temp-db t)
      (setq ibrowse-sql-candidates nil))
 
 (provide 'ibrowse-bookmark-firefox)
