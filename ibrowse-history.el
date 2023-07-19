@@ -49,48 +49,49 @@
 (defvar ibrowse-history-limit 100000
   "Limit set to the database history extraction.")
 
-;;; Backend
-
-(defun ibrowse-history-sql ()
-  "The SQL command used to extract history.
+(defun ibrowse-history-get-sql ()
+  "Get a template of the SQL command used to extract history.
 
 If you have too many history and worry about the memory use,
 consider adjusting `ibrowse-history-limit'."
-  (let ((limit (number-to-string ibrowse-history-limit)))
-    (pcase ibrowse-browser
-      ('Chromium
-       (concat
-        "SELECT title, url, id, " ; https://stackoverflow.com/a/26233663/2999892
-        "strftime('%Y-%m-%d', last_visit_time/1000000-11644473600,'unixepoch') "
-        "FROM urls "
-        "ORDER BY id "
-        "DESC LIMIT " limit ";"))
-      ('Firefox
-       (concat
-        "SELECT p.title, p.url, p.id, "
-        "MAX(strftime('%Y-%m-%d', h.visit_date/1000000,'unixepoch')) AS visit_date "
-        "FROM moz_historyvisits AS h "
-        "INNER JOIN moz_places AS p "
-        "WHERE h.place_id = p.id "
-        "GROUP BY p.id "
-        "ORDER BY visit_date "
-        "DESC LIMIT " limit ";")))))
+  (pcase ibrowse-browser
+    ('Chromium ; https://stackoverflow.com/a/26233663/2999892
+     "\
+SELECT title, url, id, strftime('%Y-%m-%d', last_visit_time/1000000-11644473600,'unixepoch')
+FROM urls
+ORDER BY id
+DESC LIMIT %s;")
+    ('Firefox
+     "\
+SELECT p.title, p.url, p.id, MAX(strftime('%Y-%m-%d', h.visit_date/1000000,'unixepoch')) AS visit_date
+FROM moz_historyvisits AS h
+INNER JOIN moz_places AS p
+WHERE h.place_id = p.id
+GROUP BY p.id
+ORDER BY visit_date
+DESC LIMIT %s;")))
 
-(defun ibrowse-history-delete-sql (id)
+(defvar ibrowse-history-sql (ibrowse-history-get-sql)
+  "A template of the SQL command used to extract history.")
+
+(defun ibrowse-history-get-delete-sql ()
   "The SQL command used to delete the item ID from history."
   (pcase ibrowse-browser
     ('Chromium
-     (concat
-      "BEGIN TRANSACTION; "
-      "DELETE FROM urls WHERE id = " id "; "
-      "DELETE FROM visits WHERE id = " id "; "
-      "COMMIT TRANSACTION;"))
+     "\
+BEGIN TRANSACTION;
+DELETE FROM urls WHERE id = %s;
+DELETE FROM visits WHERE id = %s;
+COMMIT TRANSACTION;")
     ('Firefox
-     (concat
-      "BEGIN TRANSACTION; "
-      "DELETE FROM moz_places WHERE id = " id "; "
-      "DELETE FROM moz_historyvisits WHERE place_id = " id "; "
-      "COMMIT TRANSACTION;"))))
+     "\
+BEGIN TRANSACTION;
+DELETE FROM moz_places WHERE id = %s;
+DELETE FROM moz_historyvisits WHERE place_id = %s;
+COMMIT TRANSACTION;")))
+
+(defvar ibrowse-history-delete-sql (ibrowse-history-get-delete-sql)
+  "A template of the SQL command used to delete an item from history.")
 
 (defun ibrowse-history-candidate-format (candidate)
   "Format a CANDIDATE from ibrowse-history."
@@ -101,7 +102,7 @@ consider adjusting `ibrowse-history-limit'."
   "Wrapper around `ibrowse-sql--get-candidates'."
   (ibrowse-core--file-check 'ibrowse-history-db)
   (ibrowse-sql--get-candidates ibrowse-history-db
-                               #'ibrowse-history-sql
+                               (format ibrowse-history-sql ibrowse-history-limit)
                                #'ibrowse-history-candidate-format))
 
 ;;; Interaction
@@ -111,7 +112,7 @@ consider adjusting `ibrowse-history-limit'."
   (ibrowse-core--file-check 'ibrowse-history-db)
   (with-temp-buffer
     (ibrowse-sql--apply-command ibrowse-history-db
-                                (ibrowse-history-delete-sql id)))
+                                (format ibrowse-history-delete-sql id id)))
   ;; Delete cache.
   (setq ibrowse-sql-candidates nil))
 
@@ -190,6 +191,8 @@ SQlite database."
 More precisely, this function updates `ibrowse-sql-candidates' and
 `ibrowse-history-db'."
   (setq ibrowse-history-db (ibrowse-history-get-db))
+  (setq ibrowse-history-sql (ibrowse-history-get-sql))
+  (setq ibrowse-history-delete-sql (ibrowse-history-get-delete-sql))
   (setq ibrowse-sql-candidates nil))
 
 (add-hook 'ibrowse-update-hook 'ibrowse-history-update-browser!)

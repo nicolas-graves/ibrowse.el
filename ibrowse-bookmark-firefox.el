@@ -43,88 +43,91 @@
      (dotimes (_ length result)
        (setq result (concat result (string (seq-random-elt charset))))))))
 
-(defun ibrowse-bookmark-sql ()
+(defvar ibrowse-bookmark-sql
+  "\
+SELECT bm.title, p.url, p.id
+FROM moz_bookmarks AS bm INNER JOIN moz_places AS p
+WHERE bm.fk = p.id AND bm.type = 1;"
   "The SQL command used to extract bookmarks.
-bm:type 1 ensures we extract bookmarks and not folders or separators."
-  (concat
-   "SELECT bm.title, p.url, p.id "
-   "FROM moz_bookmarks AS bm INNER JOIN moz_places AS p "
-   "WHERE bm.fk = p.id AND bm.type = 1;"))
+bm.type 1 ensures we extract bookmarks and not folders or separators.")
 
-(defun ibrowse-bookmark-delete-sql (id)
-  "The SQL command used to delete the item ID from bookmarks."
-  (concat
-   "BEGIN TRANSACTION; "
-   "DELETE FROM moz_places WHERE id =" id "; "
-   "DELETE FROM moz_bookmarks WHERE fk = " id "; "
-   "COMMIT TRANSACTION;"))
+(defvar ibrowse-bookmark-delete-sql
+  "\
+BEGIN TRANSACTION;
+DELETE FROM moz_places WHERE id = %s;
+DELETE FROM moz_bookmarks WHERE fk = %s;
+COMMIT TRANSACTION;"
+  "The SQL command used to delete the item ID from bookmarks.")
 
-(defun ibrowse-bookmark--max-id ()
-  "The SQL command used to return the max id from moz_places."
-  "SELECT max(id) FROM moz_places;")
+(defvar ibrowse-bookmark--max-id
+  "SELECT max(id) FROM moz_places;"
+  "The SQL command used to return the max id from moz_places.")
 
-(defun ibrowse-bookmark-add-sql (title url)
-  "The SQL commands used to add a new bookmark from TITLE and URL."
-  (let ((guid (ibrowse-bookmark--random-alphanumeric 12))
-        (id (1+
-             (string-to-number
-              (caar
-               (ibrowse-sql--extract-fields ibrowse-bookmark-file
-                                            #'ibrowse-bookmark--max-id
-                                            #'ibrowse-sql--read-callback))))))
-    (concat
-     "BEGIN TRANSACTION; "
-     "INSERT INTO moz_places VALUES ("
-     (number-to-string id) ", " ; id
-     url ", " ; url
-     title ", " ; title
-     "NULL, " ; rev_host
-     "NULL, " ; visit_count
-     "0, " ; hidden
-     "0, " ; typed
-     "-1, " ; frecency
-     "NULL, " ; last_visit_date
-     guid ", " ; guid
-     "0, " ; foreign_count
-     "0, " ; url_hash
-     "NULL, " ; description
-     "NULL, " ; preview_image_url
-     "NULL, " ; site_name
-     "NULL, " ; origin_id
-     "0); " ; recalc_frecency
-     "INSERT INTO moz_bookmarks VALUES ("
-     "NULL, " ; id
-     "1, " ; type 1=bookmark, 2=folders, 3=separators
-     id ", " ; fk
-     "3, " ; parent 3=unfiled
-     "NULL, " ; position
-     title ", " ; title
-     "NULL, " ; keyword_id
-     "NULL, " ; folder_type
-     "NULL, " ; dateAdded
-     "NULL, " ; lastModified
-     guid ", " ; guid
-     "0, " ; syncStatus
-     "1); " ; syncChangeCounter
-     "COMMIT TRANSACTION;")))
+(defvar ibrowse-bookmark-add-sql
+    "\
+BEGIN TRANSACTION;
+INSERT INTO moz_places VALUES (
+%s, --id
+%s, --url
+%s, --title
+NULL, --rev_host
+NULL, --visit_count
+0, --hidden
+0, --typed
+-1, --frecency
+NULL, --last-visit-date
+%s, --guid
+0, --foreign_count
+0, --url_hash
+NULL, --description
+NULL, --preview_image_url
+NULL, --site-name
+NULL, --origin_id
+0); --recalc_frecency
+INSERT INTO moz_bookmarks VALUES (
+NULL, --id
+1, --type 1=bookmark
+%s, --fk
+3, --parent 3=unfiled
+NULL, --position
+%s, --title
+NULL, --keyword_id
+NULL, --folder_type
+NULL, --dateAdded
+NULL, --lastModified
+%s, --guid
+0, --syncStatus
+1); --syncChangeCounter
+COMMIT TRANSACTION;"
+    "The SQL command used to add a new bookmark.")
 
 (defun ibrowse-bookmark-firefox--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
-  (ibrowse-sql--get-candidates ibrowse-bookmark-file #'ibrowse-bookmark-sql))
+  (ibrowse-sql--get-candidates ibrowse-bookmark-file ibrowse-bookmark-sql))
 
 (defun ibrowse-bookmark-firefox--delete-item (_title _url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
   (with-temp-buffer
     (ibrowse-sql--apply-command ibrowse-bookmark-file
-                                (ibrowse-bookmark-delete-sql id)))
+                                (format ibrowse-bookmark-delete-sql id id)))
   (setq ibrowse-sql-candidates nil))
 
 (defun ibrowse-bookmark-firefox-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
   (with-temp-buffer
-    (ibrowse-sql--apply-command ibrowse-bookmark-file
-                                (ibrowse-bookmark-add-sql title url)))
-     (setq ibrowse-sql-candidates nil))
+    (setq ibrowse-sql-candidates nil) ; ensures we get the last id.
+    (let ((guid (ibrowse-bookmark--random-alphanumeric 12))
+          (id (1+
+               (string-to-number
+                (caar
+                 (ibrowse-sql--apply-command ibrowse-bookmark-file
+                                             ibrowse-bookmark--max-id
+                                             #'ibrowse-sql--read-callback
+                                             t))))))
+      (ibrowse-sql--apply-command ibrowse-bookmark-file
+                                  (format ibrowse-bookmark-add-sql
+                                          id url title guid id title guid))))
+  (setq ibrowse-sql-candidates nil))
 
 (provide 'ibrowse-bookmark-firefox)
 ;;; ibrowse-bookmark-firefox.el ends here
