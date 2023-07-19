@@ -81,20 +81,19 @@ consider adjusting `ibrowse-history-limit'."
 
 (defun ibrowse-history-delete-sql (id)
   "The SQL command used to delete the item ID from history."
-  (let ((num-id (string-to-number id)))
-    (pcase ibrowse-browser
-      ('Chromium
-       (concat
-        "BEGIN TRANSACTION; "
-        "DELETE FROM urls WHERE id = " num-id "; "
-        "DELETE FROM visits WHERE id = " num-id "; "
-        "COMMIT TRANSACTION;"))
-      ('Firefox
-       (concat
-        "BEGIN TRANSACTION; "
-        "DELETE FROM moz_places WHERE id = " num-id "; "
-        "DELETE FROM moz_historyvisits WHERE place_id = " num-id "; "
-        "COMMIT TRANSACTION;")))))
+  (pcase ibrowse-browser
+    ('Chromium
+     (concat
+      "BEGIN TRANSACTION; "
+      "DELETE FROM urls WHERE id = " id "; "
+      "DELETE FROM visits WHERE id = " id "; "
+      "COMMIT TRANSACTION;"))
+    ('Firefox
+     (concat
+      "BEGIN TRANSACTION; "
+      "DELETE FROM moz_places WHERE id = " id "; "
+      "DELETE FROM moz_historyvisits WHERE place_id = " id "; "
+      "COMMIT TRANSACTION;"))))
 
 (defun ibrowse-history-candidate-format (candidate)
   "Format a CANDIDATE from ibrowse-history."
