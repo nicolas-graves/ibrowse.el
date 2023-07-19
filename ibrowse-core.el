@@ -124,8 +124,11 @@ chosen directory will be the most recently used profile."
   (let* ((chromium-dir (ibrowse-core-get-chromium-dir))
          (firefox-dir (ibrowse-core-get-firefox-dir)))
     (if (and chromium-dir firefox-dir)
-        (if (let* ((chromium-files (list (concat chromium-dir "History")
-                                         (concat chromium-dir "History-journal")))
+        (if (let* ((chromium-files
+                    (delq nil
+                          (list (concat chromium-dir "History")
+                                (let ((f (concat chromium-dir "History-journal")))
+                                  (if (file-exists-p f) f nil)))))
                    (firefox-files
                     (delq nil
                           (list (concat firefox-dir "places.sqlite")
