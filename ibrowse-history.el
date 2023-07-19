@@ -46,9 +46,6 @@
 (defvar ibrowse-history-db (ibrowse-history-get-db)
   "SQLite database file containing history.")
 
-(defvar ibrowse-history-candidates nil
-  "The `ibrowse-history' alist cache.")
-
 (defvar ibrowse-history-limit 100000
   "Limit set to the database history extraction.")
 
@@ -190,10 +187,10 @@ SQlite database."
 (defun ibrowse-history-update-browser! ()
   "Update variables if you have changed your current browser.
 
-More precisely, this function updates `ibrowse-history-candidates' and
+More precisely, this function updates `ibrowse-sql-candidates' and
 `ibrowse-history-db'."
   (setq ibrowse-history-db (ibrowse-history-get-db))
-  (setq ibrowse-history-candidates nil))
+  (setq ibrowse-sql-candidates nil))
 
 (add-hook 'ibrowse-update-hook 'ibrowse-history-update-browser!)
 
