@@ -6,6 +6,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.2.0
+;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -39,9 +40,9 @@
 
 (defun ibrowse-history-get-db ()
   "Get the SQLite database file containing history."
-  (pcase ibrowse-browser
-    ('Chromium (concat ibrowse-browser-dir "History"))
-    ('Firefox (concat ibrowse-browser-dir "places.sqlite"))))
+  (pcase ibrowse-core-browser
+    ('Chromium (concat ibrowse-core-browser-dir "History"))
+    ('Firefox (concat ibrowse-core-browser-dir "places.sqlite"))))
 
 (defvar ibrowse-history-db (ibrowse-history-get-db)
   "SQLite database file containing history.")
@@ -54,7 +55,7 @@
 
 If you have too many history and worry about the memory use,
 consider adjusting `ibrowse-history-limit'."
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium ; https://stackoverflow.com/a/26233663/2999892
      "\
 SELECT title, url, id, strftime('%Y-%m-%d', last_visit_time/1000000-11644473600,'unixepoch')
@@ -76,7 +77,7 @@ DESC LIMIT %s;")))
 
 (defun ibrowse-history-get-delete-sql ()
   "The SQL command used to delete the item ID from history."
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium
      "\
 BEGIN TRANSACTION;
@@ -195,7 +196,7 @@ More precisely, this function updates `ibrowse-sql-candidates' and
   (setq ibrowse-history-delete-sql (ibrowse-history-get-delete-sql))
   (setq ibrowse-sql-candidates nil))
 
-(add-hook 'ibrowse-update-hook 'ibrowse-history-update-browser!)
+(add-hook 'ibrowse-core-update-hook 'ibrowse-history-update-browser!)
 
 (provide 'ibrowse-history)
 ;;; ibrowse-history.el ends here

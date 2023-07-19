@@ -7,6 +7,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.2.0
+;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -83,7 +84,9 @@ If IMMUTABLE-P, use the immutable option for the database."
 Commands are retried while the queue is not empty."
   (when (and ibrowse-sql-queue (not ibrowse-sql-timer))
     (setq ibrowse-sql-timer
-          (run-with-timer ibrowse-sql-retry-interval ibrowse-sql-retry-interval #'ibrowse-sql--retry-commands))))
+          (run-with-timer ibrowse-sql-retry-interval
+                          ibrowse-sql-retry-interval
+                          #'ibrowse-sql--retry-commands))))
 
 (add-hook 'ibrowse-sql-queue-changed-hook 'ibrowse-sql--initiate-retry-timer)
 
@@ -124,7 +127,7 @@ before killing Emacs."
   "Update `ibrowse-sql-candidates' if you have changed your current browser."
   (setq ibrowse-sql-candidates nil))
 
-(add-hook 'ibrowse-update-hook 'ibrowse-sql-update-browser! -80)
+(add-hook 'ibrowse-core-update-hook 'ibrowse-sql-update-browser! -80)
 
 (provide 'ibrowse-sql)
 ;;; ibrowse-sql.el ends here

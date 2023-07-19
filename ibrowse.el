@@ -30,5 +30,7 @@
 (require 'ibrowse-bookmark)
 (require 'ibrowse-history)
 
+(defalias 'ibrowse-update-browser 'ibrowse-core-update-browser)
+
 (provide 'ibrowse)
 ;;; ibrowse.el ends here

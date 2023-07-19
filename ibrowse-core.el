@@ -7,6 +7,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.2.0
+;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -33,12 +34,12 @@
 
 ;;; Variables
 
-(defgroup ibrowse nil
+(defgroup ibrowse-core nil
   "Group for ibrowse customizations."
   :group 'applications
-  :prefix "ibrowse-")
+  :prefix "ibrowse-core")
 
-(defcustom ibrowse-browser nil
+(defcustom ibrowse-core-browser nil
   "The browser choice for ibrowse.
 
 This variable can take one of the three symbols: 'Chromium, 'Firefox or nil.
@@ -46,18 +47,18 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
   :type '(choice (const :tag "Chromium" Chromium)
                  (const :tag "Firefox" Firefox)
                  (const :tag "Auto" nil))
-  :group 'ibrowse)
+  :group 'ibrowse-core)
 
-(defcustom ibrowse-browser-dir nil
-  "The data directory of `ibrowse-browser'."
+(defcustom ibrowse-core-browser-dir nil
+  "The data directory of `ibrowse-core-browser'."
   :type '(choice (string :tag "String value")
                  (const :tag "No value" nil))
-  :group 'ibrowse)
+  :group 'ibrowse-core)
 
-(defcustom ibrowse-update-hook nil
-  "Hooks to run when `ibrowse-update-browser' is invoked."
+(defcustom ibrowse-core-update-hook nil
+  "Hooks to run when `ibrowse-core-update-browser' is invoked."
   :type 'hook
-  :group 'ibrowse)
+  :group 'ibrowse-core)
 
 (defvar ibrowse-core-chromium-profile "Default"
   "Name of the Chromium profile to use.")
@@ -190,18 +191,18 @@ selected item."
 (defun ibrowse-core-update-browser! ()
   "Update variables if you have changed your current browser.
 
-More precisely, this function updates `ibrowse-browser' and
-`ibrowse-browser-dir'."
+More precisely, this function updates `ibrowse-core-browser' and
+`ibrowse-core-browser-dir'."
   (cl-multiple-value-setq
-      (ibrowse-browser ibrowse-browser-dir) (ibrowse-core-guess)))
+      (ibrowse-core-browser ibrowse-core-browser-dir) (ibrowse-core-guess)))
 
-(defun ibrowse-update-browser ()
+(defun ibrowse-core-update-browser ()
   "Update all necessary variables if you have changed your current browser."
   (interactive)
-  (run-hooks 'ibrowse-update-hook))
+  (run-hooks 'ibrowse-core-update-hook))
 
 ;; -90: Always the first hook to be run.
-(add-hook 'ibrowse-update-hook 'ibrowse-core-update-browser! -90)
+(add-hook 'ibrowse-core-update-hook 'ibrowse-core-update-browser! -90)
 
 (provide 'ibrowse-core)
 (ibrowse-core-update-browser!)

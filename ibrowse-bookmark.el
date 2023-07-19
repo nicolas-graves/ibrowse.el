@@ -5,6 +5,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.2.0
+;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -41,9 +42,9 @@
 
 (defun ibrowse-bookmark-get-file ()
   "Get the SQLite database file containing bookmarks."
-  (pcase ibrowse-browser
-    ('Chromium (concat ibrowse-browser-dir "Bookmarks"))
-    ('Firefox (concat ibrowse-browser-dir "places.sqlite"))))
+  (pcase ibrowse-core-browser
+    ('Chromium (concat ibrowse-core-browser-dir "Bookmarks"))
+    ('Firefox (concat ibrowse-core-browser-dir "places.sqlite"))))
 
 (defvar ibrowse-bookmark-file (ibrowse-bookmark-get-file)
   "The file of SQLite database containing bookmarks.")
@@ -54,7 +55,7 @@
   "In the case of Chromium: get an alist with candidates.
 In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
   (ibrowse-core--file-check 'ibrowse-bookmark-file)
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium (if (fboundp 'ibrowse-bookmark-chromium--get-candidates)
                    (funcall #'ibrowse-bookmark-chromium--get-candidates)
                  (error "Chromium functions not available")))
@@ -67,7 +68,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 (defun ibrowse-bookmark--delete-item (title url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
   (ibrowse-core--file-check 'ibrowse-bookmark-file)
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium (if (fboundp 'ibrowse-bookmark-chromium--delete-item)
                    (funcall #'ibrowse-bookmark-chromium--delete-item
                             title url id)
@@ -80,7 +81,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
   (ibrowse-core--file-check 'ibrowse-bookmark-file)
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium (if (fboundp 'ibrowse-bookmark-chromium-add-item-1)
                    (funcall #'ibrowse-bookmark-chromium-add-item-1
                             title url)
@@ -171,7 +172,7 @@ the Bookmarks bar directory."
   "Update `ibrowse-bookmark-file' if you have changed your current browser."
   (setq ibrowse-bookmark-file (ibrowse-bookmark-get-file)))
 
-(add-hook 'ibrowse-update-hook 'ibrowse-bookmark-update-browser!)
+(add-hook 'ibrowse-core-update-hook 'ibrowse-bookmark-update-browser!)
 
 (provide 'ibrowse-bookmark)
 ;;; ibrowse-bookmark.el ends here

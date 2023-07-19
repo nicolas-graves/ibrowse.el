@@ -4,6 +4,7 @@
 
 ;; Author: Nicolas Graves <ngraves@ngraves.fr>
 ;; Version: 0.2.0
+;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: comm, data, files, tools
 ;; URL: https://git.sr.ht/~ngraves/ibrowse.el
 
@@ -85,7 +86,7 @@
 
 (defun ibrowse-tab--activate (_title _url id)
   "Active browser tab from ID using the chromium developer protocol."
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium
       (url-retrieve-synchronously (ibrowse-tab--cdp-url (concat "activate/" id))))
     ('Firefox
@@ -95,7 +96,7 @@
   "Close browser tab from ID using the chromium developer protocol.
 
 Optionally use the websocket WS when necessary."
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium
       (url-retrieve-synchronously (ibrowse-tab--cdp-url (concat "close/" id))))
     ('Firefox
@@ -103,7 +104,7 @@ Optionally use the websocket WS when necessary."
 
 (defun ibrowse-tab-act (prompt action)
   "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
-  (pcase ibrowse-browser
+  (pcase ibrowse-core-browser
     ('Chromium (ibrowse-core-act prompt
                                  #'ibrowse-tab--get-candidates
                                  action
