@@ -71,7 +71,6 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
               (caar
                (ibrowse-sql--extract-fields ibrowse-bookmark-file
                                             #'ibrowse-bookmark--max-id
-                                            "ibrowse-bookmark-file"
                                             #'ibrowse-sql--read-callback))))))
     (concat
      "BEGIN TRANSACTION; "
@@ -111,9 +110,7 @@ bm:type 1 ensures we extract bookmarks and not folders or separators."
 
 (defun ibrowse-bookmark-firefox--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
-  (ibrowse-sql--get-candidates ibrowse-bookmark-file
-                               #'ibrowse-bookmark-sql
-                               "ibrowse-bookmark-file"))
+  (ibrowse-sql--get-candidates ibrowse-bookmark-file #'ibrowse-bookmark-sql))
 
 (defun ibrowse-bookmark-firefox--delete-item (_title _url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."

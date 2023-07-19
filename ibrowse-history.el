@@ -102,16 +102,16 @@ consider adjusting `ibrowse-history-limit'."
 
 (defun ibrowse-history--get-candidates ()
   "Wrapper around `ibrowse-sql--get-candidates'."
+  (ibrowse-core--file-check 'ibrowse-history-db)
   (ibrowse-sql--get-candidates ibrowse-history-db
                                #'ibrowse-history-sql
-                               "ibrowse-history-db"
                                #'ibrowse-history-candidate-format))
 
 ;;; Interaction
 
 (defun ibrowse-history-delete-item (_title _url id)
   "Delete browser ID item using sqlite."
-  (ibrowse-core--file-check ibrowse-history-db "ibrowse-history-db")
+  (ibrowse-core--file-check 'ibrowse-history-db)
   (with-temp-buffer
     (ibrowse-sql--apply-command ibrowse-history-db
                                 (ibrowse-history-delete-sql id)))

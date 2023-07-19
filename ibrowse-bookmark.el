@@ -53,6 +53,7 @@
 (defun ibrowse-bookmark--get-candidates ()
   "In the case of Chromium: get an alist with candidates.
 In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
+  (ibrowse-core--file-check 'ibrowse-bookmark-file)
   (pcase ibrowse-browser
     ('Chromium (if (fboundp 'ibrowse-bookmark-chromium--get-candidates)
                    (funcall #'ibrowse-bookmark-chromium--get-candidates)
@@ -65,7 +66,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 
 (defun ibrowse-bookmark--delete-item (title url id)
   "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
-  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
+  (ibrowse-core--file-check 'ibrowse-bookmark-file)
   (pcase ibrowse-browser
     ('Chromium (if (fboundp 'ibrowse-bookmark-chromium--delete-item)
                    (funcall #'ibrowse-bookmark-chromium--delete-item
@@ -78,7 +79,7 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
 
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
-  (ibrowse-core--file-check ibrowse-bookmark-file "ibrowse-bookmark-file")
+  (ibrowse-core--file-check 'ibrowse-bookmark-file)
   (pcase ibrowse-browser
     ('Chromium (if (fboundp 'ibrowse-bookmark-chromium-add-item-1)
                    (funcall #'ibrowse-bookmark-chromium-add-item-1

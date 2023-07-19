@@ -141,9 +141,9 @@ chosen directory will be the most recently used profile."
           (cl-values 'Firefox firefox-dir))
       (user-error "The browser database directory is not found!"))))
 
-(defun ibrowse-core--file-check (file var)
-  "Check if FILE exists, used in the definition of VAR."
-  (pcase file
+(defun ibrowse-core--file-check (var)
+  "Check if the file which symbol is VAR exists."
+  (pcase (symbol-value var)
     ('nil (user-error "`%s' returns nil!" var))
     ((pred file-exists-p) nil)
     (f (user-error "'%s' doesn't exist, please inspect `%s'" f var))))
