@@ -1,7 +1,7 @@
 
 * ibrowse
 
-Ibrowse stands for interactive browse, its goal is to be able to control your browser through common actions, be it on browser *tabs*, *history* or *bookmarks* using Emacs.
+Ibrowse stands for interactive browse, its goal is to be able to control your web browser through common actions, be it on browser *tabs*, *history* or *bookmarks* using Emacs.
 
 It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, =vertico= and =embark=. Development constraints I'll try to respect are to avoid javascript or the need for any additional browser extension (try to rely on native options instead). For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox, * means the implementation is not fully functional) :
 
@@ -25,7 +25,7 @@ It is composed of three control functionalities for your browser :
 
 To use the functions in =ibrowse-tab.el=, you need to use the Chromium Developer Protocol. Simply run your browser with the option =--remote-debugging-port=9222=.
 
-The Firefox CDP implementation is not complete, and action =tab-select= is only available in Chromium. It will probably only be available once the following feature is implemented in Firefox's Webdriver BiDi implementation : [[https://bugzilla.mozilla.org/show_bug.cgi?id=1841004][browsingContext.activate]].
+The Firefox CDP implementation is not complete, and action =ibrowse-tab-select= is only available in Chromium. It will probably only be available once the following feature is implemented in Firefox's Webdriver BiDi implementation : [[https://bugzilla.mozilla.org/show_bug.cgi?id=1841004][browsingContext.activate]].
 
 This file currently introduces the following commands :
 - =ibrowse-tab-select=
@@ -82,4 +82,4 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 ** Inspiration
 
-This package is originally inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts and the [[https://github.com/cpitclaudel/biblio.el][biblio.el]] package, but aspires to have broader functionalities, more integrated with Emacs. While writing the package, I also stumbled upon other packages, shown in the upper table. All implement very close features to ibrowse, but are either more developped (=chrome.el= has a major mode frontend, which I considered unnecessary for a daily use with embark and the minibuffer), rely on =helm= or javascript code, or have more limited functionality. I occasionnally copied snippets of code from some of these packages, but gave credit to authors in copyrights and only copied GPLv3+ code, making this package an "aggregate" also under GPLv3+.
+This package is originally inspired by the [[https://github.com/kevinmorio/rofi-switch-browser-tabs][Rofi Switch Browser Tabs]] scripts and the [[https://github.com/cpitclaudel/biblio.el][biblio.el]] package, but aspires to have broader functionalities, more integrated with Emacs. While writing the package, I also stumbled upon other packages, shown in the above table. All implement very close features to ibrowse, but are either more developped (=chrome.el= has a major mode frontend, which I considered unnecessary for a daily use with embark and the minibuffer), rely on =helm= or javascript code, or have more limited functionality. I occasionnally copied snippets of code from some of these packages, but gave credit to authors in copyrights and only copied GPLv3+ code, making this package an "aggregate" also under GPLv3+.
