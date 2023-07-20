@@ -88,11 +88,12 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
             "$USERPROFILE/Local Settings/Application Data/Vivaldi/User Data"
             "~/Library/Application Support/Vivaldi"
             "~/AppData/Local/Google/Chrome/User Data/"))))
-    (concat
-     (expand-file-name
-      (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
-      (getenv "HOME"))
-     "/" ibrowse-core-chromium-profile "/")))
+    (when chromium-dirlist
+      (concat
+       (expand-file-name
+        (car (seq-sort #'file-newer-than-file-p chromium-dirlist))
+        (getenv "HOME"))
+       "/" ibrowse-core-chromium-profile "/"))))
 
 (defun ibrowse-core-get-firefox-dir ()
   "Try to get the Firefox data directory."
@@ -102,11 +103,12 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
            (file-expand-wildcards
             (expand-file-name "Mozilla/Firefox/Profiles/*"
                               (getenv "APPDATA"))))))
-    (concat
-     (expand-file-name
-      (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
-      (getenv "HOME"))
-     "/")))
+    (when firefox-dirlist
+      (concat
+       (expand-file-name
+        (car (seq-sort #'file-newer-than-file-p firefox-dirlist))
+        (getenv "HOME"))
+       "/"))))
 
 (defun ibrowse-core--most-recent (file-list)
   "Return the most recent edit time from FILE-LIST."
@@ -124,23 +126,26 @@ Chromium, `places.sqlite' in the case of Firefox.  By default, the
 chosen directory will be the most recently used profile."
   (let* ((chromium-dir (ibrowse-core-get-chromium-dir))
          (firefox-dir (ibrowse-core-get-firefox-dir)))
-    (if (and chromium-dir firefox-dir)
-        (if (let* ((chromium-files
-                    (delq nil
-                          (list (concat chromium-dir "History")
-                                (let ((f (concat chromium-dir "History-journal")))
-                                  (if (file-exists-p f) f nil)))))
-                   (firefox-files
-                    (delq nil
-                          (list (concat firefox-dir "places.sqlite")
-                                (let ((f (concat firefox-dir "places.sqlite-wal")))
-                                  (if (file-exists-p f) f nil)))))
-                   (chromium-latest (ibrowse-core--most-recent chromium-files))
-                   (firefox-latest (ibrowse-core--most-recent firefox-files)))
-              (> chromium-latest firefox-latest))
+    (cond
+     ((and chromium-dir firefox-dir)
+      (let* ((chromium-files
+              (delq nil
+                    (list (concat chromium-dir "History")
+                          (let ((f (concat chromium-dir "History-journal")))
+                            (if (file-exists-p f) f nil)))))
+             (firefox-files
+              (delq nil
+                    (list (concat firefox-dir "places.sqlite")
+                          (let ((f (concat firefox-dir "places.sqlite-wal")))
+                            (if (file-exists-p f) f nil)))))
+             (chromium-latest (ibrowse-core--most-recent chromium-files))
+             (firefox-latest (ibrowse-core--most-recent firefox-files)))
+        (if (> chromium-latest firefox-latest)
             (cl-values 'Chromium chromium-dir)
-          (cl-values 'Firefox firefox-dir))
-      (user-error "The browser database directory is not found!"))))
+          (cl-values 'Firefox firefox-dir))))
+     (chromium-dir (cl-values 'Chromium chromium-dir))
+     (firefox-dir (cl-values 'Firefox firefox-dir))
+     (t (user-error "The browser database directory is not found!")))))
 
 (defun ibrowse-core--file-check (var)
   "Check if the file which symbol is VAR exists."
