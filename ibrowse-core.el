@@ -210,5 +210,8 @@ More precisely, this function updates `ibrowse-core-browser' and
 (add-hook 'ibrowse-core-update-hook 'ibrowse-core-update-browser! -90)
 
 (provide 'ibrowse-core)
-(ibrowse-core-update-browser!)
+
+;; Do not compile (byte-compilation in a clean environment fails)
+(cl-eval-when (load)
+  (ibrowse-core-update-browser!))
 ;;; ibrowse-core.el ends here
