@@ -5,17 +5,18 @@ Ibrowse stands for interactive browse, its goal is to be able to control your we
 
 It relies on the =completing-read= built-in interface, and thus benefits grealty from integration with =consult=, =marginalia=, =vertico= and =embark=. Development constraints I'll try to respect are to avoid javascript or the need for any additional browser extension (try to rely on native options instead). For supported functionality and comparison with similar packages, check-out below (c is for Chromium, f for Firefox, * means the implementation is not fully functional) :
 
-| package             | updated | tab             | bookmark               | history   |
-|---------------------+---------+-----------------+------------------------+-----------|
-| [[https://github.com/kawabata/helm-chrome][helm-chrome]]         |    2016 |                 | c(json)                |           |
-| [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]] |    2019 |                 |                        | c(sql*)   |
-| [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]] |    2019 | c(mac+js)       |                        |           |
-| [[https://github.com/anticomputer/chrome.el][chrome.el]]           |    2021 | c(cdp)          |                        |           |
-| [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]   |    2021 |                 | c(json)                |           |
-| [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]      |    2019 |                 | f(sql*)                | f(sql*)   |
-| [[https://github.com/emacs-helm/helm-firefox][helm-firefox]]        |    2022 |                 | f(html)                |           |
-| [[https://github.com/bitspook/spookfox][spookfox]]            |    2023 | c,f(ws*)        |                        |           |
-| [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]          |    2023 | c(cdp), f(cdp*) | c(json+radix), f(sql*) | c,f(sql*) |
+| package                  | updated | tab             | bookmark               | history   |
+|--------------------------+---------+-----------------+------------------------+-----------|
+| [[https://github.com/kawabata/helm-chrome][helm-chrome]]              |    2016 |                 | c(json)                |           |
+| [[https://github.com/xuchunyang/helm-chrome-history][helm-chrome-history]]      |    2019 |                 |                        | c(sql*)   |
+| [[https://github.com/xuchunyang/helm-chrome-control][helm-chrome-control]]      |    2019 | c(mac/osa+js)   |                        |           |
+| [[https://github.com/anticomputer/chrome.el][chrome.el]]                |    2021 | c(cdp)          |                        |           |
+| [[https://github.com/BlueBoxWare/counsel-chrome-bm][counsel-chrome-bm]]        |    2021 |                 | c(json)                |           |
+| [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]           |    2019 |                 | f(sql*)                | f(sql*)   |
+| [[https://github.com/emacs-helm/helm-firefox][helm-firefox]]             |    2022 |                 | f(html)                |           |
+| [[https://github.com/bitspook/spookfox][spookfox]]                 |    2023 | c,f(ws*)        |                        |           |
+| [[https://github.com/ginqi7/global-interactive-emacs][global-interactive-emacs]] |    2023 | c(mac/osa)      | c(json)                | c(sql)    |
+| [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]               |    2023 | c(cdp), f(cdp*) | c(json+radix), f(sql*) | c,f(sql*) |
 
 Please note that the depth of actions is not comparable, much more actions are available in this package, see below. PR are welcome for other browsers/protocols/functionalities!
 
@@ -75,6 +76,7 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 - TODO : Improve implementation of SQL based on the built-in Emacs SQL support. For this, we would need the built-in Emacs SQL support to handle open the file with =immutability=1=.
 - TODO : Proper testing in different environments would greatly help.
 
+- 0.2.1 to 0.2.2: Various packaging fixes.
 - 0.2.0: Better file independence. Better SQL use. Better browser switch. Handle locked databases situation (queue + timer). Less file copies. Remove emacsql dependency. Split ibrowse-bookmark.
 - 0.1.9: Implement Firefox history and bookmark commands. Better SQL implementation. Handle browser switch.
 - 0.1.1 to 0.1.8: Various packaging fixes.
