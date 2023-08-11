@@ -179,6 +179,10 @@ Optionally use the websocket WS when necessary."
    "Insert markdown-link of browser tab:"
    #'ibrowse-core--insert-markdown-link))
 
+;; TODO ibrowse-tab-previous ibrowse-tab-next ibrowse-tab-send-to-a-new-window
+;; TODO ibrowse-core-browse (should send to the default search engine instead of nil)
+;; TODO What should we do with tabs that have the same name ? completing read would only show them once
+
 ;;; Embark
 
 (defvar ibrowse-tab-embark-actions
