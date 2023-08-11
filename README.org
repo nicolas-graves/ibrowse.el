@@ -15,7 +15,7 @@ It relies on the =completing-read= built-in interface, and thus benefits grealty
 | [[https://github.com/cireu/counsel-ffdata][counsel-ffdata]]           |    2019 |                 | f(sql*)                | f(sql*)   |
 | [[https://github.com/emacs-helm/helm-firefox][helm-firefox]]             |    2022 |                 | f(html)                |           |
 | [[https://github.com/bitspook/spookfox][spookfox]]                 |    2023 | c,f(ws*)        |                        |           |
-| [[https://github.com/ginqi7/global-interactive-emacs][global-interactive-emacs]] |    2023 | c(mac/osa)      | c(json)                | c(sql)    |
+| [[https://github.com/ginqi7/global-interactive-emacs][global-interactive-emacs]] |    2023 | c(mac/osa)      | c(json)                | c(sql*)   |
 | [[https://github.com/nicolas-graves/ibrowse.el/README.org][ibrowse.el]]               |    2023 | c(cdp), f(cdp*) | c(json+radix), f(sql*) | c,f(sql*) |
 
 Please note that the depth of actions is not comparable, much more actions are available in this package, see below. PR are welcome for other browsers/protocols/functionalities!
