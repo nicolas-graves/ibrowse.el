@@ -58,13 +58,13 @@ consider adjusting `ibrowse-history-limit'."
   (pcase ibrowse-core-browser
     ('Chromium ; https://stackoverflow.com/a/26233663/2999892
      "\
-SELECT title, url, id, strftime('%Y-%m-%d', last_visit_time/1000000-11644473600,'unixepoch')
+SELECT title, url, id, strftime('%%Y-%%m-%%d', last_visit_time/1000000-11644473600,'unixepoch')
 FROM urls
 ORDER BY id
 DESC LIMIT %s;")
     ('Firefox
      "\
-SELECT p.title, p.url, p.id, MAX(strftime('%Y-%m-%d', h.visit_date/1000000,'unixepoch')) AS visit_date
+SELECT p.title, p.url, p.id, MAX(strftime('%%Y-%%m-%%d', h.visit_date/1000000,'unixepoch')) AS visit_date
 FROM moz_historyvisits AS h
 INNER JOIN moz_places AS p
 WHERE h.place_id = p.id
