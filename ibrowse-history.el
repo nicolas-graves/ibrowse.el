@@ -107,66 +107,55 @@ COMMIT TRANSACTION;")))
                                #'ibrowse-history-candidate-format))
 
 ;;; Interaction
-
-(defun ibrowse-history-delete-item (_title _url id)
-  "Delete browser ID item using sqlite."
-  (ibrowse-core--file-check 'ibrowse-history-db)
-  (with-temp-buffer
-    (ibrowse-sql--apply-command ibrowse-history-db
-                                (format ibrowse-history-delete-sql id id)))
-  ;; Delete cache.
-  (setq ibrowse-sql-candidates nil))
-
-(defun ibrowse-history-act (prompt action)
-  "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
-  (ibrowse-core-act prompt
-                    #'ibrowse-history--get-candidates
-                    action
-                    'ibrowse-history))
+(defun ibrowse-history-completing-read (prompt)
+  "Wrapper around `ibrowse-core-completing-read' with PROMPT."
+  (ibrowse-core-completing-read prompt
+                                #'ibrowse-history--get-candidates
+                                'ibrowse-history))
 
 ;;;###autoload
-(defun ibrowse-history-browse-url ()
-  "Select and browse item from history."
-  (interactive)
-  (ibrowse-history-act
-   "Browse from browser history:"
-   #'ibrowse-core--browse-url))
+(defun ibrowse-history-browse-url (item)
+  "Select and browse url from ITEM in history."
+  (interactive
+   (list (ibrowse-history-completing-read "Browse from history:")))
+  (browse-url (cadr item)))
 
 ;;;###autoload
-(defun ibrowse-history-copy-url ()
-  "Select and copy url from history."
-  (interactive)
-  (ibrowse-history-act
-   "Copy url from browser history:"
-   #'ibrowse-core--copy-url))
+(defun ibrowse-history-copy-url (item)
+  "Select and copy url from ITEM in history."
+  (interactive
+   (list (ibrowse-history-completing-read "Copy url from history:")))
+  (kill-new (cadr item)))
 
 ;;;###autoload
-(defun ibrowse-history-insert-org-link ()
-  "Insert org-link from history."
-  (interactive)
-  (ibrowse-history-act
-   "Insert org-link from browser history:"
-   #'ibrowse-core--insert-org-link))
+(defun ibrowse-history-insert-org-link (item)
+  "Insert org-link from ITEM in history."
+  (interactive
+   (list (ibrowse-history-completing-read "Insert org-link from history:")))
+  (ibrowse-core--insert-org-link item))
 
 ;;;###autoload
-(defun ibrowse-history-insert-markdown-link ()
-  "Insert markdown-link from history."
-  (interactive)
-  (ibrowse-history-act
-   "Insert markdown-link from browser history:"
-   #'ibrowse-core--insert-markdown-link))
+(defun ibrowse-history-insert-markdown-link (item)
+  "Insert markdown-link from ITEM in history."
+  (interactive
+   (list (ibrowse-history-completing-read "Insert markdown-link from history:")))
+  (ibrowse-core--insert-markdown-link item))
 
 ;;;###autoload
-(defun ibrowse-history-delete ()
-  "Select and delete browser item from history.
+(defun ibrowse-history-delete (item)
+  "Select and delete browser ITEM from history.
 
 It is currently not possible to delete history items while browsing,
-because chromium-based browsers have an EXCLUSIVE lock on the relying
-SQlite database."
-  (interactive)
-  (ibrowse-history-act
-   "Delete item from browser history:"
-   #'ibrowse-history-delete-item))
+because web browsers have an EXCLUSIVE lock on their SQlite database."
+  (interactive
+   (list (ibrowse-history-completing-read "Delete item from history:")))
+  (ibrowse-core--file-check 'ibrowse-history-db)
+  (let ((id (caddr item)))
+    (with-temp-buffer
+      (ibrowse-sql--apply-command ibrowse-history-db
+                                  (format ibrowse-history-delete-sql id id))))
+  ;; Delete cache.
+  (setq ibrowse-sql-candidates nil))
 
 ;;; Embark
 

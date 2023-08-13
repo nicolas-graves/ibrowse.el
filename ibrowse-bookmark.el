@@ -64,20 +64,6 @@ In the case of Firefox: wrapper around `ibrowse-sql--get-candidates'."
                 (error "Firefox functions not available")))))
 
 ;;; Actions / Interaction
-
-(defun ibrowse-bookmark--delete-item (title url id)
-  "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
-  (ibrowse-core--file-check 'ibrowse-bookmark-file)
-  (pcase ibrowse-core-browser
-    ('Chromium (if (fboundp 'ibrowse-bookmark-chromium--delete-item)
-                   (funcall #'ibrowse-bookmark-chromium--delete-item
-                            title url id)
-                 (error "Chromium functions not available")))
-    ('Firefox (if (fboundp 'ibrowse-bookmark-firefox--delete-item)
-                  (funcall #'ibrowse-bookmark-firefox--delete-item
-                           title url id)
-                (error "Firefox functions not available")))))
-
 (defun ibrowse-bookmark-add-item-1 (title url)
   "Same as `ibrowse-add-item' on TITLE and URL, but never prompt."
   (ibrowse-core--file-check 'ibrowse-bookmark-file)
@@ -103,52 +89,53 @@ the Bookmarks bar directory."
     (setq url (read-string "Url: ")))
   (ibrowse-bookmark-add-item-1 title url))
 
-(defun ibrowse-bookmark-act (prompt action)
-  "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
-  (ibrowse-core-act prompt
-                    #'ibrowse-bookmark--get-candidates
-                    action
-                    'ibrowse-bookmark))
+(defun ibrowse-bookmark-completing-read (prompt)
+  "Wrapper around `ibrowse-core-completing-read' with PROMPT."
+  (ibrowse-core-completing-read prompt
+                                #'ibrowse-bookmark--get-candidates
+                                'ibrowse-bookmark))
 
 ;;;###autoload
-(defun ibrowse-bookmark-browse-url ()
-  "Select and browse item from bookmarks."
-  (interactive)
-  (ibrowse-bookmark-act
-   "Browse item from browser bookmark:"
-   #'ibrowse-core--browse-url))
+(defun ibrowse-bookmark-browse-url (item)
+  "Select and browse url from ITEM in bookmarks."
+  (interactive
+   (list (ibrowse-bookmark-completing-read "Browse item from bookmark:")))
+  (browse-url (cadr item)))
 
 ;;;###autoload
-(defun ibrowse-bookmark-copy-url ()
-  "Select and copy item from bookmarks."
-  (interactive)
-  (ibrowse-bookmark-act
-   "Copy url from browser bookmark:"
-   #'ibrowse-core--copy-url))
+(defun ibrowse-bookmark-copy-url (item)
+  "Select and copy url from ITEM in bookmarks."
+  (interactive
+   (list (ibrowse-bookmark-completing-read "Copy url from bookmark:")))
+  (kill-new (cadr item)))
 
 ;;;###autoload
-(defun ibrowse-bookmark-insert-org-link ()
-  "Insert org-link from bookmarks."
-  (interactive)
-  (ibrowse-bookmark-act
-   "Insert org-link from browser bookmark:"
-   #'ibrowse-core--insert-org-link))
+(defun ibrowse-bookmark-insert-org-link (item)
+  "Insert org-link from ITEM in bookmarks."
+  (interactive
+   (list (ibrowse-bookmark-completing-read "Insert org-link from bookmark:")))
+  (ibrowse-core--insert-org-link item))
 
 ;;;###autoload
-(defun ibrowse-bookmark-insert-markdown-link ()
-  "Insert markdown-link from bookmarks."
-  (interactive)
-  (ibrowse-bookmark-act
-   "Insert markdown-link from browser bookmark:"
-   #'ibrowse-core--insert-markdown-link))
+(defun ibrowse-bookmark-insert-markdown-link (item)
+  "Insert markdown-link from ITEM in bookmarks."
+  (interactive
+   (list (ibrowse-bookmark-completing-read "Insert markdown-link from bookmark:")))
+  (ibrowse-core--insert-markdown-link item))
 
 ;;;###autoload
-(defun ibrowse-bookmark-delete ()
-  "Delete item from bookmarks."
-  (interactive)
-  (ibrowse-bookmark-act
-   "Delete item from browser bookmarks:"
-   #'ibrowse-bookmark--delete-item))
+(defun ibrowse-bookmark-delete (item)
+  "Delete ITEM from bookmarks."
+  (interactive
+   (list (ibrowse-bookmark-completing-read "Delete item from bookmarks:")))
+  (ibrowse-core--file-check 'ibrowse-bookmark-file)
+  (pcase ibrowse-core-browser
+    ('Chromium (if (fboundp 'ibrowse-bookmark-chromium--delete-item)
+                   (funcall #'ibrowse-bookmark-chromium--delete-item item)
+                 (error "Chromium functions not available")))
+    ('Firefox (if (fboundp 'ibrowse-bookmark-firefox--delete-item)
+                  (funcall #'ibrowse-bookmark-firefox--delete-item item)
+                (error "Firefox functions not available")))))
 
 ;;; Embark
 

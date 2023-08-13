@@ -148,10 +148,10 @@ RECURSION-ID."
                  (alist-get 'roots (json-read-file
                                     ibrowse-bookmark-file))))))
 
-(defun ibrowse-bookmark-chromium--delete-item (title url id)
-  "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
+(defun ibrowse-bookmark-chromium--delete-item (item)
+  "Delete ITEM from bookmarks.  ITEM is a list of title, url and id."
   (ibrowse-bookmark-chromium--write-file
-   (delete `(,title ,url ,id) (ibrowse-bookmark-chromium--get-candidates))
+   (delete item (ibrowse-bookmark-chromium--get-candidates))
    ibrowse-bookmark-file))
 
 (defun ibrowse-bookmark-chromium-add-item-1 (title url)

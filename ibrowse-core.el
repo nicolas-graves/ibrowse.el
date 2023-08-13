@@ -154,33 +154,29 @@ chosen directory will be the most recently used profile."
     ((pred file-exists-p) nil)
     (f (user-error "'%s' doesn't exist, please inspect `%s'" f var))))
 
-(defun ibrowse-core--copy-url (_title url _id &rest _)
-  "Action to copy URL."
-  (kill-new url))
-
-(defun ibrowse-core--browse-url (_title url _id)
-  "Action to browse URL."
-  (browse-url url))
-
 (defun ibrowse-core--insert-url (_title url _id)
   "Insert URL in the current buffer."
   (with-current-buffer (insert url)))
 
-(defun ibrowse-core--insert-org-link (title url _id &rest _)
-  "Insert TITLE and URL as Org link if `org-insert-link' is available.
-Does nothing if `org-insert-link' is unavailable."
+(defun ibrowse-core--insert-org-link (item)
+  "Insert ITEM as Org link if `org-insert-link' is available.
+Do nothing if `org-insert-link' is unavailable."
   (if (fboundp 'org-insert-link)
-      (with-current-buffer (org-insert-link '() url title))))
+      (pcase item
+        (`(,title ,url ,_id)
+         (with-current-buffer (org-insert-link '() url title))))))
 
-(defun ibrowse-core--insert-markdown-link (title url _id &rest _)
-  "Insert TITLE and URL as markdown link.
-Does nothing if `markdown-insert-inline-link' is unavailable."
+(defun ibrowse-core--insert-markdown-link (item)
+  "Insert ITEM as markdown link.
+Do nothing if `markdown-insert-inline-link' is unavailable."
   (if (fboundp 'markdown-insert-inline-link)
-      (with-current-buffer (markdown-insert-inline-link title url))))
+      (pcase item
+        (`(,title ,url ,_id)
+         (with-current-buffer (markdown-insert-inline-link '() url title))))))
 
-(defun ibrowse-core-act (prompt get-candidates action categ)
-  "GET-CANDIDATES using PROMPT and call the function ACTION on the \
-selected item."
+(defun ibrowse-core-completing-read (prompt get-candidates categ)
+  "GET-CANDIDATES using `completing-read' with PROMPT and CATEG.
+GET-CANDIDATES is a function which returns candidates."
   (let* ((candidates (funcall get-candidates))
          (selected   (completing-read
                       prompt
@@ -189,9 +185,7 @@ selected item."
                             `(metadata (category . ,categ))
                           (complete-with-action
                            action candidates string predicate))))))
-    (pcase (assoc selected candidates)
-      (`(,title ,url ,id)
-       (funcall action title url id)))))
+    (assoc selected candidates)))
 
 (defun ibrowse-core-update-browser! ()
   "Update variables if you have changed your current browser.

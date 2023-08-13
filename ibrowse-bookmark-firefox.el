@@ -107,12 +107,13 @@ COMMIT TRANSACTION;"
   (ibrowse-sql--get-candidates ibrowse-bookmark-file
                                ibrowse-bookmark-firefox--sql))
 
-(defun ibrowse-bookmark-firefox--delete-item (_title _url id)
-  "Delete item from bookmarks.  Item is a list of TITLE URL and ID."
-  (with-temp-buffer
-    (ibrowse-sql--apply-command
-     ibrowse-bookmark-file
-     (format ibrowse-bookmark-firefox--delete-sql id id)))
+(defun ibrowse-bookmark-firefox--delete-item (item)
+  "Delete ITEM from bookmarks.  ITEM is a list of title, url and id."
+  (let ((id (caddr item)))
+    (with-temp-buffer
+      (ibrowse-sql--apply-command
+       ibrowse-bookmark-file
+       (format ibrowse-bookmark-firefox--delete-sql id id))))
   (setq ibrowse-sql-candidates nil))
 
 (defun ibrowse-bookmark-firefox-add-item-1 (title url)
