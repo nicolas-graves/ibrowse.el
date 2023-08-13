@@ -51,9 +51,6 @@
 (defvar ibrowse-tab--ws nil
   "The WebSocket connection to the BiDi Webdriver.")
 
-(defvar ibrowse-tab--ws-result nil
-  "Last result parsed by the Websocket.")
-
 (defun ibrowse-tab--extract-fields (item)
   "Prepare a tab search result ITEM for display."
   (let-alist item
@@ -84,14 +81,39 @@
           (seq-map #'ibrowse-tab--extract-fields
                    (json-parse-buffer :object-type 'alist)))))
 
-
 ;;; Actions
-(defun ibrowse-tab-completing-read (prompt)
-  "Wrapper aroudn `ibrowse-core-completing-read' with PROMPT."
+
+(defun ibrowse-tab--activate (item &optional _ws)
+  "Active browser tab ITEM using the chromium developer protocol."
   (pcase ibrowse-core-browser
-    ('Chromium (ibrowse-core-completing-read prompt
-                                             #'ibrowse-tab--get-cdp-candidates
-                                             'ibrowse-history))
+    ('Chromium
+     (url-retrieve-synchronously
+      (ibrowse-tab--cdp-url (concat "activate/" (caddr item)))))
+    ('Firefox
+      (error "Switching tabs is not currently implemented for Firefox"))))
+
+(defun ibrowse-tab--close (item &optional ws)
+  "Close browser tab ITEM using the chromium developer protocol.
+
+Optionally use the websocket WS when necessary."
+  (pcase ibrowse-core-browser
+    ('Chromium
+     (url-retrieve-synchronously
+      (ibrowse-tab--cdp-url (concat "close/" (caddr item)))))
+    ('Firefox
+     (websocket-send-text
+      ws
+      (json-encode (ibrowse-tab--ws--delete (caddr item)))))))
+
+;; We can't use only a completing-read function like in other sibling packages
+;; because the Firefox case is async and needs a callback.
+(defun ibrowse-tab-act (prompt action)
+  "Wrapper transmitting PROMPT and ACTION to `ibrowse-core-act'."
+  (pcase ibrowse-core-browser
+    ('Chromium (funcall action (ibrowse-core-completing-read
+                                prompt
+                                #'ibrowse-tab--get-cdp-candidates
+                                'ibrowse-tab)))
     ('Firefox
      (let ((ws (websocket-open
                 (ibrowse-tab--firefox-get-ws)
@@ -105,7 +127,7 @@
                 :on-error (lambda (_ws type err)
                             (message "WebSocket error: %s %s" type err))
                 :on-message
-                (lambda (_ws frame)
+                (lambda (ws frame)
                   (let* ((message (websocket-frame-text frame))
                          (data (json-parse-string message :object-type 'alist))
                          (result (cdr (assoc 'result data))))
@@ -117,53 +139,36 @@
                                        (lambda ()
                                          (ibrowse-tab--get-ws-candidates result))
                                        'ibrowse-tab)))
-                            (setq ibrowse-tab--ws-result item)))))))))
+                            (funcall action item ws)))))))))
        ;; Keep the websocket connection in a global variable so it's not garbage collected
-       (setq ibrowse-tab--ws ws)
-       ibrowse-tab--ws-result))))
+       (setq ibrowse-tab--ws ws)))))
 
 ;;;###autoload
-(defun ibrowse-tab-select (item)
-  "Activate browser tab from ITEM."
-  (interactive
-   (list (ibrowse-tab-completing-read "Select browser tab:")))
-  (pcase ibrowse-core-browser
-    ('Chromium
-     (url-retrieve-synchronously
-      (ibrowse-tab--cdp-url (concat "activate/" (caddr item)))))
-    ('Firefox
-     (error "Switching tabs is not currently implemented for Firefox"))))
+(defun ibrowse-tab-select ()
+  "Activate browser tab."
+  (interactive)
+  (ibrowse-tab-act "Select browser tab:" #'ibrowse-tab--activate))
 
 ;;;###autoload
-(defun ibrowse-tab-close (item)
-  "Close browser tab from ITEM.
-
-Optionally use the websocket WS when necessary."
-  (interactive
-   (list (ibrowse-tab-completing-read "Close browser tab:")))
-  (pcase ibrowse-core-browser
-    ('Chromium
-     (url-retrieve-synchronously
-      (ibrowse-tab--cdp-url (concat "close/" (caddr item)))))
-    ('Firefox
-     (websocket-send-text
-      ibrowse-tab--ws
-      (json-encode (ibrowse-tab--ws--delete (caddr item)))))))
+(defun ibrowse-tab-close ()
+  "Close browser tab."
+  (interactive)
+  (ibrowse-tab-act "Close browser tab:" #'ibrowse-tab--close))
 
 ;;;###autoload
-(defun ibrowse-tab-copy-url (item)
-  "Select and copy url from ITEM in tabs."
-  (interactive
-   (list (ibrowse-tab-completing-read "Copy url from tab:")))
-  (kill-new (cadr item)))
+(defun ibrowse-tab-copy-url ()
+  "Copy url of the browser tab."
+  (interactive)
+  (ibrowse-tab-act
+   "Copy url from tab:"
+   (lambda (item)
+     (kill-new (cadr item)))))
 
 ;;;###autoload
-(defun ibrowse-tab-insert-link (item)
-  "Insert link from ITEM in tabs.
-See `ibrowse-core--insert-link' for more details."
-  (interactive
-   (list (ibrowse-tab-completing-read "Insert link from tab:")))
-  (ibrowse-core--insert-link item))
+(defun ibrowse-tab-insert-link ()
+  "Insert link of the browser tab."
+  (interactive)
+  (ibrowse-tab-act "Insert link from tab:" #'ibrowse-core--insert-link))
 
 ;; TODO ibrowse-tab-previous ibrowse-tab-next ibrowse-tab-send-to-a-new-window
 ;; TODO ibrowse-core-browse (should send to the default search engine instead of nil)

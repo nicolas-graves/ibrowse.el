@@ -156,7 +156,7 @@ chosen directory will be the most recently used profile."
     ((pred file-exists-p) nil)
     (f (user-error "'%s' doesn't exist, please inspect `%s'" f var))))
 
-(defun ibrowse-core--insert-link (item)
+(defun ibrowse-core--insert-link (item &optional _ws)
   "Insert ITEM in the current buffer.
 If called in `org-mode', insert an org link.
 If called in `markdown-mode', insert a markdown link.
