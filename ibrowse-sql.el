@@ -26,6 +26,9 @@
 
 ;;; Commentary:
 ;; Interact with your browser from Emacs
+;; Currently opening an immutable database file is not allowed with the builtin
+;; sqlite implementation, test with this command for instance :
+;; (sqlite-open (concat "file:" ibrowse-history-db "?immutable=1"))
 
 ;;; Code:
 

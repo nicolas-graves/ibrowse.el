@@ -28,7 +28,7 @@ To use the functions in =ibrowse-tab.el=, you need to use the Chromium Developer
 
 The Firefox CDP implementation is not complete, and action =ibrowse-tab-select= is only available in Chromium.
 
-This subpackage will migrate to a Webdriver BiDi implementation once its release is effective: [[https://wpt.fyi/results/webdriver/tests/bidi/browsing_context?label=master&label=stable&product=chrome&product=firefox][web-platform-tests dashboard]].
+This subpackage will migrate to a Webdriver BiDi implementation once available in stable released web browsers.
 
 This file currently introduces the following commands :
 - =ibrowse-tab-select=
@@ -69,12 +69,19 @@ Embark also allows to act on multiple entries as one (you can simply use embark 
 
 ** Changelog
 
-- TODO : Implement Nyxt and Emacs' browsers interaction.
-- TODO : Replace CDP by Webdriver BiDi in a near future.
-- TODO : Add actions to print or screenshot a page.
-- TODO : Improve implementation of SQL based on the built-in Emacs SQL support. For this, we would need the built-in Emacs SQL support to handle open the file with =immutability=1=.
+- TODO : Implement Nyxt and Emacs' browsers interaction:
+  - [ ] Nyxt : Iff it makes sense, see [[https://github.com/migalmoreno/nyxt.el][nyxt.el]].
+  - [ ] EWW (wanted, but I won't do it myself).
+  - +emacs-webkit+ (unsupported, security reasons).
+
+- WAIT : Migrate ibrowse-tab to Webdriver BiDi when available in stable packages [[https://wpt.fyi/results/webdriver/tests/bidi/browsing_context?label=master&label=stable&product=chrome&product=firefox][web-platform-tests dashboard]].
+  - Add actions to print or screenshot a page.
+
+- WAIT : Improve implementation of SQL based on the built-in Emacs SQL support. For this, we would need the built-in Emacs SQL support to handle open the file with =immutability=1=. See [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2023-08/msg00954.html][bug#65274]].
+
 - TODO : Proper testing in different environments would greatly help.
 
+- 0.2.3: Context-rich insert-link. Action management replaced by completing-read where possible.
 - 0.2.1 to 0.2.2: Various packaging fixes.
 - 0.2.0: Better file independence. Better SQL use. Better browser switch. Handle locked databases situation (queue + timer). Less file copies. Remove emacsql dependency. Split ibrowse-bookmark.
 - 0.1.9: Implement Firefox history and bookmark commands. Better SQL implementation. Handle browser switch.
