@@ -167,7 +167,7 @@ Elsewhere, insert the url."
       ((derived-mode-p 'org-mode)
        (with-current-buffer (org-insert-link '() url title)))
       ((derived-mode-p 'markdown-mode)
-       (with-current-buffer (markdown-insert-inline-link '() url title)))
+       (with-current-buffer (markdown-insert-inline-link title url)))
       (t
        (with-current-buffer (insert url)))))))
 
