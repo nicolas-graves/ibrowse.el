@@ -158,18 +158,12 @@ Optionally use the websocket WS when necessary."
   (kill-new (cadr item)))
 
 ;;;###autoload
-(defun ibrowse-tab-insert-org-link (item)
-  "Insert org-link from ITEM in tabs."
+(defun ibrowse-tab-insert-link (item)
+  "Insert link from ITEM in tabs.
+See `ibrowse-core--insert-link' for more details."
   (interactive
-   (list (ibrowse-tab-completing-read "Insert org-link from tab:")))
-  (ibrowse-core--insert-org-link item))
-
-;;;###autoload
-(defun ibrowse-tab-insert-markdown-link (item)
-  "Insert markdown-link from ITEM in tabs."
-  (interactive
-   (list (ibrowse-tab-completing-read "Insert markdown-link from tab:")))
-  (ibrowse-core--insert-markdown-link item))
+   (list (ibrowse-tab-completing-read "Insert link from tab:")))
+  (ibrowse-core--insert-link item))
 
 ;; TODO ibrowse-tab-previous ibrowse-tab-next ibrowse-tab-send-to-a-new-window
 ;; TODO ibrowse-core-browse (should send to the default search engine instead of nil)
@@ -182,8 +176,7 @@ Optionally use the websocket WS when necessary."
     (define-key map "s" #'ibrowse-tab-select)
     (define-key map "k" #'ibrowse-tab-close)
     (define-key map "u" #'ibrowse-tab-copy-url)
-    (define-key map "o" #'ibrowse-tab-insert-org-link)
-    (define-key map "m" #'ibrowse-tab-insert-markdown-link)
+    (define-key map "i" #'ibrowse-tab-insert-link)
     map)
   "Keymap for actions for browser tabs.")
 

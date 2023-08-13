@@ -110,18 +110,12 @@ the Bookmarks bar directory."
   (kill-new (cadr item)))
 
 ;;;###autoload
-(defun ibrowse-bookmark-insert-org-link (item)
-  "Insert org-link from ITEM in bookmarks."
+(defun ibrowse-bookmark-insert-link (item)
+  "Insert link from ITEM in bookmarks.
+See `ibrowse-core--insert-link' for more details."
   (interactive
-   (list (ibrowse-bookmark-completing-read "Insert org-link from bookmark:")))
-  (ibrowse-core--insert-org-link item))
-
-;;;###autoload
-(defun ibrowse-bookmark-insert-markdown-link (item)
-  "Insert markdown-link from ITEM in bookmarks."
-  (interactive
-   (list (ibrowse-bookmark-completing-read "Insert markdown-link from bookmark:")))
-  (ibrowse-core--insert-markdown-link item))
+   (list (ibrowse-bookmark-completing-read "Insert link from bookmark:")))
+  (ibrowse-core--insert-link item))
 
 ;;;###autoload
 (defun ibrowse-bookmark-delete (item)
@@ -144,8 +138,7 @@ the Bookmarks bar directory."
     (define-key map "b" #'ibrowse-bookmark-browse-url)
     (define-key map "d" #'ibrowse-bookmark-delete)
     (define-key map "u" #'ibrowse-bookmark-copy-url)
-    (define-key map "o" #'ibrowse-bookmark-insert-org-link)
-    (define-key map "m" #'ibrowse-bookmark-insert-markdown-link)
+    (define-key map "i" #'ibrowse-bookmark-insert-link)
     map)
   "Keymap for actions for browser bookmark items.")
 

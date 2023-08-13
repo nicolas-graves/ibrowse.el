@@ -26,14 +26,15 @@ It is composed of three control functionalities for your browser :
 
 To use the functions in =ibrowse-tab.el=, you need to use the Chromium Developer Protocol. Simply run your browser with the option =--remote-debugging-port=9222=.
 
-The Firefox CDP implementation is not complete, and action =ibrowse-tab-select= is only available in Chromium. It will probably only be available once the following feature is implemented in Firefox's Webdriver BiDi implementation : [[https://bugzilla.mozilla.org/show_bug.cgi?id=1841004][browsingContext.activate]].
+The Firefox CDP implementation is not complete, and action =ibrowse-tab-select= is only available in Chromium.
+
+This subpackage will migrate to a Webdriver BiDi implementation once its release is effective: [[https://wpt.fyi/results/webdriver/tests/bidi/browsing_context?label=master&label=stable&product=chrome&product=firefox][web-platform-tests dashboard]].
 
 This file currently introduces the following commands :
 - =ibrowse-tab-select=
 - =ibrowse-tab-close=
 - =ibrowse-tab-copy-url=
-- =ibrowse-tab-insert-org-link=
-- =ibrowse-tab-insert-markdown-link=
+- =ibrowse-tab-insert-link=
 
 Copying url title is a native embark option.
 
@@ -44,11 +45,10 @@ This file has a dependency on =ibrowse-sql.el=, which itself depends on =sqlite3
 Warning about SQL : Actions on SQL databases can't work with an open browser (Chromium and Firefox lock their databases). =ibrowse-history= will record the command you want to execute on the database in =ibrowse-sql-queue=, and retry the command every =ibrowse-sql-retry-interval= seconds. If trying to close emacs without =ibrowse-sql-queue= empty, you will be prompted for a confirmation. Close the browser before Emacs for the commands to be applied.
 
 This file will introduce the following commands :
-- =ibrowse-history-browse-url=
 - =ibrowse-history-delete=
+- =ibrowse-history-browse-url=
 - =ibrowse-history-copy-url=
-- =ibrowse-history-insert-org-link=
-- =ibrowse-history-insert-markdown-link=
+- =ibrowse-history-insert-link=
 
 ** ibrowse-bookmark.el
 
@@ -59,8 +59,7 @@ This file will introduce the following commands :
 - =ibrowse-bookmark-add=
 - =ibrowse-bookmark-browse-url=
 - =ibrowse-bookmark-copy-url=
-- =ibrowse-bookmark-insert-org-link=
-- =ibrowse-bookmark-insert-markdown-link=
+- =ibrowse-bookmark-insert-link=
 
 ** Embark functionalities
 

@@ -31,6 +31,8 @@
 
 (require 'seq)
 (require 'cl-lib)
+(autoload 'org-insert-link "org")
+(autoload 'markdown-insert-inline-link "markdown")
 
 ;;; Variables
 
@@ -154,25 +156,20 @@ chosen directory will be the most recently used profile."
     ((pred file-exists-p) nil)
     (f (user-error "'%s' doesn't exist, please inspect `%s'" f var))))
 
-(defun ibrowse-core--insert-url (_title url _id)
-  "Insert URL in the current buffer."
-  (with-current-buffer (insert url)))
-
-(defun ibrowse-core--insert-org-link (item)
-  "Insert ITEM as Org link if `org-insert-link' is available.
-Do nothing if `org-insert-link' is unavailable."
-  (if (fboundp 'org-insert-link)
-      (pcase item
-        (`(,title ,url ,_id)
-         (with-current-buffer (org-insert-link '() url title))))))
-
-(defun ibrowse-core--insert-markdown-link (item)
-  "Insert ITEM as markdown link.
-Do nothing if `markdown-insert-inline-link' is unavailable."
-  (if (fboundp 'markdown-insert-inline-link)
-      (pcase item
-        (`(,title ,url ,_id)
-         (with-current-buffer (markdown-insert-inline-link '() url title))))))
+(defun ibrowse-core--insert-link (item)
+  "Insert ITEM in the current buffer.
+If called in `org-mode', insert an org link.
+If called in `markdown-mode', insert a markdown link.
+Elsewhere, insert the url."
+  (pcase item
+    (`(,title ,url ,_id)
+     (cond
+      ((derived-mode-p 'org-mode)
+       (with-current-buffer (org-insert-link '() url title)))
+      ((derived-mode-p 'markdown-mode)
+       (with-current-buffer (markdown-insert-inline-link '() url title)))
+      (t
+       (with-current-buffer (insert url)))))))
 
 (defun ibrowse-core-completing-read (prompt get-candidates categ)
   "GET-CANDIDATES using `completing-read' with PROMPT and CATEG.

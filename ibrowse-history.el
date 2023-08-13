@@ -128,18 +128,12 @@ COMMIT TRANSACTION;")))
   (kill-new (cadr item)))
 
 ;;;###autoload
-(defun ibrowse-history-insert-org-link (item)
-  "Insert org-link from ITEM in history."
+(defun ibrowse-history-insert-link (item)
+  "Insert link from ITEM in history.
+See `ibrowse-core--insert-link' for more details."
   (interactive
-   (list (ibrowse-history-completing-read "Insert org-link from history:")))
-  (ibrowse-core--insert-org-link item))
-
-;;;###autoload
-(defun ibrowse-history-insert-markdown-link (item)
-  "Insert markdown-link from ITEM in history."
-  (interactive
-   (list (ibrowse-history-completing-read "Insert markdown-link from history:")))
-  (ibrowse-core--insert-markdown-link item))
+   (list (ibrowse-history-completing-read "Insert link from history:")))
+  (ibrowse-core--insert-link item))
 
 ;;;###autoload
 (defun ibrowse-history-delete (item)
@@ -164,8 +158,7 @@ because web browsers have an EXCLUSIVE lock on their SQlite database."
     (define-key map "b" #'ibrowse-history-browse-url)
     (define-key map "d" #'ibrowse-history-delete)
     (define-key map "u" #'ibrowse-history-copy-url)
-    (define-key map "o" #'ibrowse-history-insert-org-link)
-    (define-key map "m" #'ibrowse-history-insert-markdown-link)
+    (define-key map "i" #'ibrowse-history-insert-link)
     map)
     "Keymap for actions for browser history items.")
 
