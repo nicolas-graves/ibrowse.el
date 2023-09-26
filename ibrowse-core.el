@@ -101,7 +101,7 @@ When nil, the most recently used profile (Chromium or Firefox) will be chosen."
   "Try to get the Firefox data directory."
   (let* ((firefox-dirlist
           (append
-           (file-expand-wildcards "~/.mozilla/firefox/*.default")
+           (file-expand-wildcards "~/.mozilla/firefox/*default")
            (file-expand-wildcards
             (expand-file-name "Mozilla/Firefox/Profiles/*"
                               (getenv "APPDATA"))))))
